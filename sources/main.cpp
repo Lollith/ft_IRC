@@ -1,26 +1,15 @@
 #include <stdio.h>
+ #include <cstring>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <arpa/inet.h> //htons +define the in_addr cf <netinet/in.h>
-// struct sockaddr {
-//         unsigned short    sa_family;    /* famille d'adresse, AF_xxx        */
-//         char              sa_data[14];  /* 14 octets d'adresse de protocole */
-// };
 
-// struct sockaddr_in
-// {
-// 	short int			sin_family; //famille d adresse
-// 	unsigned short int	sin_port; // num du port
-// 	struct in_addr		sin_addr; //adresse internet
-// 	unsigned char		sin_zero[8];// meme taille que struct sockaddr
-// };
 #define MYPORT 3490  // port du client, creation - bind()
-#define DEST_PORT 23
 #define BACKLOG 10     /* Le nombre maxi de connections en attente  */
 
+char *buf;
 
-
-int main ( int ac, char **av)
+int main ( int ac, char **av )
 {
 	int					socket_fd; // listen sur socket_fd
 	int					new_fd; // conncetion sur
@@ -33,7 +22,10 @@ int main ( int ac, char **av)
 
 	// creer un socket -descirpteur de fichier
 	// https://man7.org/linux/man-pages/man2/socket.2.html
-	//AF_INET: IPv4, SOCK_STREAM :TCP, IPPPROTO_TCP :TCP => 0 Indicates that the default protocol for the type selected is to be used. For example, IPPROTO_TCP is chosen for the protocol if the type was set to SOCK_STREAM and the address family is AF_INET.
+	//AF_INET: IPv4, SOCK_STREAM :TCP, IPPPROTO_TCP :TCP => 0 Indicates 
+	//that the default protocol for the type selected is to be used. For example,
+	// IPPROTO_TCP is chosen for the protocol if the type was set to SOCK_STREAM 
+	//and the address family is AF_INET.
 	socket_fd = socket(AF_INET, SOCK_STREAM , 0);
 	if (socket_fd == -1)
 	{
@@ -45,7 +37,7 @@ int main ( int ac, char **av)
 	my_addr.sin_family = AF_INET; //host byte order
 	my_addr.sin_port = htons(MYPORT); // short, network byte order
 	my_addr.sin_addr.s_addr = INADDR_ANY;// auto-remplissage avec  mon IP//inet_addr("127.0.0.1");
-// initialiser sin_zero??????
+	bzero(&(my_addr.sin_zero), 8);// interdite?
 
 // , nous devons appeler bind() avant d'appeler listen() ou sinon le système va écouter sur un port au hasard. 
 // int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
@@ -54,23 +46,22 @@ int main ( int ac, char **av)
 		perror("bind");
 		return (1);
 	}
-	// 
 	if(listen(socket_fd, BACKLOG) == -1)
 	{
 		perror("listen");
 		return (1);
 	}
 	while (1){
-	sin_size = sizeof(struct sockaddr_in);
-	new_fd = accept(socket_fd, (struct sockaddr *)&client_addr, &sin_size);
-	if (new_fd == -1)
-	{
-		perror("accept"); // interdite ?
-	}
-	send(new_fd, "HI",3, 0);
-	}
+		sin_size = sizeof(struct sockaddr_in);
+		new_fd = accept(socket_fd, (struct sockaddr *)&client_addr, &sin_size);
+		if (new_fd == -1)
+			perror("accept"); // interdite ?
 
 
-	
+		send(new_fd, "HI",3, 0);
+		recv(new_fd, buf, 20, 0);
+		printf ( "%s", buf);
+		}
+
 	return (0); 
 }
