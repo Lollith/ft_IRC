@@ -2,9 +2,11 @@
 
 Plan de bataille - a revoir
 
-0. recevoir Myport en arg => string en int
+1.0. recevoir Myport en arg => string en int
 
-1. recevoir et parcer un message envoye
+1.1. recevoir et parcer un message envoye
+
+1.2 blocage - select()
 
 2. authentification 
 
@@ -14,11 +16,13 @@ Plan de bataille - a revoir
 
 
 
-
+//-----------------------------PORTS--------------------------------------------
+Tous les port en dessous de 1024 sont réservés.
+Utiliser n'importe quel port au dessus de 1024 jusqu'à 65535.
 
 
 //------------------------------------------------------------------------------
-definition de la structure : contenue ds la lib;
+definition de la structure ( contenue ds la lib )
 ```c
 #include <arpa/inet.h>
 

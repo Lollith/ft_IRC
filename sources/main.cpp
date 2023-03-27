@@ -26,7 +26,7 @@ int main ( int ac, char **av )
 	//that the default protocol for the type selected is to be used. For example,
 	// IPPROTO_TCP is chosen for the protocol if the type was set to SOCK_STREAM 
 	//and the address family is AF_INET.
-	socket_fd = socket(AF_INET, SOCK_STREAM , 0);
+	socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (socket_fd == -1)
 	{
 		perror("socket"); // interdite ?
@@ -46,6 +46,8 @@ int main ( int ac, char **av )
 		perror("bind");
 		return (1);
 	}
+	// les connections vont attendre dans la file de BACKLOG jusqu'à ce que vous 
+	//les acceptiez avec accept()
 	if(listen(socket_fd, BACKLOG) == -1)
 	{
 		perror("listen");
