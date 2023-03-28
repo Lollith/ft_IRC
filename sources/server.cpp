@@ -11,10 +11,6 @@ Server::Server(const int port, const std::string password)
 			<< std::endl;
 		return;
 	}
-	//test
-	// else
-	// 	std::cout << "first socket ok" << std::endl;
-	//test
 	setAddrServ();
 }
 
@@ -141,18 +137,26 @@ bool Server::startServer()
 		if (setSocketClient())
 		{
 			int res_send = send(_socket_client, "HI\n", 3, 0);
-			if ( res_send < 0)
+			// il faut s'assurer que tout le buffer est envoyé et adapter cette condition
+			// en attendant on le hard code
+			if ( res_send != 3) 
 			{
 				perror("send client failed");
 				return 1;
 			}
-			int res_recv = recv(_socket_client, buf, 3, 0);
-			if (res_send != res_recv)
-			{
-				perror("bad data len, send bytes and recv bytes not matching");
-				return 1;
-			}
-			if (res_recv < 0)
+			//sizeof buf ne fonctionne pas car pour le moment c'est bloquant
+			// c'est select() qui va permettre de garantir que la lecture complete 
+			// de recv() se passera correctement 
+			//select permet d'attendre dans le cas de la receptiom (recv) 
+			//quil y ait de la donnée a lire ds la socket et donc de garantir 
+			// qu un receive va fournir de la donnée et remplir le buffer
+			// select() prend en parametre les fd_socket qu'il doit surveiller
+			// il retourne quand un fd est dispo (données à lire ou écrire)
+
+			//boucle qui va virer avec select() à faire : lire 1 à 1 jusqu`à un \n
+			int res_recv = recv(_socket_client, buf, sizeof(buf), 0);
+			// condition à changer en fonction de la taille de buf
+			if (res_recv < 0) 
 			{
 				perror("receive client failed");
 				return 1;
