@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <cstring>
 #include <string>
+#include <iostream>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <arpa/inet.h> //htons +define the in_addr cf <netinet/in.h>
@@ -44,7 +45,7 @@ public:
 
 	//__________________________________________________members functions
 
-	void	startServer();
+	bool	startServer();
 
 private:
 	// useless constructor

@@ -8,7 +8,11 @@ int main(int ac, char **av)
 	{
 		int sock_serv = atoi(av[1]);
 		Server serv(sock_serv, av[2]);
-		serv.startServer();
+		if (!serv.startServer())
+		{
+			std::cout << "startServer failed" << std::endl;
+			return 1;
+		}
 	}
 	return (0);
 }

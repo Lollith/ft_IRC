@@ -5,7 +5,16 @@
 Server::Server(const int port, const std::string password)
 	: _port(port), _password(password)
 {
-	setSocketServer();
+	if (!setSocketServer())
+	{
+		std::cout << "cannot create server object because it is not possible to create socket server." 
+			<< std::endl;
+		return;
+	}
+	//test
+	// else
+	// 	std::cout << "first socket ok" << std::endl;
+	//test
 	setAddrServ();
 }
 
@@ -129,16 +138,32 @@ bool Server::startServer()
 	while (1)
 	{
 		setSinSize();
-		setSocketClient();
-		if (send(_socket_client, "HI\n", 3, 0) < 0)
+		if (setSocketClient())
 		{
-			perror("send client failed");
-			return 1;
+			int res_send = send(_socket_client, "HI\n", 3, 0);
+			if ( res_send < 0)
+			{
+				perror("send client failed");
+				return 1;
+			}
+			int res_recv = recv(_socket_client, buf, 3, 0);
+			if (res_send != res_recv) 
+			{
+				perror("bad data len, send bytes and recv bytes not matching");
+				return 1;
+			}
+			if (res_recv < 0)
+			{
+				perror("receive client failed");
+				return 1;
+			}
 		}
-		if (recv(_socket_client, buf, 3, 0) < 0)
+		//test
+		else
 		{
-			perror("receive client failed");
-			return 1;
+			std::cout << "socket client creation failed" << std::endl;
 		}
+		// //test
 	}
+	return true;
 }
