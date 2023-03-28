@@ -7,7 +7,7 @@
 #define MYPORT 3490 // port du client, creation - bind()
 #define BACKLOG 10	/* Le nombre maxi de connections en attente  */
 
-char *buf;
+char buf[3];
 
 int main(int ac, char **av)
 {
@@ -60,14 +60,19 @@ int main(int ac, char **av)
 		if (new_fd == -1)
 		{
 			perror("accept"); // interdite ?
+			return(1);
 		}
-		if (connect(new_fd, (struct sockaddr *)&my_addr, sin_size) == -1)
+		if (send(new_fd, "HI\n", 3, 0) < 0)
 		{
-			perror("connexion with client failed.");
+			perror("send client failed");
+			return 1;
 		}
-		send(new_fd, "HI", 3, 0);
-		recv(new_fd, buf, 20, 0);
-		printf("%s", buf);
+		if (recv(new_fd, buf, 3, 0) < 0)
+		{
+			perror("receive client failed");
+			return 1;
+		}
+
 	}
 
 	return (0);
