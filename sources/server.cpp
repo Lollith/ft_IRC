@@ -120,7 +120,7 @@ socklen_t Server::getSinSize()
 // return false en cas d'erreur
 bool Server::startServer()
 {
-	char *buf;
+	char buf[3];
 	// , nous devons appeler bind() avant d'appeler listen() ou sinon le système va écouter sur un port au hasard.
 	// int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 	if (bind(_socket_server, (struct sockaddr *)&_addr_server, sizeof(struct sockaddr)) == -1)
@@ -147,7 +147,7 @@ bool Server::startServer()
 				return 1;
 			}
 			int res_recv = recv(_socket_client, buf, 3, 0);
-			if (res_send != res_recv) 
+			if (res_send != res_recv)
 			{
 				perror("bad data len, send bytes and recv bytes not matching");
 				return 1;
@@ -158,12 +158,7 @@ bool Server::startServer()
 				return 1;
 			}
 		}
-		//test
-		else
-		{
-			std::cout << "socket client creation failed" << std::endl;
-		}
-		// //test
+	
 	}
 	return true;
 }

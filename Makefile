@@ -32,6 +32,9 @@ fclean: clean
 re: fclean
 	make -C .
 
+grind: $(NAME)
+	valgrind --track-origins=yes --leak-check=full --show-leak-kinds=all ./ircserv 3490 867
+
 .PHONY: all re clean fclean
 
 -include $(DEP)
