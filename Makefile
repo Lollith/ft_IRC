@@ -4,6 +4,7 @@ CXX = c++
 SRC_PATHS = ./sources/
 
 SRC = $(addprefix $(SRC_PATHS),\
+	server.cpp\
 	main.cpp)
 
 OBJ		=	$(SRC:./sources/%.cpp=./build/%.o)
@@ -31,6 +32,9 @@ fclean: clean
 
 re: fclean
 	make -C .
+
+grind: $(NAME)
+	valgrind --track-origins=yes --leak-check=full --show-leak-kinds=all ./ircserv 3490 867
 
 .PHONY: all re clean fclean
 
