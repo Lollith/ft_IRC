@@ -2,11 +2,13 @@
 
 Plan de bataille - a revoir
 
-1.0. recevoir Myport en arg => string en int
+<!-- 1.0. recevoir Myport en arg => string en int -->
 
 1.1. recevoir et parcer un message envoye
 
 1.2 blocage - select()
+
+1.3 quitter proprement
 
 2. authentification 
 
