@@ -3,6 +3,7 @@
 Plan de bataille - a revoir
 
 <!-- 1.0. recevoir Myport en arg => string en int -->
+1.0 r 
 
 1.1. recevoir et parcer un message envoye
 
