@@ -174,8 +174,6 @@ bool Server::startServer()
 				perror("receive client failed");
 				return false;
 			}
-			buf[res_recv] = '\0';
-			printf ("client: %s\n",buf );
 		}
 		else
 			return false;
