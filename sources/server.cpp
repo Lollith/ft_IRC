@@ -14,17 +14,15 @@ Server::Server(const int port, const std::string password)
 	setAddrServ();
 }
 
-// Server::Server(Server const &cpy):
+// Server::Server(Server const &cpy)
 // {
-
 // }
 
 // Server &Server::operator=(Server const &rhs)
 // {
-
 // }
 
-Server::~Server(void) {} // close? freeinfo?
+Server::~Server(void) {} // close() ou/et freeinfo() à faire?
 
 //__________________________________________________GETTERS_SETTERS
 
@@ -95,7 +93,6 @@ void Server::setAddrServ()
 	bzero(&(this->_addr_server.sin_zero), 8);		  // interdite?
 }
 
-// define typedef ici pour struct sockaddr_in??
 struct sockaddr_in Server::getAddrServ()
 {
 	return this->_addr_server;
@@ -129,7 +126,7 @@ bool Server::startServer()
 	if (listen(_socket_server, BACKLOG) == -1)
 	{
 		perror("listen");
-		return (1);
+		return false;
 	}
 	while (1)
 	{
@@ -142,7 +139,7 @@ bool Server::startServer()
 			if ( res_send != 3) 
 			{
 				perror("send client failed");
-				return 1;
+				return false;
 			}
 			//sizeof buf ne fonctionne pas car pour le moment c'est bloquant
 			// c'est select() qui va permettre de garantir que la lecture complete 
@@ -159,9 +156,11 @@ bool Server::startServer()
 			if (res_recv < 0) 
 			{
 				perror("receive client failed");
-				return 1;
+				return false;
 			}
 		}
+		else
+			return false;
 	
 	}
 	return true;
