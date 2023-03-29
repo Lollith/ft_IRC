@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <cstring>
+#include <unistd.h>
 #include <string>
 #include <iostream>
 #include <sys/socket.h>
@@ -51,6 +52,8 @@ public:
 private:
 	// useless constructor
 	Server(void);
+
+	//attributes________________________________________________________________
 
 	int					_port;
 	int					_socket_server; //listen sur cette socket

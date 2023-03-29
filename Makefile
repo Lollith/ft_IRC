@@ -12,7 +12,7 @@ DEP		=	$(SRC:./sources/%.cpp=./build/%.d)
 INC		=	-I ./includes/
 
 CXXFLAGS = -MMD -Wall -Wextra -Werror -std=c++98 
-CXXFLAGS += -fsanitize=address
+# CXXFLAGS += -fsanitize=address
 
 build/%.o:	./sources/%.cpp
 			mkdir -p build

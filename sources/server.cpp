@@ -39,7 +39,7 @@ Server::~Server(void) {} // close() ou/et freeinfo() à faire?
 
 bool Server::setSocketServer()
 {
-	this->_socket_server = socket(AF_INET, SOCK_STREAM, 0);
+	this->_socket_server = socket(AF_INET,SOCK_STREAM, 0);
 	if (this->_socket_server == -1)
 	{
 		perror("socket()");
@@ -123,9 +123,8 @@ void Server::crash_protector()
 // return false en cas d'erreur
 bool Server::startServer()
 {
-	char buf[3];
-
 	crash_protector();
+  
 	// associer la socket avec un port de votre machine locale.
 	if (bind(_socket_server, (struct sockaddr *)&_addr_server, sizeof(struct sockaddr)) == -1)
 	{
@@ -141,7 +140,10 @@ bool Server::startServer()
 	}
 	while (1)
 	{
+		char buf[1024] = {0};
+		
 		setSinSize();//accept
+
 		if (setSocketClient())
 		{
 			int res_send = send(_socket_client, "HI\n", 3, 0);
@@ -162,9 +164,12 @@ bool Server::startServer()
 			// il retourne quand un fd est dispo (données à lire ou écrire)
 
 			//boucle qui va virer avec select() à faire : lire 1 à 1 jusqu`à un \n
-			int res_recv = recv(_socket_client, buf, sizeof(buf), 0);
+			int res_rd = recv(_socket_client, buf, sizeof(buf), 0);
+			// int res_rd = read(_socket_client, buf, sizeof(buf));
+			std::cout << buf << std::endl;
+
 			// condition à changer en fonction de la taille de buf
-			if (res_recv < 0) 
+			if (res_rd < 0) 
 			{
 				perror("receive client failed");
 				return false;
