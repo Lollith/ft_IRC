@@ -27,26 +27,27 @@ public:
 	//__________________________________________________GETTERS_SETTERS	
 
 	//return false si la création de la socket a échoué
-	bool	setSocketServer();
-	int		getSocketServer();
+	bool				setSocketServer();
+	int					getSocketServer();
 
-	bool	setSocketClient();
-	int		getSocketClient();
+	bool				setSocketClient();
+	int					getSocketClient();
 
-	int		getPort();
+	int					getPort();
 
-	std::string		getPassword();
+	std::string			getPassword();
 
 	//define typedef ici pour struct sockaddr_in??
 	void				setAddrServ();
 	struct sockaddr_in	getAddrServ();
 
-	void 		setSinSize();
-	socklen_t 	getSinSize();
+	void 				setSinSize();
+	socklen_t 			getSinSize();
 
 	//__________________________________________________members functions
 
-	bool	startServer();
+	void 				crash_protector();
+	bool				startServer();
 
 private:
 	// useless constructor
