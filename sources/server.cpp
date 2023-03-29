@@ -34,9 +34,9 @@ Server::~Server(void) {} // close() ou/et freeinfo() à faire?
 // that the default protocol for the type selected is to be used. For example,
 // IPPROTO_TCP is chosen for the protocol if the type was set to SOCK_STREAM
 // and the address family is AF_INET.
+// return false si la création de la socket a échoué
 //__________________________________________________________________________
 
-// return false si la création de la socket a échoué
 bool Server::setSocketServer()
 {
 	this->_socket_server = socket(AF_INET, SOCK_STREAM, 0);
@@ -83,10 +83,10 @@ std::string Server::getPassword()
 
 // data from sockaddr_______________________________________________________
 
+
+
 void Server::setAddrServ()
 {
-	// associer la socket avec un port de votre machine locale.
-
 	this->_addr_server.sin_family = AF_INET;		  // host byte order
 	this->_addr_server.sin_port = htons(this->_port); // short, network byte order
 	this->_addr_server.sin_addr.s_addr = INADDR_ANY;  // auto-remplissage avec  mon IP//inet_addr("127.0.0.1");
@@ -109,13 +109,24 @@ socklen_t Server::getSinSize()
 }
 
 //__________________________________________________MEMBERS FUNCTIONS
+// si serveur crash, socket maintenue non reutilisable => autorise  de reutiliser mon adress et port 
+void Server::crash_protector()
+{
+	int	yes = 1;
+
+	if (setsockopt(_socket_server, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
+		perror("setsockopt");
+		exit(1);
+	}
+}
 
 // return false en cas d'erreur
 bool Server::startServer()
 {
 	char buf[3];
-	// , nous devons appeler bind() avant d'appeler listen() ou sinon le système va écouter sur un port au hasard.
-	// int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+
+	crash_protector();
+	// associer la socket avec un port de votre machine locale.
 	if (bind(_socket_server, (struct sockaddr *)&_addr_server, sizeof(struct sockaddr)) == -1)
 	{
 		perror("bind");
@@ -130,7 +141,7 @@ bool Server::startServer()
 	}
 	while (1)
 	{
-		setSinSize();
+		setSinSize();//accept
 		if (setSocketClient())
 		{
 			int res_send = send(_socket_client, "HI\n", 3, 0);
@@ -158,6 +169,8 @@ bool Server::startServer()
 				perror("receive client failed");
 				return false;
 			}
+			buf[res_recv] = '\0';
+			printf ("client: %s\n",buf );
 		}
 		else
 			return false;
