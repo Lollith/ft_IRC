@@ -15,6 +15,7 @@ int main(int ac, char **av)
 			std::cout << "startServer failed" << std::endl;
 			return 1;
 		}
+		serv.loop_recept_send();
 	}
 	return (0);
 }

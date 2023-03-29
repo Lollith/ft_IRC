@@ -2,7 +2,7 @@
 #define MESSAGE_HPP
 #include <string>
 
-
+// a faire une fonction par commande
 class Message{
 	private: 
 		std::string _buffer;

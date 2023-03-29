@@ -53,15 +53,16 @@ int Server::getSocketServer()
 	return this->_socket_server;
 }
 
-bool Server::setSocketClient()
+void Server::setSocketClient()
 {
+	setSinSize();
 	this->_socket_client = accept(_socket_server, (struct sockaddr *)&_client_addr, &_sin_size);
 	if (this->_socket_client == -1)
 	{
 		perror("accept()");
-		return false;
+		// return false;
 	}
-	return true;
+	// return true;
 }
 
 int Server::getSocketClient()
@@ -138,46 +139,82 @@ bool Server::startServer()
 		perror("listen");
 		return false;
 	}
+	return true;
+}
+
+//-----loop recept, send , select------------------------------------------------
+// https://manpages.ubuntu.com/manpages/xenial/fr/man2/select_tut.2.html 
+// Afin de gérer ses clients, notre serveur va maintenant devoir maintenir une 
+// liste de clients connectés en enregistrant les retours de accept qui représente
+// chaque client effectivement connecté à notre serveur, et en supprimant ceux 
+//dont le socket retourne une erreur indiquant qu'ils ont été déconnectés.
+
+// « Gérer ses clients » signifie recevoir et traiter les données qu'ils envoient,
+// les requêtes, puis envoyer d'éventuelles réponses.
+// Souvenez-vous aussi que send et surtout recv sont bloquants.
+// La fonction surveille des ensembles de descripteurs de fichiers et plus particulierement 
+//readfds, writefds, et exceptfds.
+
+// select retourne le nombre de sockets qui sont prêts à lire, écrire ou ayant une erreur, 
+//peut retourner 0 si aucun socket n'est prêt. Retourne -1 en cas d'erreur.
+
+// Pour vérifier qu'une connexion entrante est en attente, que l'appel à accept ne sera pas bloquant,
+// on doit vérifier que notre socket serveur est prêt en écriture :
+
+bool Server::loop_recept_send()
+{
+	fd_set rd,wr,er;
+	timeval timeout = {0};
+	FD_ZERO (&rd); // initialise
+	FD_ZERO (&wr); 
+	FD_ZERO (&er); 
+	FD_SET (_socket_server, &rd);// ajoute mon fd de serveur a lensemble
+	FD_SET (_socket_server, &wr);
+	FD_SET (_socket_server, &er);
+	//a faire : add all client to the set
+
+
 	while (1)
 	{
 		char buf[1024] = {0};
-		
-		setSinSize();//accept
 
-		if (setSocketClient())
+		int select_ready = select(_socket_server + 1, &rd, &wr, &er, NULL); // select verifie si des donnes sont dispo en lecture , ecruiture sur notre socket et retourne le nombre
+		std::cout << select_ready<< std::endl;
+		if (select_ready == -1)
+		{
+			perror("select");
+			return false; // continue?? si errno == eintr
+		}
+		if(FD_ISSET(_socket_server, &rd)) // check si notre socket est pret a lire
+		{
+		setSocketClient();//accept le client et lui associe une nouvel socket
+			{
+				int res_rd = recv(_socket_client, buf, sizeof(buf), 0);
+				// int res_rd = read(_socket_client, buf, sizeof(buf));
+				std::cout << buf << std::endl;
+
+				// condition à changer en fonction de la taille de buf
+				if (res_rd < 0) 
+				{
+					perror("receive client failed");
+					return false;
+				}
+			}
+		if(FD_ISSET(_socket_client, &wr)) // check si notre socket est pret a lire
 		{
 			int res_send = send(_socket_client, "HI\n", 3, 0);
-			// il faut s'assurer que tout le buffer est envoyé et adapter cette condition
-			// en attendant on le hard code
+				// il faut s'assurer que tout le buffer est envoyé et adapter cette condition
+				// en attendant on le hard code
 			if ( res_send != 3) 
 			{
 				perror("send client failed");
 				return false;
 			}
-			//sizeof buf ne fonctionne pas car pour le moment c'est bloquant
-			// c'est select() qui va permettre de garantir que la lecture complete 
-			// de recv() se passera correctement 
-			//select permet d'attendre dans le cas de la receptiom (recv) 
-			//quil y ait de la donnée a lire ds la socket et donc de garantir 
-			// qu un receive va fournir de la donnée et remplir le buffer
-			// select() prend en parametre les fd_socket qu'il doit surveiller
-			// il retourne quand un fd est dispo (données à lire ou écrire)
 
-			//boucle qui va virer avec select() à faire : lire 1 à 1 jusqu`à un \n
-			int res_rd = recv(_socket_client, buf, sizeof(buf), 0);
-			// int res_rd = read(_socket_client, buf, sizeof(buf));
-			std::cout << buf << std::endl;
-
-			// condition à changer en fonction de la taille de buf
-			if (res_rd < 0) 
-			{
-				perror("receive client failed");
-				return false;
-			}
 		}
-		else
-			return false;
-	
+		}
 	}
 	return true;
 }
+// a faire  vector de client => si accept => pushback ds le client le nouvel fd
+// si serveur rrecoi => creer un nouveau client => nouveau client va lire ou ercrire

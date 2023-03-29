@@ -30,7 +30,7 @@ public:
 	bool				setSocketServer();
 	int					getSocketServer();
 
-	bool				setSocketClient();
+	void 				setSocketClient();
 	int					getSocketClient();
 
 	int					getPort();
@@ -48,6 +48,7 @@ public:
 
 	void 				crash_protector();
 	bool				startServer();
+	bool				loop_recept_send();
 
 private:
 	// useless constructor
