@@ -30,8 +30,8 @@ public:
 	bool				setSocketServer();
 	int					getSocketServer();
 
-	void 				setSocketClient();
-	int					getSocketClient();
+	int 				setSocketClient();
+	// int					getSocketClient();
 
 	int					getPort();
 
@@ -59,7 +59,7 @@ private:
 	int					_port;
 	int					_socket_server; //listen sur cette socket
 	struct sockaddr_in	_addr_server;
-	int 				_socket_client; // ici ou dans une classe client? //connection sur le client
+	// int 				_socket_client; // ici ou dans une classe client? //connection sur le client
 	struct sockaddr_in	_client_addr; // info adresse du client // ici ?
 	socklen_t			_sin_size;
 	std::string 		_password;

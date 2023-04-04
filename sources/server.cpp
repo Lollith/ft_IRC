@@ -45,6 +45,7 @@ bool Server::setSocketServer()
 		perror("socket()");
 		return false;
 	}
+	// _socket_client = 0;
 	return true;
 }
 
@@ -53,22 +54,22 @@ int Server::getSocketServer()
 	return this->_socket_server;
 }
 
-void Server::setSocketClient()
+int Server::setSocketClient()
 {
 	setSinSize();
-	this->_socket_client = accept(_socket_server, (struct sockaddr *)&_client_addr, &_sin_size);
-	if (this->_socket_client == -1)
+	int socket = ( accept(_socket_server, (struct sockaddr *)&_client_addr, &_sin_size));
+	if (socket == -1)
 	{
 		perror("accept()");
-		// return false;
+		return false;
 	}
-	// return true;
+	return socket;
 }
 
-int Server::getSocketClient()
-{
-	return this->_socket_client;
-}
+// int Server::getSocketClient()
+// {
+// 	return Client::_socket_client;
+// }
 
 // data from params_________________________________________________________
 
@@ -143,6 +144,10 @@ bool Server::startServer()
 }
 
 //-----loop recept, send , select------------------------------------------------
+
+// envoi dun message dun client => serveur => client 2// passe tjs par le serveur qui renvoi
+// doit etre connecter a un channel pour que les messages soient envoyes
+
 // https://manpages.ubuntu.com/manpages/xenial/fr/man2/select_tut.2.html 
 // Afin de gérer ses clients, notre serveur va maintenant devoir maintenir une 
 // liste de clients connectés en enregistrant les retours de accept qui représente
@@ -163,56 +168,65 @@ bool Server::startServer()
 
 bool Server::loop_recept_send()
 {
+	Client *client;
 	fd_set rd,wr,er;
 	timeval timeout = {0};
-	FD_ZERO (&rd); // initialise
-	FD_ZERO (&wr); 
-	FD_ZERO (&er); 
-	FD_SET (_socket_server, &rd);// ajoute mon fd de serveur a lensemble
-	FD_SET (_socket_server, &wr);
-	FD_SET (_socket_server, &er);
-	//a faire : add all client to the set
 
+	//a faire : add all client to the set
 
 	while (1)
 	{
+		FD_ZERO (&rd); // initialise ; a mettre ds la boucle
+		FD_ZERO (&wr); 
+		// FD_ZERO (&er); // rare cas => NULL
+		FD_SET (_socket_server, &rd);// ajoute mon fd de serveur a lensemble
+		FD_SET (_socket_server, &wr);
+		// FD_SET (_socket_server, &er);
 		char buf[1024] = {0};
 
-		int select_ready = select(_socket_server + 1, &rd, &wr, &er, NULL); // select verifie si des donnes sont dispo en lecture , ecruiture sur notre socket et retourne le nombre
-		std::cout << select_ready<< std::endl;
+		int select_ready = select(FD_SETSIZE, &rd, &wr, NULL, NULL); // select verifie si des donnes sont dispo en lecture , ecruiture sur notre socket et retourne le nombre
+		//fd_setsize = par default sur linux = 1024 fd  => il faut nb de client + mon fd du serveur +1 au moins
+		std::cout << "nb fd selected: "<<select_ready<< std::endl;
 		if (select_ready == -1)
 		{
 			perror("select");
 			return false; // continue?? si errno == eintr
 		}
+		// else if (select_ready == 0) // why???
+		// {
+		// 	std::cout <<"timeout"<< std::endl;
+		// 	continue;
+		// }
 		if(FD_ISSET(_socket_server, &rd)) // check si notre socket est pret a lire
 		{
-		setSocketClient();//accept le client et lui associe une nouvel socket
+			if(setSocketClient() == false)
+				return false;//accept le client et lui associe une nouvel socket
+			FD_SET (client->getSocketClient(), &rd);
+			FD_SET (client->getSocketClient(), &wr);
+			int res_rd = recv(client->getSocketClient(), buf, sizeof(buf), 0);
+			// int res_rd = read(_socket_client, buf, sizeof(buf));
+			std::cout << buf << std::endl;
+			// condition à changer en fonction de la taille de buf
+			if (res_rd < 0) 
 			{
-				int res_rd = recv(_socket_client, buf, sizeof(buf), 0);
-				// int res_rd = read(_socket_client, buf, sizeof(buf));
-				std::cout << buf << std::endl;
-
-				// condition à changer en fonction de la taille de buf
-				if (res_rd < 0) 
-				{
-					perror("receive client failed");
-					return false;
-				}
-			}
-		if(FD_ISSET(_socket_client, &wr)) // check si notre socket est pret a lire
-		{
-			int res_send = send(_socket_client, "HI\n", 3, 0);
-				// il faut s'assurer que tout le buffer est envoyé et adapter cette condition
-				// en attendant on le hard code
-			if ( res_send != 3) 
-			{
-				perror("send client failed");
+				perror("receive client failed");
 				return false;
 			}
+			if(FD_ISSET(client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
+			{
+				int res_send = send(client->getSocketClient(), "HI\n", 3, 0);
+				// il faut s'assurer que tout le buffer est envoyé et adapter cette condition
+				// en attendant on le hard code
+				if ( res_send != 3) 
+				{
+					perror("send client failed");
+					return false;
+				}
 
+			}
 		}
-		}
+		
+		
 	}
 	return true;
 }
