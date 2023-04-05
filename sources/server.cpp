@@ -22,7 +22,9 @@ Server::Server(const int port, const std::string password)
 // {
 // }
 
-Server::~Server(void) {} // close() ou/et freeinfo() à faire?
+Server::~Server(void) {
+	delete _client;
+} // close() ou/et freeinfo() à faire?
 
 //__________________________________________________GETTERS_SETTERS
 
@@ -53,16 +55,16 @@ int Server::getSocketServer()
 	return this->_socket_server;
 }
 
-int Server::AcceptSocketClient()
+bool Server::AcceptSocketClient()
 {
 	setSinSize();
-	int socket = ( accept(_socket_server, (struct sockaddr *)&_client_addr, &_sin_size));
-	if (socket == -1)
+	_client->setSocketClient( accept(_socket_server, (struct sockaddr *)&_client_addr, &_sin_size));
+	if (_client->getSocketClient() == -1)
 	{
 		perror("accept()");
 		return false;
 	}
-	return socket;
+	return true;
 }
 
 // int Server::getSocketClient()
@@ -167,7 +169,7 @@ bool Server::startServer()
 
 bool Server::loop_recept_send()
 {
-	Client *client;
+	_client = new Client();
 	fd_set rd,wr,er;
 
 	//a faire : add all client(container) to the set
@@ -191,30 +193,30 @@ bool Server::loop_recept_send()
 		// 	std::cout <<"timeout"<< std::endl;
 		// 	continue;
 		// }
-		if(FD_ISSET(_socket_server, &rd)) // check si notre socket est pret a lire
-		{
-			int socketClient = AcceptSocketClient();
-std::cout << "socket.client: " << socketClient<< std::endl;
-			if (socketClient == false)
-				return false;//accept le client et lui associe une nouvel socket
-			client->setSocketClient( socketClient);
-			
-			FD_SET (client->getSocketClient(), &rd);
-			FD_SET (client->getSocketClient(), &wr);
-			int res_rd = recv(client->getSocketClient(), buf, sizeof(buf), 0);
+		if(FD_ISSET(_socket_server, &rd)) // check si notre socket est pret a lire // recoi le client, et ces logs
+		{ 
+			if(	AcceptSocketClient() == false)
+				return false;
+			std::cout << "client_socket :"<< _client->getSocketClient()<< std::endl;	
+			FD_SET (_client->getSocketClient(), &rd);
+			FD_SET (_client->getSocketClient(), &wr);
+			int res_rd = recv(_client->getSocketClient(), buf, sizeof(buf), 0);
 			std::cout << buf << std::endl;
 			// condition à changer en fonction de la taille de buf
 			if (res_rd < 0) 
 			{
 				perror("receive client failed");
+				close(_client->getSocketClient());
+				delete _client;
 				return false;
 			}
-			if(FD_ISSET(client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
+			if(FD_ISSET(_client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
 			{
-				int res_send = send(client->getSocketClient(), "HI\n", 3, 0);
-				if ( res_send != 3) 
+				int res_send = send(_client->getSocketClient(), _client->getMessage().c_str(), _client->getMessage().size(), 0);
+				if ( res_send != _client->getMessage().size()) 
 				{
 					perror("send client failed");
+					close(_client->getSocketClient());
 					return false;
 				}
 

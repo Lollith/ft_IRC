@@ -1,38 +1,51 @@
 #ifndef MESSAGE_HPP
 #define MESSAGE_HPP
-#include <string>
-#include <map>
 
+#include <string>
+// #include <map>
+
+
+// message appartiennent a la classe client
 // a faire une fonction par commande
 class Message{
+
+
+	//__________________________________________________canonic form
+	public:
+		Message( void );
+		Message( std::string &buffer );
+		Message( Message const &copy );
+		~Message( void );
+		Message &operator=( Message const &rhs);
+
+		// std::string getCmd(void) const;
+		// std::map<size_t, std::string> getParams(void)  const;
+
+	//__________________________________________________GETTERS_SETTERS	
+		std::string getBuffer( void )const;
+	
+	//attributes________________________________________________________________
 	private: 
 		std::string _buffer;
-		std::string _cmd;
-		std::map<size_t, std::string> _param;
-
-		Message( void );
-
-	public:
-		Message(std::string &buffer);
-		std::string getCmd(void) const;
-		std::map<size_t, std::string> getParams(void)  const;
+		// std::string _cmd;
+		// std::map<size_t, std::string> _param;
 
 };
 
 
-class Connection : public Message
-{
+// class Connection : public Message
+// {
 
-};
+// };
 
-class Disconnection : public Message
-{
+// class Disconnection : public Message
+// {
 
-};
+// };
 
-class UserData : public Message
-{
+// class UserData : public Message
+// {
 
-};
+// };
 
 #endif

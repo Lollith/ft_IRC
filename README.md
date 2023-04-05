@@ -7,7 +7,8 @@ Plan de bataille - a revoir
 
 1.1. recevoir et parcer un message envoye
 
-1.2 blocage - select()
+<!-- 1.2 blocage - select() -->
+1.3. client_socket qui increment =>  close qq part???
 
 1.3 quitter proprement
 
