@@ -23,7 +23,10 @@ public:
 	~Client(void);
 
 	//__________________________________________________GETTERS_SETTERS	
-	int					getSocketClient();
+
+	int					getSocketClient() const;
+	void				setSocketClient(int socket);
+
 
 	//define typedef ici pour struct sockaddr_in??
 
@@ -33,10 +36,10 @@ private:
 
 	//attributes________________________________________________________________
 
-	int 				_socket_client;
-	struct sockaddr_in	_client_addr; // info adresse du client // ici ?
-	// Messages _messages;		//class Messages ?
+
 	// Client	_client_data;	//données à récupérer et à stocker ? container: set ?
+	int 				_socket_client; // faire un containeur
+
 };
 
 #endif

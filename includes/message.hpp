@@ -3,7 +3,7 @@
 #include <string>
 #include <map>
 
-
+// a faire une fonction par commande
 class Message{
 	private: 
 		std::string _buffer;
