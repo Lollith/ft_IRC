@@ -1,16 +1,21 @@
 # ft_IRC
 
-Plan de bataille - a revoir
+# Plan de bataille 
 
-<!-- 1.0. recevoir Myport en arg => string en int -->
-1.0 reparer port pour pouvoir accepter n
+1. initialisation - debut send-recev - sockets -select
+	<!-- 1.0. recevoir Myport en arg => string en int -->
+	1.0 reparer port pour pouvoir accepter n
 
-1.1. recevoir et parcer un message envoye
+	1.1. recevoir et parcer un message envoye
 
-<!-- 1.2 blocage - select() -->
-1.3. client_socket qui increment =>  close qq part???
+	<!-- 1.2 blocage - select() -->
 
-1.3 quitter proprement : disconnecting and reconnecting servers
+	1.3. client_socket qui increment =>  close qq part???
+
+	1.4 quitter proprement : disconnecting and reconnecting servers
+
+	1.5 check leaks, fd opens,....
+
 
 2. authentification 
 	nickname (cf rules name, unique)+ username
@@ -27,8 +32,13 @@ Plan de bataille - a revoir
 4. messages prives
 
 5. operators // utilisateurs basiques: 
-	allowed to perform maintenance: remove user = close the connection between a client and server,.... 
+	allowed to perform maintenance: 
+	KILL = close the connection between a client and server,.... 
+
 	can disconnect and reconnect servers
+	SQUIT = disconnect a server
+	RESTART = reconnect
+	
 
 
 
