@@ -25,10 +25,6 @@ public:
 	//__________________________________________________GETTERS_SETTERS	
 	int					getSocketClient();
 
-	// int					getPort();
-
-	// std::string			getPassword();
-
 	//define typedef ici pour struct sockaddr_in??
 
 private:
@@ -37,10 +33,8 @@ private:
 
 	//attributes________________________________________________________________
 
-	int					_port;
 	int 				_socket_client;
 	struct sockaddr_in	_client_addr; // info adresse du client // ici ?
-	std::string 		_password;
 	// Messages _messages;		//class Messages ?
 	// Client	_client_data;	//données à récupérer et à stocker ? container: set ?
 };
