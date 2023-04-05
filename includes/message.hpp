@@ -1,6 +1,7 @@
 #ifndef MESSAGE_HPP
 #define MESSAGE_HPP
 #include <string>
+#include <map>
 
 // a faire une fonction par commande
 class Message{

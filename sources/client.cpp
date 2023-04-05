@@ -5,7 +5,7 @@
 
 Client::Client(int sock_client): _socket_client(sock_client)
 {
-	std::cout << "create client" << std::endl; 
+	std::cout << "create client" << std::endl;
 }
 
 // Client::Client(Client const &cpy)
