@@ -45,7 +45,6 @@ bool Server::setSocketServer()
 		perror("socket()");
 		return false;
 	}
-	// _socket_client = 0;
 	return true;
 }
 
@@ -54,7 +53,7 @@ int Server::getSocketServer()
 	return this->_socket_server;
 }
 
-int Server::setSocketClient()
+int Server::AcceptSocketClient()
 {
 	setSinSize();
 	int socket = ( accept(_socket_server, (struct sockaddr *)&_client_addr, &_sin_size));
@@ -170,41 +169,39 @@ bool Server::loop_recept_send()
 {
 	Client *client;
 	fd_set rd,wr,er;
-	timeval timeout = {0};
 
-	//a faire : add all client to the set
+	//a faire : add all client(container) to the set
 
 	while (1)
 	{
 		FD_ZERO (&rd); // initialise ; a mettre ds la boucle
 		FD_ZERO (&wr); 
-		// FD_ZERO (&er); // rare cas => NULL
 		FD_SET (_socket_server, &rd);// ajoute mon fd de serveur a lensemble
 		FD_SET (_socket_server, &wr);
-		// FD_SET (_socket_server, &er);
 		char buf[1024] = {0};
 
 		int select_ready = select(FD_SETSIZE, &rd, &wr, NULL, NULL); // select verifie si des donnes sont dispo en lecture , ecruiture sur notre socket et retourne le nombre
-		//fd_setsize = par default sur linux = 1024 fd  => il faut nb de client + mon fd du serveur +1 au moins
-		std::cout << "nb fd selected: "<<select_ready<< std::endl;
 		if (select_ready == -1)
 		{
 			perror("select");
 			return false; // continue?? si errno == eintr
 		}
-		// else if (select_ready == 0) // why???
+		// else if (select_ready == 0) //utile?
 		// {
 		// 	std::cout <<"timeout"<< std::endl;
 		// 	continue;
 		// }
 		if(FD_ISSET(_socket_server, &rd)) // check si notre socket est pret a lire
 		{
-			if(setSocketClient() == false)
+			int socketClient = AcceptSocketClient();
+std::cout << "socket.client: " << socketClient<< std::endl;
+			if (socketClient == false)
 				return false;//accept le client et lui associe une nouvel socket
+			client->setSocketClient( socketClient);
+			
 			FD_SET (client->getSocketClient(), &rd);
 			FD_SET (client->getSocketClient(), &wr);
 			int res_rd = recv(client->getSocketClient(), buf, sizeof(buf), 0);
-			// int res_rd = read(_socket_client, buf, sizeof(buf));
 			std::cout << buf << std::endl;
 			// condition à changer en fonction de la taille de buf
 			if (res_rd < 0) 
@@ -215,8 +212,6 @@ bool Server::loop_recept_send()
 			if(FD_ISSET(client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
 			{
 				int res_send = send(client->getSocketClient(), "HI\n", 3, 0);
-				// il faut s'assurer que tout le buffer est envoyé et adapter cette condition
-				// en attendant on le hard code
 				if ( res_send != 3) 
 				{
 					perror("send client failed");
@@ -225,8 +220,6 @@ bool Server::loop_recept_send()
 
 			}
 		}
-		
-		
 	}
 	return true;
 }

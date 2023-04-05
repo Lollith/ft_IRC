@@ -14,7 +14,7 @@ public:
 	~Client(void);
 
 	//__________________________________________________GETTERS_SETTERS	
-	int			getSocketClient() const;
+	int					getSocketClient() const;
 	void				setSocketClient(int socket);
 
 	// int					getPort();
@@ -31,8 +31,8 @@ private:
 
 	int					_port;
 	int 				_socket_client; // faire un containeur
-	struct sockaddr_in	_client_addr; // info adresse du client // ici ?
-	std::string 		_password;
+	// struct sockaddr_in	_client_addr; // info adresse du client // ici ?
+	// std::string 		_password;
 	// Messages _messages;		//class Messages ?
 	// Client	_client_data;	//données à récupérer et à stocker ? container: set ?
 

@@ -9,6 +9,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <arpa/inet.h> //htons +define the in_addr cf <netinet/in.h>
+#include "client.hpp"
 
 #define BACKLOG 10
 
@@ -30,7 +31,7 @@ public:
 	bool				setSocketServer();
 	int					getSocketServer();
 
-	int 				setSocketClient();
+	int 				AcceptSocketClient();
 	// int					getSocketClient();
 
 	int					getPort();
