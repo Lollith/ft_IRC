@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <arpa/inet.h> //htons +define the in_addr cf <netinet/in.h>
 #include "client.hpp"
+#include "message.hpp"
 
 #define BACKLOG 10
 
@@ -31,7 +32,7 @@ public:
 	bool				setSocketServer();
 	int					getSocketServer();
 
-	int 				AcceptSocketClient();
+	bool 				AcceptSocketClient();
 	// int					getSocketClient();
 
 	int					getPort();
@@ -60,12 +61,11 @@ private:
 	int					_port;
 	int					_socket_server; //listen sur cette socket
 	struct sockaddr_in	_addr_server;
-	// int 				_socket_client; // ici ou dans une classe client? //connection sur le client
 	struct sockaddr_in	_client_addr; // info adresse du client // ici ?
 	socklen_t			_sin_size;
 	std::string 		_password;
-	// Messages _messages;		//class Messages ?
 	// Client	_client_data;	//données à récupérer et à stocker ? class?
+	Client*				_client;
 };
 
 #endif
