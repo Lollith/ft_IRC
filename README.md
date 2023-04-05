@@ -10,13 +10,25 @@ Plan de bataille - a revoir
 <!-- 1.2 blocage - select() -->
 1.3. client_socket qui increment =>  close qq part???
 
-1.3 quitter proprement
+1.3 quitter proprement : disconnecting and reconnecting servers
 
 2. authentification 
+	nickname (cf rules name, unique)+ username
 
-3. chan
+3. channels = group d un ou +ieurs clients, receive all message; creee lorsque le 1er client joins et rm when last leave, name rules
+	JOIN = create ou se connecter => 1er connecter devient Operators
+	KICK: Eject a client from the channel
+	MODE: Change the channel’s modes
+	INVITE: Invite a client to an invite-only channel (mode +i)
+	TOPIC: Change the channel topic in a mode +t channel
 
-4. autre : messages prives,....
+	1 user => join serveral channel ( 1 limite)
+
+4. messages prives
+
+5. operators // utilisateurs basiques: 
+	allowed to perform maintenance: remove user = close the connection between a client and server,.... 
+	can disconnect and reconnect servers
 
 
 
