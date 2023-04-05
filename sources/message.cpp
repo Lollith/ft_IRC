@@ -1,7 +1,9 @@
 #include "message.hpp"
 
 //__________________________________________________canonic form
-Message::Message( void ):_buffer("WELCOME!\n"){}
+Message::Message( void ):_buffer("WELCOME!\n"){
+
+}
 
 Message::Message( std::string &buffer ): _buffer(buffer){
 }
