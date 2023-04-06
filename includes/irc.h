@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <arpa/inet.h> //htons +define the in_addr cf <netinet/in.h>
 #include <set>
+#include <vector>
 #include "message.hpp"
 #include "client.hpp"
 #include "channel.hpp"

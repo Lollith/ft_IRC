@@ -22,10 +22,18 @@ public:
 	void				setSocketClient( int socket );
 
 	void				setMsgRecv( std::string buf);
+	std::string			getMsgRecv( void )const;
 
 	std::string			getMessage( void ) const;
 
 	//define typedef ici pour struct sockaddr_in??
+	
+	//__________________________________________________MEMBERS
+
+	// void parse_msg_recv( void );
+
+
+
 
 private:
 	// useless constructor
@@ -36,7 +44,7 @@ private:
 
 
 	// Client	_client_data;	//données à récupérer et à stocker ? container: set ?
-	int 				_socket_client; // faire un containeur
+	int 				_socket_client;
 	std::string			_message_recv;
 };
 

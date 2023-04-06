@@ -57,7 +57,7 @@ private:
 	std::string 		_password;
 	// Client	_client_data;	//données à récupérer et à stocker ? class?
 	Client*				_client; // passer en std::set
-	std::set<Channel*>	_channel;
+	std::vector<Channel*>	_channel;
 
 };
 
