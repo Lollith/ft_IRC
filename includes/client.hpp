@@ -18,7 +18,6 @@ public:
 	//__________________________________________________canonic form
 
 	Client(void);
-	// Client(int sock_client);
 	// Client(Client const &cpy);
 
 	// Client &operator=(Client const &rhs);
@@ -34,6 +33,12 @@ public:
 
 	std::string			getMessage( void ) const;
 
+	// dans cette fonction split du buf pour récuperer une pair commande - argument
+	// lancement d'une fonction de check
+	void 				tokenization_cmd(std::string cmd_line);
+	void 				getCmdLine();
+	void 				checkParams();
+
 	//define typedef ici pour struct sockaddr_in??
 
 private:
@@ -45,8 +50,11 @@ private:
 
 
 	// Client	_client_data;	//données à récupérer et à stocker ? container: set ?
-	int 				_socket_client; // faire un containeur
-	std::string			_message_recv;
+	int 						_socket_client; // faire un containeur
+	std::string					_message_recv;
+	std::string 				_cmd_registration;
+	std::vector<std::string>	_arg_registration;
+
 };
 
 #endif

@@ -3,7 +3,7 @@
 
 #include <string>
 #include <iostream>
-// #include <map>
+#include <vector>
 
 
 // message appartiennent a la classe client
@@ -19,16 +19,18 @@ class Message{
 		~Message( void );
 		Message &operator=( Message const &rhs);
 
-		// std::string getCmd(void) const;
-		// std::map<size_t, std::string> getParams(void)  const;
+		// std::string const& getCmd(void) const;
+		// std::vector<std::string> const& getParams(void)  const;
 
 	//__________________________________________________GETTERS_SETTERS	
-		std::string getBuffer( void )const;
+		std::string const& getBuffer( void )const;
 	
 	//attributes________________________________________________________________
-	private: 
+	protected: 
 		std::string _buffer;
 		// std::string _cmd;
+		// std::vector<std::string> const& getParams(void)  const;
+
 		// std::map<size_t, std::string> _param;
 
 };
@@ -36,7 +38,9 @@ class Message{
 
 class Connection : public Message
 {
-
+	// public:
+	
+	//Connection(std::string cmd, std::vector<std::string> arg);)
 	// heritage ; cap ID
 	// check si cap	=> std::cout << num erreur,...
 
