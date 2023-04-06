@@ -1,16 +1,7 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include <stdio.h>
-#include <cstring>
-#include <unistd.h>
-#include <string>
-#include <iostream>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <arpa/inet.h> //htons +define the in_addr cf <netinet/in.h>
-#include "message.hpp"
-#include <set>
+#include "irc.h"
 
 class Client
 {

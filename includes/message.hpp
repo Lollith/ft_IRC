@@ -1,9 +1,7 @@
 #ifndef MESSAGE_HPP
 #define MESSAGE_HPP
 
-#include <string>
-#include <iostream>
-// #include <map>
+#include "irc.h"
 
 
 // message appartiennent a la classe client

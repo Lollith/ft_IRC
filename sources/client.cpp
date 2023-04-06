@@ -1,5 +1,4 @@
-#include "client.hpp"
-#include "server.hpp"
+#include "irc.h"
 
 //__________________________________________________canonic form
 

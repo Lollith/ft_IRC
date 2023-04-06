@@ -1,4 +1,4 @@
-#include "message.hpp"
+#include "irc.h"
 
 //__________________________________________________canonic form
 Message::Message( void ):_buffer("WELCOME!\n"){

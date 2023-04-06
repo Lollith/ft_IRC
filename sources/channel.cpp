@@ -1,3 +1,3 @@
-#include "channel.hpp"
+#include "irc.h"
 
 Channel::Channel ( void ){}
