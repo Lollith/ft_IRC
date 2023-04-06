@@ -1,7 +1,10 @@
 #include "message.hpp"
 
 //__________________________________________________canonic form
-Message::Message( void ):_buffer("WELCOME!\n"){}
+Message::Message( void ):_buffer("WELCOME!\n"){
+	// _buffer = "001 lollith :welcome to the localhost Network, lollith! lollith@localhost\r\n";
+	//   "<client> :Welcome to the <networkname> Network, <nick>[!<user>@<host>]"
+}
 
 Message::Message( std::string &buffer ): _buffer(buffer){
 }

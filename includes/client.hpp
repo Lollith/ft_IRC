@@ -37,7 +37,8 @@ private:
 	// useless constructor
 
 	//attributes________________________________________________________________
-	Message 			_message;		
+	Message 			_message;
+	Connection			_msg_connection;			
 
 
 	// Client	_client_data;	//données à récupérer et à stocker ? container: set ?
