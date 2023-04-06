@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <arpa/inet.h> //htons +define the in_addr cf <netinet/in.h>
 #include "message.hpp"
+#include <set>
 
 class Client
 {
@@ -29,6 +30,8 @@ public:
 	int					getSocketClient( void ) const;
 	void				setSocketClient( int socket );
 
+	void				setMsgRecv( std::string buf);
+
 	std::string			getMessage( void ) const;
 
 	//define typedef ici pour struct sockaddr_in??
@@ -43,6 +46,7 @@ private:
 
 	// Client	_client_data;	//données à récupérer et à stocker ? container: set ?
 	int 				_socket_client; // faire un containeur
+	std::string			_message_recv;
 };
 
 #endif

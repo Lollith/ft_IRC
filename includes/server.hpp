@@ -11,6 +11,7 @@
 #include <arpa/inet.h> //htons +define the in_addr cf <netinet/in.h>
 #include "client.hpp"
 #include "message.hpp"
+#include "channel.hpp"
 
 #define BACKLOG 10
 
@@ -65,7 +66,9 @@ private:
 	socklen_t			_sin_size;
 	std::string 		_password;
 	// Client	_client_data;	//données à récupérer et à stocker ? class?
-	Client*				_client;
+	Client*				_client; // passer en std::set
+	std::set<Channel*>	_channel;
+
 };
 
 #endif
