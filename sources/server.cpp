@@ -201,6 +201,7 @@ bool Server::loop_recept_send()
 			FD_SET (_client->getSocketClient(), &rd);
 			FD_SET (_client->getSocketClient(), &wr);
 			int res_rd = recv(_client->getSocketClient(), buf, sizeof(buf), 0);
+			_client->setMsgRecv(buf);	
 			std::cout << buf << std::endl;
 			// condition à changer en fonction de la taille de buf
 			if (res_rd < 0) 

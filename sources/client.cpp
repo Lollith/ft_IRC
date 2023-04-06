@@ -37,3 +37,7 @@ void Client::setSocketClient(int socket)
 std::string	Client::getMessage( void ) const{
 	return this->_message.getBuffer();
 }
+
+void Client::setMsgRecv( std::string buf){
+	this->_message_recv = buf;
+}

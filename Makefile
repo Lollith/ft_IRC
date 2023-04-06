@@ -7,6 +7,7 @@ SRC = $(addprefix $(SRC_PATHS),\
 	server.cpp\
 	client.cpp\
 	message.cpp\
+	channel.cpp\
 	main.cpp)
 
 OBJ		=	$(SRC:./sources/%.cpp=./build/%.o)
