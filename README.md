@@ -21,11 +21,11 @@
 	nickname (cf rules name, unique)+ username
 
 3. channels = group d un ou +ieurs clients, receive all message; creee lorsque le 1er client joins et rm when last leave, name rules
-	JOIN = create ou se connecter => 1er connecter devient Operators
-	KICK: Eject a client from the channel
-	MODE: Change the channel’s modes
-	INVITE: Invite a client to an invite-only channel (mode +i)
-	TOPIC: Change the channel topic in a mode +t channel
+	- JOIN = create ou se connecter => 1er connecter devient Operators
+	- KICK: Eject a client from the channel
+	- MODE: Change the channel’s modes
+	- INVITE: Invite a client to an invite-only channel (mode +i)
+	- TOPIC: Change the channel topic in a mode +t channel
 
 	1 user => join serveral channel ( 1 limite)
 
@@ -33,11 +33,11 @@
 
 5. operators // utilisateurs basiques: 
 	allowed to perform maintenance: 
-	KILL = close the connection between a client and server,.... 
+	- KILL = close the connection between a client and server,.... 
 
 	can disconnect and reconnect servers
-	SQUIT = disconnect a server
-	RESTART = reconnect
+	- SQUIT = disconnect a server
+	- RESTART = reconnect
 	
 
 

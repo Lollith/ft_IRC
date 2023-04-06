@@ -2,6 +2,7 @@
 #define MESSAGE_HPP
 
 #include <string>
+#include <iostream>
 // #include <map>
 
 
@@ -36,8 +37,8 @@ class Message{
 class Connection : public Message
 {
 
-	heritage ; cap ID
-	check si cap	=> std::cout << num erreur,...
+	// heritage ; cap ID
+	// check si cap	=> std::cout << num erreur,...
 
 };
 
