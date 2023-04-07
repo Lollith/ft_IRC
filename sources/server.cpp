@@ -171,13 +171,13 @@ bool Server::loop_recept_send()
 {
 	_client = new Client();
 	fd_set rd,wr,er;
-	char buf[1024] = {0};
 
 	//a faire : add all client(container) to the set
 	// a faire  vector de client => si accept => pushback ds le client le nouvel fd
 
 	while (1)
 	{
+		char buf[1024] = {0};
 		FD_ZERO (&rd); // initialise ; a mettre ds la boucle
 		FD_ZERO (&wr); 
 		FD_SET (_socket_server, &rd);// ajoute mon fd de serveur a lensemble
@@ -221,8 +221,10 @@ bool Server::loop_recept_send()
 				close(_client->getSocketClient());
 				return false;
 			}
-			std::cout << buf <<"\r\n";
+			std::cout << buf << std::endl;
 			_client->setMsgRecv(buf);
+			
+			parse_msg_recv(buf);
 		}
 			
 		if(FD_ISSET(_client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
@@ -242,4 +244,33 @@ bool Server::loop_recept_send()
 		}
 	}
 	return true;
+}
+
+
+//-----fct _channels------------------------------------------------------------
+void Server::parse_msg_recv( std::string msg_recv )
+{
+	int nb_fct = 2;
+	std::string funct_names[] = {"JOIN", "QUIT"};
+
+	void (Server::*fct_member[])( std::string arg) = { &Server::join, &Server::quit };
+
+	for (int i = 0; i < nb_fct; i++)
+	{
+		if(msg_recv.find(funct_names[i]) != std::string::npos)
+			(this->*fct_member[i])(msg_recv);
+	}
+
+}
+
+
+void Server::join( std::string arg )
+{
+	std::cout << "=>Join le channel\n" << std::endl;
+	// std::cout << arg << std::endl;
+}
+
+void Server::quit( std::string arg )
+{
+	std::cout << "=>Quit le channel" << std::endl;
 }
