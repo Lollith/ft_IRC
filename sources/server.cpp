@@ -202,7 +202,7 @@ bool Server::loop_recept_send()
 
 		if(FD_ISSET(_socket_server, &rd)) // check si notre socket est pret a lire // recoi le client, et ces logs
 		{ 
-			std::cout << "accept le nouvel entrant: ";
+			std::cout << "=>Accept le nouvel entrant: ";
 			if(	AcceptSocketClient() == false)
 				return false;
 			std::cout << "client_socket :"<< _client->getSocketClient()<< std::endl;	
@@ -212,14 +212,13 @@ bool Server::loop_recept_send()
 
 		if(FD_ISSET(_client->getSocketClient(), &rd))// rajout de cette ligne!
 		{
-			std::cout << "recoi un message depuis le client" << std::endl;
+			std::cout << "=>Recois un message depuis le client" << std::endl;
 			int res_rd = recv(_client->getSocketClient(), buf, sizeof(buf), 0);
 			
 			if (res_rd < 0) 
 			{
 				perror("receive client failed");
 				close(_client->getSocketClient());
-				// delete _client;
 				return false;
 			}
 			std::cout << buf <<"\r\n";
@@ -230,7 +229,7 @@ bool Server::loop_recept_send()
 		{
 			if(!_client->getMessage().empty()) // du coup comme je reinitialise a la fin le message, ca fait bugger qd g rien a send dou la condition ici
 			{
-				std::cout << "repond au client." << std::endl;
+				std::cout << "=>Repond au client." << std::endl;
 				int res_send = send(_client->getSocketClient(), _client->getMessage().c_str(), _client->getMessage().size(), 0);
 				if ( res_send != _client->getMessage().size()) 
 				{
