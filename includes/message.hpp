@@ -1,9 +1,6 @@
 #ifndef MESSAGE_HPP
 #define MESSAGE_HPP
 
-#include <string>
-#include <iostream>
-#include <vector>
 #include "irc.h"
 
 

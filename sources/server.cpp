@@ -171,13 +171,13 @@ bool Server::loop_recept_send()
 {
 	_client = new Client();
 	fd_set rd,wr,er;
-	char buf[1024] = {0};
 
 	//a faire : add all client(container) to the set
 	// a faire  vector de client => si accept => pushback ds le client le nouvel fd
 
 	while (1)
 	{
+		char buf[1024] = {0};
 		FD_ZERO (&rd); // initialise ; a mettre ds la boucle
 		FD_ZERO (&wr); 
 		FD_SET (_socket_server, &rd);// ajoute mon fd de serveur a lensemble
@@ -222,7 +222,7 @@ bool Server::loop_recept_send()
 			// std::cout << buf <<"\r\n";
 			_client->setMsgRecv(buf);
 			// while (this->step_registration != 4)
-			_client->getCmdLine();
+			_client->getCmdLine(_password);
 		}
 			
 		if(FD_ISSET(_client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
