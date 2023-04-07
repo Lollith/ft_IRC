@@ -212,7 +212,7 @@ bool Server::loop_recept_send()
 
 		if(FD_ISSET(_client->getSocketClient(), &rd))// rajout de cette ligne!
 		{
-			std::cout << "=>Recois un message depuis le client" << std::endl;
+			std::cout << "=>Recois un message depuis le client:" << std::endl;
 			int res_rd = recv(_client->getSocketClient(), buf, sizeof(buf), 0);
 			
 			if (res_rd < 0) 
