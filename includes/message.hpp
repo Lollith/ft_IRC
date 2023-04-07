@@ -22,6 +22,7 @@ class Message{
 
 	//__________________________________________________GETTERS_SETTERS	
 		std::string getBuffer( void )const;
+		void setBuffer( std::string buffer );
 	
 	//attributes________________________________________________________________
 	private: 

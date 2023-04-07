@@ -30,3 +30,7 @@ Message &Message::operator=( Message const &rhs )
 std::string Message::getBuffer( void )const{
 	return(_buffer);
 }
+
+void 	Message::setBuffer( std::string buffer ){
+	this->_buffer = buffer;
+}

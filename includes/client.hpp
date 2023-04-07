@@ -25,6 +25,7 @@ public:
 	std::string			getMsgRecv( void )const;
 
 	std::string			getMessage( void ) const;
+	void				setMessage( std::string );
 
 	//define typedef ici pour struct sockaddr_in??
 	

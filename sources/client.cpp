@@ -38,8 +38,12 @@ std::string	Client::getMessage( void ) const{
 	return this->_message.getBuffer();
 }
 
+void Client::setMessage( std::string buffer ){
+	this->_message.setBuffer(buffer);
+}
+
 void Client::setMsgRecv( std::string buf){
-	this->_message_recv = buf;
+	_message_recv = buf;
 }
 
 std::string Client::getMsgRecv( void ) const{
