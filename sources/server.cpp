@@ -212,26 +212,28 @@ bool Server::loop_recept_send()
 
 		if(FD_ISSET(_client->getSocketClient(), &rd))// rajout de cette ligne!
 		{
-			std::cout << "=>Recois un message depuis le client:" << std::endl;
 			int res_rd = recv(_client->getSocketClient(), buf, sizeof(buf), 0);
-			
 			if (res_rd < 0) 
 			{
 				perror("receive client failed");
 				close(_client->getSocketClient());
 				return false;
 			}
-			std::cout << buf << std::endl;
+			if (buf[0])
+			{
+				std::cout << "=>Recois un message depuis le client:" << std::endl;
+				std::cout << buf << std::endl;
+			}
 			_client->setMsgRecv(buf);
 			
-			parse_msg_recv(buf);
+			parse_msg_recv(_client, buf);
 		}
 			
 		if(FD_ISSET(_client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
 		{
 			if(!_client->getMessage().empty()) // du coup comme je reinitialise a la fin le message, ca fait bugger qd g rien a send dou la condition ici
 			{
-				std::cout << "=>Repond au client." << std::endl;
+				std::cout << "=>Repond au client:" << std::endl;
 				int res_send = send(_client->getSocketClient(), _client->getMessage().c_str(), _client->getMessage().size(), 0);
 				if ( res_send != _client->getMessage().size()) 
 				{
@@ -239,7 +241,8 @@ bool Server::loop_recept_send()
 					close(_client->getSocketClient());
 					return false;
 				}
-				_client->setMessage(""); // reinitialise le message , sinon boucle sur le welcome
+				std::cout << "=>Message envoye: " << _client->getMessage()<< std::endl;
+				_client->setMessage(""); // reinitialise le message , sinon boucle
 			}
 		}
 	}
@@ -248,29 +251,33 @@ bool Server::loop_recept_send()
 
 
 //-----fct _channels------------------------------------------------------------
-void Server::parse_msg_recv( std::string msg_recv )
+void Server::parse_msg_recv( Client *client, std::string msg_recv )
 {
 	int nb_fct = 2;
 	std::string funct_names[] = {"JOIN", "QUIT"};
 
-	void (Server::*fct_member[])( std::string arg) = { &Server::join, &Server::quit };
+	void (Server::*fct_member[])(Client *client, std::string arg) = { &Server::join, &Server::quit };
 
 	for (int i = 0; i < nb_fct; i++)
 	{
 		if(msg_recv.find(funct_names[i]) != std::string::npos)
-			(this->*fct_member[i])(msg_recv);
+			(this->*fct_member[i])(client, msg_recv);
 	}
 
 }
 
 
-void Server::join( std::string arg )
+void Server::join( Client *client, std::string arg )
 {
 	std::cout << "=>Join le channel\n" << std::endl;
-	// std::cout << arg << std::endl;
+	// client->setMessage("353 lollith = #test :lollith\r\n"); //RPL_NAMREPLY
+	client->setMessage("332 lollith #test :welcome\r\n"); //RPL_NAMREPLY
+	//lollith has joined #test
+	// Topic for #test:welcome
+	// Topic set by X[] [time] 
 }
 
-void Server::quit( std::string arg )
+void Server::quit(Client *client, std::string arg )
 {
 	std::cout << "=>Quit le channel" << std::endl;
 }

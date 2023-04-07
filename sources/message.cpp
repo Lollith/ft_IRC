@@ -1,8 +1,7 @@
 #include "irc.h"
 
 //__________________________________________________canonic form
-Message::Message( void ):_buffer("WELCOME!\r\n "){
-	_buffer = "001 lollith :welcome to the localhost Network, lollith! lollith@localhost\r\n";
+Message::Message( void ):_buffer( "001 lollith :welcome to the localhost Network, lollith! lollith@localhost\r\n"){
 	//   "<client> :Welcome to the <networkname> Network, <nick>[!<user>@<host>]"
 }
 

@@ -43,9 +43,9 @@ public:
 	bool				startServer();
 	bool				loop_recept_send();
 
-	void 				parse_msg_recv( std::string msg_recv );
-	void 				join( std::string arg );
-	void 				quit( std::string arg );
+	void 				parse_msg_recv( Client *client, std::string msg_recv );
+	void 				join( Client *client, std::string arg );
+	void 				quit( Client *client, std::string arg );
 
 private:
 	// useless constructor
