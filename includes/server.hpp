@@ -43,20 +43,23 @@ public:
 	bool				startServer();
 	bool				loop_recept_send();
 
+	void 				parse_msg_recv( std::string msg_recv );
+	void 				join( std::string arg );
+	void 				quit( std::string arg );
+
 private:
 	// useless constructor
 	Server(void);
 
 	//attributes________________________________________________________________
 
-	int					_port;
-	int					_socket_server; //listen sur cette socket
-	struct sockaddr_in	_addr_server;
-	struct sockaddr_in	_client_addr; // info adresse du client // ici ?
-	socklen_t			_sin_size;
-	std::string 		_password;
-	// Client	_client_data;	//données à récupérer et à stocker ? class?
-	Client*				_client; // passer en std::set
+	int						_port;
+	int						_socket_server; //listen sur cette socket
+	struct sockaddr_in		_addr_server;
+	struct sockaddr_in		_client_addr; // info adresse du client // ici ?
+	socklen_t				_sin_size;
+	std::string 			_password;
+	Client*					_client; // passer en std::set
 	std::vector<Channel*>	_channel;
 
 };

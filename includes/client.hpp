@@ -31,7 +31,6 @@ public:
 	
 	//__________________________________________________MEMBERS
 
-	// void parse_msg_recv( void );
 
 
 

@@ -53,14 +53,3 @@ std::string Client::getMsgRecv( void ) const{
 
 //__________________________________________________MEMBERS
 
-// void Client::parse_msg_recv( void )
-// {
-// 	std::string found = "CAP LS";
-// 	if(_message_recv.find(found) != std::string::npos)
-// 	 	std::cout <<"OK"<< std::endl;
-// 		// go => fct recup PASS NICK NAME
-	
-// 	else  //"/"
-// 		// fct cherche commandes
-// 	 	std::cout <<"JOIN"<< std::endl;
-// }
