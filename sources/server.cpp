@@ -1,4 +1,4 @@
-#include "server.hpp"
+#include "irc.h"
 
 //__________________________________________________canonic form
 
@@ -171,8 +171,10 @@ bool Server::loop_recept_send()
 {
 	_client = new Client();
 	fd_set rd,wr,er;
+	char buf[1024] = {0};
 
 	//a faire : add all client(container) to the set
+	// a faire  vector de client => si accept => pushback ds le client le nouvel fd
 
 	while (1)
 	{
@@ -180,7 +182,11 @@ bool Server::loop_recept_send()
 		FD_ZERO (&wr); 
 		FD_SET (_socket_server, &rd);// ajoute mon fd de serveur a lensemble
 		FD_SET (_socket_server, &wr);
-		char buf[1024] = {0};
+		if (_client->getSocketClient()) // n existe pas au 1er tour de boucle, rajout condition ici sinon ne marche pas
+		{
+			FD_SET (_client->getSocketClient(), &rd);
+			FD_SET (_client->getSocketClient(), &wr);
+		}
 
 		int select_ready = select(FD_SETSIZE, &rd, &wr, NULL, NULL); // select verifie si des donnes sont dispo en lecture , ecruiture sur notre socket et retourne le nombre
 		if (select_ready == -1)
@@ -193,27 +199,36 @@ bool Server::loop_recept_send()
 		// 	std::cout <<"timeout"<< std::endl;
 		// 	continue;
 		// }
+
 		if(FD_ISSET(_socket_server, &rd)) // check si notre socket est pret a lire // recoi le client, et ces logs
 		{ 
+			std::cout << "=>Accept le nouvel entrant: ";
 			if(	AcceptSocketClient() == false)
 				return false;
 			std::cout << "client_socket :"<< _client->getSocketClient()<< std::endl;	
-			FD_SET (_client->getSocketClient(), &rd);
-			FD_SET (_client->getSocketClient(), &wr);
+		}
+		
+		if(FD_ISSET(_client->getSocketClient(), &rd))// rajout de cette ligne!
+		{
+			std::cout << "=>Recois un message depuis le client:" << std::endl;
 			int res_rd = recv(_client->getSocketClient(), buf, sizeof(buf), 0);
-			_client->setMsgRecv(buf);
-			std::cout << buf << std::endl;
-			// here split buf and save pair CMD-ARG-/r/n
-			_client->getCmdLine();
+
 			if (res_rd < 0) 
 			{
 				perror("receive client failed");
 				close(_client->getSocketClient());
-				delete _client;
 				return false;
 			}
-			if(FD_ISSET(_client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
+			std::cout << buf <<"\r\n";
+			_client->setMsgRecv(buf);
+			_client->getCmdLine();
+		}
+			
+		if(FD_ISSET(_client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
+		{
+			if(!_client->getMessage().empty()) // du coup comme je reinitialise a la fin le message, ca fait bugger qd g rien a send dou la condition ici
 			{
+				std::cout << "=>Repond au client." << std::endl;
 				int res_send = send(_client->getSocketClient(), _client->getMessage().c_str(), _client->getMessage().size(), 0);
 				if ( res_send != _client->getMessage().size()) 
 				{
@@ -221,11 +236,9 @@ bool Server::loop_recept_send()
 					close(_client->getSocketClient());
 					return false;
 				}
-
+				_client->setMessage(""); // reinitialise le message , sinon boucle sur le welcome
 			}
 		}
 	}
 	return true;
 }
-// a faire  vector de client => si accept => pushback ds le client le nouvel fd
-// si serveur rrecoi => creer un nouveau client => nouveau client va lire ou ercrire

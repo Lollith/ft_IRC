@@ -1,16 +1,7 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include <stdio.h>
-#include <cstring>
-#include <unistd.h>
-#include <string>
-#include <iostream>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <arpa/inet.h> //htons +define the in_addr cf <netinet/in.h>
-#include "message.hpp"
-#include <set>
+#include "irc.h"
 
 class Client
 {
@@ -30,8 +21,10 @@ public:
 	void				setSocketClient( int socket );
 
 	void				setMsgRecv( std::string buf);
+	std::string			getMsgRecv( void )const;
 
 	std::string			getMessage( void ) const;
+	void				setMessage( std::string );
 
 	// dans cette fonction split du buf pour récuperer une pair commande - argument
 	void 				tokenization_cmd(std::string& cmd_line);
@@ -39,6 +32,13 @@ public:
 	void 				checkParams();
 
 	//define typedef ici pour struct sockaddr_in??
+	
+	//__________________________________________________MEMBERS
+
+	// void parse_msg_recv( void );
+
+
+
 
 private:
 	// useless constructor

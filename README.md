@@ -4,7 +4,7 @@
 
 1. initialisation - debut send-recev - sockets -select
 	<!-- 1.0. recevoir Myport en arg => string en int -->
-	1.0 reparer port pour pouvoir accepter n
+	<!-- 1.0 reparer port pour pouvoir accepter n -->
 
 	1.1. recevoir et parcer un message envoye
 
@@ -16,6 +16,7 @@
 
 	1.5 check leaks, fd opens,....
 
+	1.6 parsing port + passeword
 
 2. authentification 
 	nickname (cf rules name, unique)+ username

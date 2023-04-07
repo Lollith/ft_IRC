@@ -1,8 +1,8 @@
-#include "message.hpp"
+#include "irc.h"
 
 //__________________________________________________canonic form
-Message::Message( void ):_buffer("WELCOME!\n"){
-	// _buffer = "001 lollith :welcome to the localhost Network, lollith! lollith@localhost\r\n";
+Message::Message( void ):_buffer("WELCOME!\r\n "){
+	_buffer = "001 lollith :welcome to the localhost Network, lollith! lollith@localhost\r\n";
 	//   "<client> :Welcome to the <networkname> Network, <nick>[!<user>@<host>]"
 }
 
@@ -14,7 +14,8 @@ Message::Message( Message const &copy ){
 	*this = copy;
 }
 
-Message::~Message( void ) { }
+Message::~Message( void ) { 
+}
 
 Message &Message::operator=( Message const &rhs )
 {
@@ -26,7 +27,10 @@ Message &Message::operator=( Message const &rhs )
 }
 
 //__________________________________________________GETTERS_SETTERS
-std::string const& Message::getBuffer( void )const
-{
+std::string Message::getBuffer( void )const{
 	return(_buffer);
+}
+
+void 	Message::setBuffer( std::string buffer ){
+	this->_buffer = buffer;
 }

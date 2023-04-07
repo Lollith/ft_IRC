@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include "irc.h"
 
 
 // message appartiennent a la classe client
@@ -17,13 +18,14 @@ class Message{
 		Message( std::string &buffer );
 		Message( Message const &copy );
 		~Message( void );
-		Message &operator=( Message const &rhs);
+		Message &operator=( Message const &rhs );
 
 		// std::string const& getCmd(void) const;
 		// std::vector<std::string> const& getParams(void)  const;
 
 	//__________________________________________________GETTERS_SETTERS	
-		std::string const& getBuffer( void )const;
+		std::string getBuffer( void )const;
+		void setBuffer( std::string buffer );
 	
 	//attributes________________________________________________________________
 	protected: 

@@ -1,4 +1,4 @@
-#include "server.hpp"
+#include "irc.h"
 
 int main(int ac, char **av)
 {
