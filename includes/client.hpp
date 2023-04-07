@@ -27,9 +27,16 @@ public:
 	void				setMessage( std::string );
 
 	// dans cette fonction split du buf pour récuperer une pair commande - argument
-	void 				tokenization_cmd(std::string& cmd_line);
-	void 				getCmdLine();
-	void 				checkParams();
+	void 	tokenization_cmd(std::string& cmd_line);
+	void 	getCmdLine();
+
+	//here fonctions qui vont check d'éventuelles d'erreurs et construire un objet
+	// Conncexioin pour envoyer la réponse adéquate
+	void 	checkParams();
+	void	ignoreCap();
+	void	checkPassword();
+	void	checkNick();
+	void	checkUser();
 
 	//define typedef ici pour struct sockaddr_in??
 	
@@ -50,6 +57,7 @@ private:
 
 	// Client	_client_data;	//données à récupérer et à stocker ? container: set ?
 	int 						_socket_client; // faire un containeur
+	int							_step_registration; //compteur des étapes d'authentification
 	std::string					_message_recv;
 	std::string 				_cmd_registration;
 	std::vector<std::string>	_arg_registration;

@@ -59,7 +59,7 @@ void Client::tokenization_cmd(std::string& cmd)
 
 	//verif contenu cmd line ex: CAP LS \r\n
 	
-	std::cout << "complete cmd line in tokenisation is : " << cmd << std::endl;
+	// std::cout << "complete cmd line in tokenisation is : " << cmd << std::endl;
 
 	pos = cmd.find(' ', i);
 	this->_cmd_registration = cmd.substr(i, (pos - i));
@@ -71,8 +71,50 @@ void Client::tokenization_cmd(std::string& cmd)
 
 	}
 	//vérifs attributs cmd and args
-	std::cout << "in tokenization: cmd is : " << this->_cmd_registration << std::endl;
-	std::cout << "in tokenization: args are : " << this->_arg_registration.back()<< std::endl;
+	// std::cout << "in tokenization: cmd is : " << this->_cmd_registration << std::endl;
+	// std::cout << "in tokenization: args are : " << this->_arg_registration.back()<< std::endl;
+}
+
+
+void Client::ignoreCap()
+{
+	std::cout << "here is CAP check func" << std::endl;
+}
+
+void Client::checkPassword()
+{
+	std::cout << "here is PASS check func" << std::endl;
+
+}
+
+void Client::checkNick()
+{
+	std::cout << "here is NICK check func" << std::endl;
+}
+
+void Client::checkUser()
+{
+	std::cout << "here is USER check func" << std::endl;
+
+}
+
+
+
+void Client::checkParams()
+{
+	int i = 0;
+	void (Client::*func_list[4])(void) = 
+		{&Client::ignoreCap, &Client::checkPassword, &Client::checkNick, &Client::checkUser};
+	std::string	cmd_to_check[4] = {"PASS", "NICK", "USER"};
+	while (i < 4)
+	{
+		if (_cmd_registration == cmd_to_check[i])
+		{
+			(this->*(func_list[i]))();
+			break;
+		}
+		i++;
+	}
 }
 
 void Client::getCmdLine()

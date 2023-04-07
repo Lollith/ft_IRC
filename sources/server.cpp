@@ -210,7 +210,7 @@ bool Server::loop_recept_send()
 		
 		if(FD_ISSET(_client->getSocketClient(), &rd))// rajout de cette ligne!
 		{
-			std::cout << "=>Recois un message depuis le client:" << std::endl;
+			// std::cout << "=>Recois un message depuis le client:" << std::endl;
 			int res_rd = recv(_client->getSocketClient(), buf, sizeof(buf), 0);
 
 			if (res_rd < 0) 
@@ -219,8 +219,9 @@ bool Server::loop_recept_send()
 				close(_client->getSocketClient());
 				return false;
 			}
-			std::cout << buf <<"\r\n";
+			// std::cout << buf <<"\r\n";
 			_client->setMsgRecv(buf);
+			// while (this->step_registration != 4)
 			_client->getCmdLine();
 		}
 			
@@ -228,7 +229,7 @@ bool Server::loop_recept_send()
 		{
 			if(!_client->getMessage().empty()) // du coup comme je reinitialise a la fin le message, ca fait bugger qd g rien a send dou la condition ici
 			{
-				std::cout << "=>Repond au client." << std::endl;
+				// std::cout << "=>Repond au client." << std::endl;
 				int res_send = send(_client->getSocketClient(), _client->getMessage().c_str(), _client->getMessage().size(), 0);
 				if ( res_send != _client->getMessage().size()) 
 				{
