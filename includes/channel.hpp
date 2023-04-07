@@ -1,7 +1,7 @@
 #ifndef CHANNEL_HPP
 #define CHANNEL_HPP
 
-#include <string>
+#include "irc.h"
 
 class Channel{
 	public:

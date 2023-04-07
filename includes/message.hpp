@@ -1,9 +1,7 @@
 #ifndef MESSAGE_HPP
 #define MESSAGE_HPP
 
-#include <string>
-#include <iostream>
-// #include <map>
+#include "irc.h"
 
 
 // message appartiennent a la classe client
@@ -17,13 +15,14 @@ class Message{
 		Message( std::string &buffer );
 		Message( Message const &copy );
 		~Message( void );
-		Message &operator=( Message const &rhs);
+		Message &operator=( Message const &rhs );
 
 		// std::string getCmd(void) const;
 		// std::map<size_t, std::string> getParams(void)  const;
 
 	//__________________________________________________GETTERS_SETTERS	
 		std::string getBuffer( void )const;
+		void setBuffer( std::string buffer );
 	
 	//attributes________________________________________________________________
 	private: 

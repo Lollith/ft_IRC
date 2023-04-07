@@ -1,17 +1,7 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include <stdio.h>
-#include <cstring>
-#include <unistd.h>
-#include <string>
-#include <iostream>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <arpa/inet.h> //htons +define the in_addr cf <netinet/in.h>
-#include "client.hpp"
-#include "message.hpp"
-#include "channel.hpp"
+#include "irc.h"
 
 #define BACKLOG 10
 
@@ -67,7 +57,7 @@ private:
 	std::string 		_password;
 	// Client	_client_data;	//données à récupérer et à stocker ? class?
 	Client*				_client; // passer en std::set
-	std::set<Channel*>	_channel;
+	std::vector<Channel*>	_channel;
 
 };
 

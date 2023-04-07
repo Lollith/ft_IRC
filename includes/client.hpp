@@ -1,16 +1,7 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include <stdio.h>
-#include <cstring>
-#include <unistd.h>
-#include <string>
-#include <iostream>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <arpa/inet.h> //htons +define the in_addr cf <netinet/in.h>
-#include "message.hpp"
-#include <set>
+#include "irc.h"
 
 class Client
 {
@@ -31,10 +22,19 @@ public:
 	void				setSocketClient( int socket );
 
 	void				setMsgRecv( std::string buf);
+	std::string			getMsgRecv( void )const;
 
 	std::string			getMessage( void ) const;
+	void				setMessage( std::string );
 
 	//define typedef ici pour struct sockaddr_in??
+	
+	//__________________________________________________MEMBERS
+
+	// void parse_msg_recv( void );
+
+
+
 
 private:
 	// useless constructor
@@ -45,7 +45,7 @@ private:
 
 
 	// Client	_client_data;	//données à récupérer et à stocker ? container: set ?
-	int 				_socket_client; // faire un containeur
+	int 				_socket_client;
 	std::string			_message_recv;
 };
 
