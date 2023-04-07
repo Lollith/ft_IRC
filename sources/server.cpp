@@ -204,7 +204,7 @@ bool Server::loop_recept_send()
 			_client->setMsgRecv(buf);
 			std::cout << buf << std::endl;
 			// here split buf and save pair CMD-ARG-/r/n
-			_client->tokenization_cmd();
+			_client->getCmdLine();
 			if (res_rd < 0) 
 			{
 				perror("receive client failed");

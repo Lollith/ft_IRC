@@ -34,8 +34,7 @@ public:
 	std::string			getMessage( void ) const;
 
 	// dans cette fonction split du buf pour récuperer une pair commande - argument
-	// lancement d'une fonction de check
-	void 				tokenization_cmd(std::string cmd_line);
+	void 				tokenization_cmd(std::string& cmd_line);
 	void 				getCmdLine();
 	void 				checkParams();
 

@@ -26,7 +26,7 @@ Message &Message::operator=( Message const &rhs )
 }
 
 //__________________________________________________GETTERS_SETTERS
-std::string Message::getBuffer( void )const
+std::string const& Message::getBuffer( void )const
 {
 	return(_buffer);
 }

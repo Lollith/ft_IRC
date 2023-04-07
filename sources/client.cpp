@@ -44,49 +44,42 @@ void Client::setMsgRecv( std::string buf){
 	this->_message_recv = buf;
 }
 
-void Client::tokenization_cmd(std::string cmd)
+void Client::tokenization_cmd(std::string& cmd)
 {
 	size_t pos;
 	size_t i = 0;
 
-	// pos = this->_message_recv.find(' ', i);
-	// if (pos == std::string::npos)
-	// 	; // ici mettre une logique correspondante
-	// // std::string str_tmp;
-	// this->_cmd_registration = _message_recv.substr(i, (pos - i));
-	// //debugg__________________________________________________________________
-	// std::cout << "i : " << i << std::endl;
-	// std::cout << "in tokenization: cmd is : " << this->_cmd_registration << std::endl;
-	// //_____end____________________________________________________________________
-	// i = pos + 1;
-	// //debugg___________________________________________________________________
-	// std::cout << "pos : " << pos << std::endl;
-	// std::cout << "i after pos + 1: " << i << std::endl;
-	// //__end_______________________________________________________________________
-	// pos = this->_message_recv.find(' ', i);
-	// this->_arg_registration.push_back(_message_recv.substr(i, (pos - i)));
-	// //debugg___________________________________________________________________
-	// std::cout << "pos : " << pos << std::endl;
-	// std::cout << "in tokenization: args are : " << this->_arg_registration.back()<< std::endl;
-	// //__end_______________________________________________________________________
-	// _message_recv.erase(_message_recv.begin(), _message_recv.begin()+ pos);
-	// //debugg___________________________________________________________________
-	// std::cout << "in tokenization: what is after erase : " << this->_arg_registration.front() << std::endl;
-	// //__end_______________________________________________________________________
+	//verif contenu cmd line ex: CAP LS \r\n
+	
+	std::cout << "complete cmd line in tokenisation is : " << cmd << std::endl;
+
+	pos = cmd.find(' ', i);
+	this->_cmd_registration = cmd.substr(i, (pos - i));
+	while (pos != std::string::npos)
+	{	
+		i = pos + 1;
+		pos = cmd.find(' ', i);
+		this->_arg_registration.push_back(cmd.substr(i, (pos - i)));
+
+	}
+	//vérifs attributs cmd and args
+	std::cout << "in tokenization: cmd is : " << this->_cmd_registration << std::endl;
+	std::cout << "in tokenization: args are : " << this->_arg_registration.back()<< std::endl;
 }
 
 void Client::getCmdLine()
 {
-	size_t i = 0;
+	const std::string eol_marker = "\r\n";
 	size_t pos;
 	std::string cmd_line;
-	pos = this->_message_recv.find("/r/n", i);
-	while( i != std::string::npos)
+
+	pos = this->_message_recv.find(eol_marker);
+	while (pos != std::string::npos)
 	{
-		cmd_line = _message_recv.substr(i, (pos - i));
+		cmd_line = _message_recv.substr(0, pos);
 		tokenization_cmd(cmd_line);
-		checkParams();
-		_message_recv.erase(_message_recv.begin(),  _message_recv.begin() + pos);
-		pos = this->_message_recv.find("/r/n", i);
+		// checkParams();
+		_message_recv.erase(_message_recv.begin(), (_message_recv.begin() + pos + eol_marker.length()));
+		pos = this->_message_recv.find(eol_marker);
 	}
 }
