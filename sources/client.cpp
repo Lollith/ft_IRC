@@ -91,32 +91,24 @@ void Client::checkPassword(std::string const& psswd)
 	{
 		this->_step_registration += 1;
 		this->_flag_password_ok = true;
+		std::cout << "PASSWORD OK : " << _flag_password_ok << std::endl;
 	}
 	else if (_flag_password_ok == true)
 	{
-		//ici construct Connexion buffer to send response ERR_ALREADYREGISTERED //462
-		
-		shutdown(_socket_client, SHUT_RDWR);
-		//close();
-		//free_something_i_dont_know_what;
+		//send response ERR_ALREADYREGISTERED //462
+		setMessage(" 462:You may not reregistered\r\n"); //message incomplet, nick à préciser
 		return ;
 	}
 	else if ((_cmd_registration == "PASS") && (_arg_registration.empty()))
 	{
-		//ici construct Connexion buffer to send response ERR_NEEDMOREPARAMS //462
-		
-		shutdown(_socket_client, SHUT_RDWR);
-		//close();
-		//free_something_i_dont_know_what;
+		//send response ERR_NEEDMOREPARAMS //461
+		setMessage(" 461::Not enough parameters\r\n"); //message incomplet, nick à préciser
 		return ;
 	}
 	else
 	{
-		//ici construct Connexion buffer to send response ERR_PASSWDMISMATCH //462
-		
-		shutdown(_socket_client, SHUT_RDWR);
-		//close();
-		//free_something_i_dont_know_what;
+		//send response ERR_PASSWDMISMATCH //464
+		setMessage(" 462::Password incorrect\r\n"); //message incomplet, nick à préciser
 		return ;
 	}
 }
