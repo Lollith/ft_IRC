@@ -2,7 +2,7 @@
 
 //__________________________________________________canonic form
 
-Client::Client(void)
+Client::Client(void): _flag_password_ok("false")
 {
 	// std::cout << "constructeur client par default"<< std::endl;
 }
@@ -138,17 +138,22 @@ void Client::checkParams(std::string const &password)
 		// QQPART CHECKER L EXISTANCE DE PASS DANS LES CMD RECV
 		//  -> CHECK FLAG_PASSWORD_OK
 
-		if (i == 1 && _cmd_registration != "PASS" && _flag_password_ok == false)
+		if (_cmd_registration == cmd_to_check[i])
 		{
-			std::cout << "here" << std::endl;
-			setMessage("PASS: 461:Not enough parameters\r\n");
-			i++; // pour ne plus rentrer dans cette condition
-			return;
-		}
-		else if (_cmd_registration == cmd_to_check[i])
-		{
-			(this->*(func_list[i]))(password);
-			break;
+			std::cout << "password flag state each time: " << _flag_password_ok << std::endl;
+			if (i > 1 && _flag_password_ok == false)
+			{
+				std::cout << "PASS not detected, condition meets" << std::endl;
+				setMessage("PASS: 461:Not enough parameters\r\n");
+				// i++;
+				return;
+			}
+			else
+			{
+				std::cout << "should enter in checkPass" << std::endl;
+				(this->*(func_list[i]))(password);
+				break;
+			}
 		}
 		i++;
 	}
@@ -157,7 +162,7 @@ void Client::checkParams(std::string const &password)
 void Client::getCmdLine(std::string const &password)
 {
 	const std::string eol_marker = "\r\n"; // à mettre ds un define?
-	this->_flag_password_ok = false;
+	// this->_flag_password_ok = false;
 	size_t pos;
 	std::string cmd_line;
 
