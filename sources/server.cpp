@@ -23,8 +23,13 @@ Server::Server(const int port, const std::string password)
 // }
 
 Server::~Server(void) {
+	
+	shutdown(this->_socket_server, SHUT_RDWR);
+	close(this->_socket_server);
+	shutdown(_client->getSocketClient() , SHUT_RDWR);
+	close(_client->getSocketClient());
 	delete _client;
-} // close() ou/et freeinfo() à faire?
+}
 
 //__________________________________________________GETTERS_SETTERS
 
@@ -92,7 +97,7 @@ void Server::setAddrServ()
 {
 	this->_addr_server.sin_family = AF_INET;		  // host byte order
 	this->_addr_server.sin_port = htons(this->_port); // short, network byte order
-	this->_addr_server.sin_addr.s_addr = INADDR_ANY;  // auto-remplissage avec  mon IP//inet_addr("127.0.0.1");
+	this->_addr_server.sin_addr.s_addr = INADDR_ANY;  // a#include <signal.h>uto-remplissage avec  mon IP//inet_addr("127.0.0.1");
 	bzero(&(this->_addr_server.sin_zero), 8);		  // interdite?
 }
 
@@ -280,4 +285,10 @@ void Server::join( Client *client, std::string arg )
 void Server::quit(Client *client, std::string arg )
 {
 	std::cout << "=>Quit le channel" << std::endl;
+}
+
+//______________________________TEST CTRLC
+void Server::stop()
+{
+	std::cout << "pour l'instant, rien ne se passe ds la fonction stop() set ds sigHandler, set ds sa_handker, set dans sigaction() set ds le main()" <<std::endl;
 }

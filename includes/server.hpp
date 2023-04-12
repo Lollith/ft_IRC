@@ -48,6 +48,8 @@ public:
 	void 				join( Client *client, std::string arg );
 	void 				quit( Client *client, std::string arg );
 
+	void 				stop();
+
 private:
 	// useless constructor
 	Server(void);
