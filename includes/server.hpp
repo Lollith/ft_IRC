@@ -37,6 +37,7 @@ public:
 	void 				setSinSize();
 	socklen_t 			getSinSize();
 
+
 	//__________________________________________________members functions
 
 	void 				crash_protector();

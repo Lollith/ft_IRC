@@ -178,6 +178,8 @@ bool Server::startServer()
 bool Server::loop_recept_send()
 {
 	fd_set rd,wr,er;
+	_client->setFlagPsswd(false);
+	_client->setFlagPsswdProvided(false);
 
 	while (1)
 	{
@@ -212,10 +214,9 @@ bool Server::loop_recept_send()
 		{ 
 			std::cout << "=>Accept le nouvel entrant: ";
 			if(	AcceptSocketClient() == false)
-			{
 				return false;
-			}
 		}
+
 		for (it = _client.begin(); it != _client.end(); it++)
 		{
 //----------------recev------------------------------------------------------------
@@ -235,7 +236,7 @@ bool Server::loop_recept_send()
 					std::cout << buf << std::endl;
 					client->setMsgRecv(buf);
 				}
-				
+				client->getCmdLine(_password);
 				parse_msg_recv(client, buf);
 			}
 			if(FD_ISSET(client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
