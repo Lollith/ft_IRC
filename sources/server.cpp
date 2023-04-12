@@ -178,8 +178,12 @@ bool Server::startServer()
 bool Server::loop_recept_send()
 {
 	fd_set rd,wr,er;
-	_client->setFlagPsswd(false);
-	_client->setFlagPsswdProvided(false);
+	std::vector<Client*>:: iterator it;
+	for (it = _client.begin(); it != _client.end(); it++)
+	{
+		(*it)->setFlagPsswd(false);
+		(*it)->setFlagPsswdProvided(false);
+	}
 
 	while (1)
 	{
