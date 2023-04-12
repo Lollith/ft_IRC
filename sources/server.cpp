@@ -171,6 +171,8 @@ bool Server::loop_recept_send()
 {
 	_client = new Client();
 	fd_set rd,wr,er;
+	_client->setFlagPsswd(false);
+	_client->setFlagPsswdProvided(false);
 
 	//a faire : add all client(container) to the set
 	// a faire  vector de client => si accept => pushback ds le client le nouvel fd

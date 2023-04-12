@@ -26,6 +26,10 @@ public:
 	std::string			getMessage( void ) const;
 	void				setMessage( std::string );
 
+	void		 		setFlagPsswd(bool boolean);
+	void		 		setFlagPsswdProvided(bool boolean);
+
+
 	// dans cette fonction split du buf pour récuperer une pair commande - argument
 	void 	tokenization_cmd(std::string& cmd_line);
 	void 	getCmdLine(std::string const& password);
@@ -58,6 +62,7 @@ private:
 	int 						_socket_client; // faire un containeur
 	int							_step_registration; //compteur des étapes d'authentification
 	bool						_flag_password_ok;
+	bool						_flag_password_provided;
 	std::string					_message_recv;
 	std::string 				_cmd_registration;
 	std::vector<std::string>	_arg_registration;

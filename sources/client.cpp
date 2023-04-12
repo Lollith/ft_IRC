@@ -54,6 +54,19 @@ std::string Client::getMsgRecv(void) const
 	return this->_message_recv;
 }
 
+void	Client::setFlagPsswd(bool boolean)
+{
+	this->_flag_password_ok = boolean;
+}void	
+
+Client::setFlagPsswdProvided(bool boolean)
+{
+	this->_flag_password_provided = boolean;
+}
+
+//__________________________________________________MEMBERS FUNCTIONS
+
+
 void Client::tokenization_cmd(std::string &cmd)
 {
 	size_t pos;
@@ -87,6 +100,7 @@ void Client::checkPassword(std::string const &psswd)
 {
 	std::cout << "here is PASS check func" << std::endl;
 
+	this->_flag_password_provided = true;
 	if (_arg_registration.back() == psswd)
 	{
 		this->_step_registration += 1;
@@ -141,10 +155,10 @@ void Client::checkParams(std::string const &password)
 		if (_cmd_registration == cmd_to_check[i])
 		{
 			std::cout << "password flag state each time: " << _flag_password_ok << std::endl;
-			if (i > 1 && _flag_password_ok == false)
+			if (i > 1 && _flag_password_provided == false)
 			{
-				std::cout << "PASS not detected, condition meets" << std::endl;
-				setMessage("PASS: 461:Not enough parameters\r\n");
+				std::cout<< "PASS not detected should not enter in the if otherwise" << std::endl;
+				setMessage("PASS: 451::You have not registered\r\n");
 				// i++;
 				return;
 			}
