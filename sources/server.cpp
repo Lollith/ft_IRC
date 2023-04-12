@@ -171,6 +171,8 @@ bool Server::loop_recept_send()
 {
 	_client = new Client();
 	fd_set rd,wr,er;
+	_client->setFlagPsswd(false);
+	_client->setFlagPsswdProvided(false);
 
 	//a faire : add all client(container) to the set
 	// a faire  vector de client => si accept => pushback ds le client le nouvel fd
@@ -207,9 +209,7 @@ bool Server::loop_recept_send()
 				return false;
 			std::cout << "client_socket :"<< _client->getSocketClient()<< std::endl;	
 		}
-		// FD_SET (_client->getSocketClient(), &rd);// suppression ici car sinon je ne repasse plus ds select . je sais pas pourquoi => remis avant select
-		// FD_SET (_client->getSocketClient(), &wr); // 2 lignes a suprimer qd tu les as lues
-
+		
 		if(FD_ISSET(_client->getSocketClient(), &rd))// rajout de cette ligne!
 		{
 			int res_rd = recv(_client->getSocketClient(), buf, sizeof(buf), 0);
@@ -225,7 +225,7 @@ bool Server::loop_recept_send()
 				std::cout << buf << std::endl;
 			}
 			_client->setMsgRecv(buf);
-			
+			_client->getCmdLine(_password);
 			parse_msg_recv(_client, buf);
 		}
 			

@@ -1,5 +1,5 @@
 #ifndef IRC_H
-#define IRC_H
+# define IRC_H
 
 #include <stdio.h>
 #include <cstring>
@@ -15,5 +15,6 @@
 #include "client.hpp"
 #include "channel.hpp"
 #include "server.hpp"
+
 
 #endif
