@@ -23,7 +23,11 @@ Server::Server(const int port, const std::string password)
 // }
 
 Server::~Server(void) {
-	delete _client;
+	std::vector<Client*>:: iterator it;
+	for (it = _client.begin(); it != _client.end(); it++)
+	{
+		delete (*it);
+	}
 } // close() ou/et freeinfo() à faire?
 
 //__________________________________________________GETTERS_SETTERS
@@ -58,12 +62,16 @@ int Server::getSocketServer()
 bool Server::AcceptSocketClient()
 {
 	setSinSize();
-	_client->setSocketClient( accept(_socket_server, (struct sockaddr *)&_client_addr, &_sin_size));
-	if (_client->getSocketClient() == -1)
+
+	int socket = accept(_socket_server, (struct sockaddr *)&_client_addr, &_sin_size );
+	if (socket == -1)
 	{
 		perror("accept()");
 		return false;
 	}
+	std::cout << socket << std::endl;	
+		_client.push_back(new Client());
+		_client.back()->setSocketClient(socket);
 	return true;
 }
 
@@ -169,11 +177,7 @@ bool Server::startServer()
 
 bool Server::loop_recept_send()
 {
-	_client = new Client();
 	fd_set rd,wr,er;
-
-	//a faire : add all client(container) to the set
-	// a faire  vector de client => si accept => pushback ds le client le nouvel fd
 
 	while (1)
 	{
@@ -182,12 +186,16 @@ bool Server::loop_recept_send()
 		FD_ZERO (&wr); 
 		FD_SET (_socket_server, &rd);// ajoute mon fd de serveur a lensemble
 		FD_SET (_socket_server, &wr);
-		if (_client->getSocketClient()) // n existe pas au 1er tour de boucle, rajout condition ici sinon ne marche pas
+		
+		std::vector<Client*>:: iterator it;
+		for (it = _client.begin(); it != _client.end(); it++)
 		{
-			FD_SET (_client->getSocketClient(), &rd);
-			FD_SET (_client->getSocketClient(), &wr);
+			if ((*it)->getSocketClient()) // n existe pas au 1er tour de boucle
+			{
+				FD_SET ((*it)->getSocketClient(), &rd);
+				FD_SET ((*it)->getSocketClient(), &wr);
+			}
 		}
-
 		int select_ready = select(FD_SETSIZE, &rd, &wr, NULL, NULL); // select verifie si des donnes sont dispo en lecture , ecruiture sur notre socket et retourne le nombre
 		if (select_ready == -1)
 		{
@@ -204,45 +212,47 @@ bool Server::loop_recept_send()
 		{ 
 			std::cout << "=>Accept le nouvel entrant: ";
 			if(	AcceptSocketClient() == false)
-				return false;
-			std::cout << "client_socket :"<< _client->getSocketClient()<< std::endl;	
-		}
-		// FD_SET (_client->getSocketClient(), &rd);// suppression ici car sinon je ne repasse plus ds select . je sais pas pourquoi => remis avant select
-		// FD_SET (_client->getSocketClient(), &wr); // 2 lignes a suprimer qd tu les as lues
-
-		if(FD_ISSET(_client->getSocketClient(), &rd))// rajout de cette ligne!
-		{
-			int res_rd = recv(_client->getSocketClient(), buf, sizeof(buf), 0);
-			if (res_rd < 0) 
 			{
-				perror("receive client failed");
-				close(_client->getSocketClient());
 				return false;
 			}
-			if (buf[0])
-			{
-				std::cout << "=>Recois un message depuis le client:" << std::endl;
-				std::cout << buf << std::endl;
-			}
-			_client->setMsgRecv(buf);
-			
-			parse_msg_recv(_client, buf);
 		}
-			
-		if(FD_ISSET(_client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
+		for (it = _client.begin(); it != _client.end(); it++)
 		{
-			if(!_client->getMessage().empty()) // du coup comme je reinitialise a la fin le message, ca fait bugger qd g rien a send dou la condition ici
+//----------------recev------------------------------------------------------------
+			Client *client = *it;
+			if(FD_ISSET(client->getSocketClient(), &rd))
 			{
-				std::cout << "=>Repond au client:" << std::endl;
-				int res_send = send(_client->getSocketClient(), _client->getMessage().c_str(), _client->getMessage().size(), 0);
-				if ( res_send != _client->getMessage().size()) 
+				int res_rd = recv(client->getSocketClient(), buf, sizeof(buf), 0);
+				if (res_rd < 0) 
 				{
-					perror("send client failed");
-					close(_client->getSocketClient());
+					perror("receive client failed");
+					close(client->getSocketClient());
 					return false;
 				}
-				std::cout << "=>Message envoye: " << _client->getMessage()<< std::endl;
-				_client->setMessage(""); // reinitialise le message , sinon boucle
+				if (buf[0])
+				{
+					std::cout << "=>Recois un message depuis le client:" << std::endl;
+					std::cout << buf << std::endl;
+					client->setMsgRecv(buf);
+				}
+				
+				parse_msg_recv(client, buf);
+			}
+			if(FD_ISSET(client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
+			{
+				if(!client->getMessage().empty()) // du coup comme je reinitialise a la fin le message, ca fait bugger qd g rien a send dou la condition ici
+				{
+					std::cout << "=>Repond au client:" << std::endl;
+					int res_send = send(client->getSocketClient(), client->getMessage().c_str(), client->getMessage().size(), 0);
+					if ( res_send != client->getMessage().size()) 
+					{
+						perror("send client failed");
+						close(client->getSocketClient());
+						return false;
+					}
+					std::cout << "=>Message envoye: " << client->getMessage()<< std::endl;
+					client->setMessage(""); // reinitialise le message , sinon boucle
+				}
 			}
 		}
 	}
