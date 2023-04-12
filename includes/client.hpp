@@ -3,12 +3,14 @@
 
 #include "irc.h"
 
+class Channel;
 class Client
 {
 public:
 	//__________________________________________________canonic form
 
-	Client(void);
+	Client(int sock_client);
+
 	// Client(Client const &cpy);
 
 	// Client &operator=(Client const &rhs);
@@ -42,6 +44,10 @@ public:
 	void	checkNick(std::string const&);
 	void	checkUser(std::string const&);
 
+	//-----fct _channels------------------------------------------------------------
+	void 				parse_msg_recv( Client *client, std::string msg_recv );
+	void 				join( Client *client, std::string arg );
+	void 				quit( Client *client, std::string arg );
 	//define typedef ici pour struct sockaddr_in??
 	
 	//__________________________________________________MEMBERS
@@ -52,10 +58,11 @@ public:
 
 private:
 	// useless constructor
+	Client(void);
 
 	//attributes________________________________________________________________
 	Message 			_message;
-	Connection			_msg_connection;			
+	// Connection			_msg_connection;			
 
 
 	// Client	_client_data;	//données à récupérer et à stocker ? container: set ?
@@ -66,7 +73,9 @@ private:
 	std::string					_message_recv;
 	std::string 				_cmd_registration;
 	std::vector<std::string>	_arg_registration;
+	std::set<Channel*>			_channels;
 
 };
 
+#include "channel.hpp"
 #endif

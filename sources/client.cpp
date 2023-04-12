@@ -7,10 +7,10 @@ Client::Client(void): _flag_password_ok("false")
 	// std::cout << "constructeur client par default"<< std::endl;
 }
 
-// Client::Client(int sock_client): _socket_client(sock_client)
-// {
+Client::Client(int sock_client): _socket_client(sock_client), _flag_password_ok("false")
+{
 // 	std::cout << "create client" << std::endl;
-// }
+}
 
 // Client::Client(Client const &cpy)
 // {
@@ -189,4 +189,54 @@ void Client::getCmdLine(std::string const &password)
 		_message_recv.erase(_message_recv.begin(), (_message_recv.begin() + pos + eol_marker.length()));
 		pos = this->_message_recv.find(eol_marker);
 	}
+}
+
+
+
+//-----fct _channels------------------------------------------------------------
+void Client::parse_msg_recv( Client *client, std::string msg_recv )
+{
+	int nb_fct = 2;
+	std::string funct_names[] = {"JOIN", "QUIT"};
+
+	void (Client::*fct_member[])(Client *client, std::string arg) = { &Client::join, &Client::quit };
+
+	for (int i = 0; i < nb_fct; i++)
+	{
+		if(msg_recv.find(funct_names[i]) != std::string::npos)
+			(this->*fct_member[i])(client, msg_recv);
+	}
+
+}
+
+void Client::join( Client *client, std::string arg )
+{
+	std::cout << "=>Join le channel\n" << std::endl;
+	// client->setMessage("353 lollith = #test :lollith\r\n"); //RPL_NAMREPLY
+	client->setMessage("332 lollith #test :welcome\r\n"); //RPL_NAMREPLY
+
+	// rempalcer #test = _arg_registration.back()
+	//remplacer lollith par: ?
+	//lollith has joined #test
+	// Topic for #test:welcome
+	// Topic set by X[] [time]
+	std::set<Channel*>::iterator it;	
+	for (it = _channels.begin(); it != _channels.end(); it++)
+	{
+		if ((*it)->getName() == _arg_registration.back())
+		{
+			(*it)->addClient();
+			return;
+			NON cava pAS
+		}
+
+
+	}
+		_channels.insert(new Channel( _arg_registration.back()));
+
+}
+
+void Client::quit(Client *client, std::string arg )
+{
+	std::cout << "=>Quit le channel" << std::endl;
 }

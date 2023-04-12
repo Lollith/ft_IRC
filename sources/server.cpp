@@ -70,8 +70,7 @@ bool Server::AcceptSocketClient()
 		return false;
 	}
 	std::cout << socket << std::endl;	
-		_client.push_back(new Client());
-		_client.back()->setSocketClient(socket);
+		_client.push_back(new Client(socket));
 	return true;
 }
 
@@ -241,11 +240,11 @@ bool Server::loop_recept_send()
 					client->setMsgRecv(buf);
 				}
 				client->getCmdLine(_password);
-				parse_msg_recv(client, buf);
+				client->parse_msg_recv(client, buf);
 			}
 			if(FD_ISSET(client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
 			{
-				if(!client->getMessage().empty()) // du coup comme je reinitialise a la fin le message, ca fait bugger qd g rien a send dou la condition ici
+				if(!client->getMessage().empty()) // comme je reinitialise a la fin le message
 				{
 					std::cout << "=>Repond au client:" << std::endl;
 					int res_send = send(client->getSocketClient(), client->getMessage().c_str(), client->getMessage().size(), 0);
@@ -264,35 +263,3 @@ bool Server::loop_recept_send()
 	return true;
 }
 
-
-//-----fct _channels------------------------------------------------------------
-void Server::parse_msg_recv( Client *client, std::string msg_recv )
-{
-	int nb_fct = 2;
-	std::string funct_names[] = {"JOIN", "QUIT"};
-
-	void (Server::*fct_member[])(Client *client, std::string arg) = { &Server::join, &Server::quit };
-
-	for (int i = 0; i < nb_fct; i++)
-	{
-		if(msg_recv.find(funct_names[i]) != std::string::npos)
-			(this->*fct_member[i])(client, msg_recv);
-	}
-
-}
-
-
-void Server::join( Client *client, std::string arg )
-{
-	std::cout << "=>Join le channel\n" << std::endl;
-	// client->setMessage("353 lollith = #test :lollith\r\n"); //RPL_NAMREPLY
-	client->setMessage("332 lollith #test :welcome\r\n"); //RPL_NAMREPLY
-	//lollith has joined #test
-	// Topic for #test:welcome
-	// Topic set by X[] [time] 
-}
-
-void Server::quit(Client *client, std::string arg )
-{
-	std::cout << "=>Quit le channel" << std::endl;
-}

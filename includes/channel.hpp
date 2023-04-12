@@ -5,10 +5,19 @@
 
 class Channel{
 	public:
-		Channel( void );
+		Channel( std::string name );
+
+		std::string getName( void ) const;
+	
+		void addClient();
+
 
 	private:
+		
 		std::string		_name;
+		
+		
+		Channel( void );
 
 };
 
