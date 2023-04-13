@@ -62,7 +62,7 @@ private:
 	struct sockaddr_in		_client_addr; // info adresse du client // ici ?
 	socklen_t				_sin_size;
 	std::string 			_password;
-	Client*					_client; // passer en std::set
+	std::vector<Client*>	_client;
 	std::vector<Channel*>	_channel;
 
 };
