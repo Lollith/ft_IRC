@@ -29,7 +29,7 @@ Server::~Server(void)
 
 	for (it = _client.begin(); it != _client.end(); it++)
 	{
-		//test_________________________________
+		// à modifier?_____________________________
 		shutdown(this->_socket_server, SHUT_RDWR);
 		close(this->_socket_server);
 		shutdown((*it)->getSocketClient(), SHUT_RDWR);
@@ -306,6 +306,5 @@ void Server::quit(Client *client, std::string arg)
 //______________________________TEST CTRLC
 void Server::stop()
 {
-	std::cout << "here function stop()" << std::endl;
 	this->_flag_keep_loop = false;
 }

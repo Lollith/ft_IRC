@@ -8,7 +8,6 @@ Server *sp = NULL;
 
 void sigHandler(int sig)
 {
-	std::cout << "ctrl C detected" << std::endl;
 	sp->stop();
 }
 
