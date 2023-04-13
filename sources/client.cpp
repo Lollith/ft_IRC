@@ -96,6 +96,9 @@ void Client::ignoreCap(std::string const &)
 	this->_step_registration += 1;
 }
 
+
+
+// FERMER LE SOCKET CLIENT SI PASSWD FAUX + GARDER LE SERVEUR ALIVE
 void Client::checkPassword(std::string const &psswd)
 {
 	std::cout << "here is PASS check func" << std::endl;
@@ -168,6 +171,7 @@ void Client::checkParams(std::string const &password)
 		}
 		i++;
 	}
+	
 }
 
 void Client::getCmdLine(std::string const &password)

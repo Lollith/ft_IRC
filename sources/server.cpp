@@ -29,7 +29,7 @@ Server::~Server(void)
 
 	for (it = _client.begin(); it != _client.end(); it++)
 	{
-		// à modifier?_____________________________
+		// // à modifier?_____________________________
 		shutdown(this->_socket_server, SHUT_RDWR);
 		close(this->_socket_server);
 		shutdown((*it)->getSocketClient(), SHUT_RDWR);
