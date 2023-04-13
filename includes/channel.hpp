@@ -9,12 +9,13 @@ class Channel{
 
 		std::string getName( void ) const;
 	
-		void addClient();
+		void addClient(Client *client);
 
+		std::vector<Client *>	_clients;// remettre en prive + ceer get
 
 	private:
 		
-		std::string		_name;
+		std::string				_name;
 		
 		
 		Channel( void );

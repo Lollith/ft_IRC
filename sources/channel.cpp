@@ -1,7 +1,7 @@
 #include "irc.h"
 
 Channel::Channel ( std::string name ): _name(name){
-	std::cout << "constructeur channel par default"<< std::endl;
+	// std::cout << "constructeur channel par default"<< std::endl;
 }
 
 std::string Channel::getName( void ) const{
@@ -9,6 +9,8 @@ std::string Channel::getName( void ) const{
 
 }
 
-void Channel::addClient(){
-	std::cout << "client rejoint"<< std::endl;
+void Channel::addClient(Client *client){
+	std::cout << "client"<< client->getSocketClient()<<" rejoint" << std::endl;
+	this->_clients.push_back(client);
+
 }

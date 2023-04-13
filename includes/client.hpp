@@ -19,38 +19,36 @@ public:
 
 	//__________________________________________________GETTERS_SETTERS	
 
-	int					getSocketClient( void ) const;
-	void				setSocketClient( int socket );
+	int							getSocketClient( void ) const;
+	void						setSocketClient( int socket );
 
-	void				setMsgRecv( std::string buf);
-	std::string			getMsgRecv( void )const;
+	void						setMsgRecv( std::string buf );
+	std::string					getMsgRecv( void )const;
 
-	std::string			getMessage( void ) const;
-	void				setMessage( std::string );
+	std::string					getMessage( void ) const;
+	void						setMessage( std::string );
 
-	void		 		setFlagPsswd(bool boolean);
-	void		 		setFlagPsswdProvided(bool boolean);
+	void				 		setFlagPsswd(bool boolean);
+	void		 				setFlagPsswdProvided(bool boolean);
+
+	std::vector<std::string>  	get_arg( void ) const;
 
 
+	//__________________________________________________MEMBERS
 	// dans cette fonction split du buf pour récuperer une pair commande - argument
-	void 	tokenization_cmd(std::string& cmd_line);
-	void 	getCmdLine(std::string const& password);
+	void 						tokenization_cmd( std::string& cmd_line );
+	void 						getCmdLine( std::string const& password );
 
 	//here fonctions qui vont check d'éventuelles d'erreurs et construire un objet
 	// Conncexioin pour envoyer la réponse adéquate
-	void 	checkParams(std::string const& password);
-	void	ignoreCap(std::string const&);
-	void	checkPassword(std::string const& password);
-	void	checkNick(std::string const&);
-	void	checkUser(std::string const&);
+	void 						checkParams( std::string const& password );
+	void						ignoreCap( std::string const& );
+	void						checkPassword( std::string const& password );
+	void						checkNick( std::string const& );
+	void						checkUser( std::string const& );
 
-	//-----fct _channels------------------------------------------------------------
-	void 				parse_msg_recv( Client *client, std::string msg_recv );
-	void 				join( Client *client, std::string arg );
-	void 				quit( Client *client, std::string arg );
 	//define typedef ici pour struct sockaddr_in??
 	
-	//__________________________________________________MEMBERS
 
 
 
@@ -72,9 +70,8 @@ private:
 	bool						_flag_password_provided;
 	std::string					_message_recv;
 	std::string 				_cmd_registration;
-	std::vector<std::string>	_arg_registration;
-	std::set<Channel*>			_channels;
 
+	std::vector<std::string>	_arg_registration;
 };
 
 #include "channel.hpp"

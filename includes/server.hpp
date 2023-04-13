@@ -44,6 +44,11 @@ public:
 	bool				startServer();
 	bool				loop_recept_send();
 
+	//-----fct _channels------------------------------------------------------------
+	void 				parse_msg_recv( Client *client, std::string msg_recv );
+	void 				join( Client *client, std::string arg );
+	void 				quit( Client *client, std::string arg );
+	void				privmsg( Client *client, std::string arg );
 
 private:
 	// useless constructor
@@ -59,6 +64,7 @@ private:
 	std::string 			_password;
 	std::vector<Client*>	_client;
 
+	std::vector<Channel*>	_channels;
 };
 
 #endif
