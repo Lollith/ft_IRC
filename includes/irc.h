@@ -5,6 +5,7 @@
 #include <cstring>
 #include <unistd.h>
 #include <string>
+#include <signal.h>
 #include <iostream>
 #include <sys/socket.h>
 #include <sys/types.h>
