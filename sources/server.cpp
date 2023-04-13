@@ -3,7 +3,7 @@
 //__________________________________________________canonic form
 
 Server::Server(const int port, const std::string password)
-	: _port(port), _password(password)
+	: _port(port), _password(password), _flag_keep_loop(true)
 {
 	if (!setSocketServer())
 	{
@@ -193,7 +193,7 @@ bool Server::loop_recept_send()
 		(*it)->setFlagPsswdProvided(false);
 	}
 
-	while (1)
+	while (_flag_keep_loop == true)
 	{
 		char buf[1024] = {0};
 		FD_ZERO(&rd); // initialise ; a mettre ds la boucle
@@ -306,5 +306,6 @@ void Server::quit(Client *client, std::string arg)
 //______________________________TEST CTRLC
 void Server::stop()
 {
-	std::cout << "pour l'instant, rien ne se passe ds la fonction stop() set ds sigHandler, set ds sa_handker, set dans sigaction() set ds le main()" << std::endl;
+	std::cout << "here function stop()" << std::endl;
+	this->_flag_keep_loop = false;
 }

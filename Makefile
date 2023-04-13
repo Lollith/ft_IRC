@@ -37,7 +37,7 @@ re: fclean
 	make -C .
 
 grind: $(NAME)
-	valgrind --track-origins=yes --leak-check=full --show-leak-kinds=all ./ircserv 3490 867
+	valgrind --track-origins=yes --track-fds=yes --leak-check=full --show-leak-kinds=all ./ircserv 6667 coucou
 
 .PHONY: all re clean fclean
 
