@@ -12,5 +12,6 @@ std::string Channel::getName( void ) const{
 void Channel::addClient(Client *client){
 	std::cout << "client"<< client->getSocketClient()<<" rejoint" << std::endl;
 	this->_clients.push_back(client);
+	// std::cout << "vector client"<< _clients.back()->getSocketClient()<< std::endl;
 
 }

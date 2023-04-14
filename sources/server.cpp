@@ -240,7 +240,7 @@ bool Server::loop_recept_send()
 					client->setMsgRecv(buf);
 				}
 				client->getCmdLine(_password);
-				parse_msg_recv(client, buf); // client issu de mon cetor de client
+				parse_msg_recv(client, buf); // client issu de mon vector de client
 			}
 			if(FD_ISSET(client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
 			{
@@ -283,7 +283,7 @@ void Server::join( Client *client, std::string arg )
 {
 	std::cout << "=>Join le channel\n" << std::endl;
 	// client->setMessage("353 lollith = #test :lollith\r\n"); //RPL_NAMREPLY
-	client->setMessage("332 lollith #test :welcome\r\n"); //RPL_NAMREPLY
+	client->setMessage("332 lollith #test :welcome\r\n"); //RPL_TOPIC
 
 	// rempalcer #test = _arg_registration.back()
 	//remplacer lollith par: ?
@@ -321,9 +321,17 @@ int size = client->get_arg().size() - 2;
 	{
 		if ((*it)->getName() == client->get_arg()[size])
 		{
-			// (*it)->_clients[1]->setMessage(client->get_arg().back());
-			std::cout<<(*it)->_clients.back()->getSocketClient()<< std::endl;
-			std::cout<< "message recu: "<<client->get_arg().back()<< ",a envoyer a:"<< client->get_arg()[size]<< std::endl;
+			std::string l(":lollith");
+			std::string p(" PRIVMSG ");
+			// std::cout<< "message recu: "<<client->get_arg().back()<< ",a envoyer a:"<< client->get_arg()[size]<< std::endl;
+			std::string message =  l + p + client->get_arg()[size] + " " +client->get_arg().back() + "\r\n";
+			int i = 0;
+			while (i!= (*it)->_clients.size())
+			{
+				(*it)->_clients[i]->setMessage(message);
+				i++;
+			}
+				client->setMessage("");// interdit le client en cours de recevoir son propre message 
 		}
 	}
 
