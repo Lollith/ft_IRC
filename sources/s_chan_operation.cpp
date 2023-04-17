@@ -30,14 +30,14 @@ void Server::join( Client *client, std::string arg )
 		{
 			INFO("=>Join le channel\n");
 			(*it)->addClient(client);
-			welcome_new_chan(client);
+			welcome_new_chan(client, *it);
 			return;
 		}
 	}
 	_channels.push_back(new Channel( channel)); // si chan n existe pas => le creer
 	INFO("creation Channel " + _channels.back()->getName()+ "\n");
 	_channels.back()->addClient(client);
-	welcome_new_chan(client);
+	welcome_new_chan(client, _channels.back());
 
 
 }
@@ -54,12 +54,12 @@ void Server::join( Client *client, std::string arg )
 // A list of users currently joined to the channel (with one or more RPL_NAMREPLY 
 //(353) numerics followed by a single RPL_ENDOFNAMES (366) numeric). These 
 //RPL_NAMREPLY messages sent by the server MUST include the requesting client that has just joined the channel.
-void Server::welcome_new_chan(Client *client)
+void Server::welcome_new_chan(Client *client, Channel *channel)
 {
 	std::string join_msg = ":"+ client->get_user() + "@" +"~" + client->get_hostname() + " JOIN "+ _channels.back()->getName() +"\r\n";
-	join_msg += reply(RPL_TOPIC, client, _channels);
-	join_msg += reply(RPL_NAMREPLY, client, _channels);
-	join_msg += reply(RPL_ENDOFNAMES, client, _channels);
+	join_msg += reply(RPL_TOPIC, client, channel);
+	join_msg += reply(RPL_NAMREPLY, client, channel);
+	join_msg += reply(RPL_ENDOFNAMES, client, channel);
 	client->setMessage(join_msg);
 }
 
