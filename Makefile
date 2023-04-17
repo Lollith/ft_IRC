@@ -5,9 +5,11 @@ SRC_PATHS = ./sources/
 
 SRC = $(addprefix $(SRC_PATHS),\
 	server.cpp\
+	s_chan_operation.cpp\
 	client.cpp\
 	message.cpp\
 	channel.cpp\
+	numerics_replies.cpp\
 	main.cpp)
 
 OBJ		=	$(SRC:./sources/%.cpp=./build/%.o)

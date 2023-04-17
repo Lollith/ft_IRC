@@ -32,6 +32,9 @@ public:
 	void		 				setFlagPsswdProvided(bool boolean);
 
 	std::vector<std::string>  	get_arg( void ) const;
+	std::string					get_user( void ) const;
+	std::string					get_hostname( void ) const;
+	std::string					get_nickname( void ) const;
 
 
 	//__________________________________________________MEMBERS
@@ -53,6 +56,7 @@ public:
 
 
 
+	std::vector<std::string>	_arg_registration;
 
 private:
 	// useless constructor
@@ -64,14 +68,16 @@ private:
 
 
 	// Client	_client_data;	//données à récupérer et à stocker ? container: set ?
-	int 						_socket_client; // faire un containeur
+	int 						_socket_client;
 	int							_step_registration; //compteur des étapes d'authentification
 	bool						_flag_password_ok;
 	bool						_flag_password_provided;
 	std::string					_message_recv;
 	std::string 				_cmd_registration;
+	std::string					_user;
+	std::string					_nickname;
+	std::string					_hostname;
 
-	std::vector<std::string>	_arg_registration;
 };
 
 #include "channel.hpp"
