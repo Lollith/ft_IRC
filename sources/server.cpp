@@ -78,9 +78,10 @@ bool Server::AcceptSocketClient()
 		perror("accept()");
 		return false;
 	}
-	std::cout << socket << std::endl;
-	_client.push_back(new Client());
-	_client.back()->setSocketClient(socket);
+
+	std::cout << socket << std::endl;	
+		_client.push_back(new Client(socket));
+
 	return true;
 }
 
@@ -244,16 +245,16 @@ bool Server::loop_recept_send()
 				}
 				if (buf[0])
 				{
-					std::cout << "=>Recois un message depuis le client:" << std::endl;
+					std::cout << "=>Recois un message depuis le client "<< client->getSocketClient()<< ": "<< std::endl;
 					std::cout << buf << std::endl;
 					client->setMsgRecv(buf);
 				}
 				client->getCmdLine(_password);
-				parse_msg_recv(client, buf);
+				parse_msg_recv(client, buf); // client issu de mon vector de client
 			}
 			if (FD_ISSET(client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
 			{
-				if (!client->getMessage().empty()) // du coup comme je reinitialise a la fin le message, ca fait bugger qd g rien a send dou la condition ici
+				if(!client->getMessage().empty()) // comme je reinitialise a la fin le message
 				{
 					std::cout << "=>Repond au client:" << std::endl;
 					int res_send = send(client->getSocketClient(), client->getMessage().c_str(), client->getMessage().size(), 0);
@@ -275,10 +276,10 @@ bool Server::loop_recept_send()
 //-----fct _channels------------------------------------------------------------
 void Server::parse_msg_recv(Client *client, std::string msg_recv)
 {
-	int nb_fct = 2;
-	std::string funct_names[] = {"JOIN", "QUIT"};
+	int nb_fct = 3;
+	std::string funct_names[] = {"JOIN", "QUIT", "PRIVMSG"};
 
-	void (Server::*fct_member[])(Client * client, std::string arg) = {&Server::join, &Server::quit};
+	void (Server::*fct_member[])(Client *client, std::string arg) = { &Server::join, &Server::quit, &Server::privmsg };
 
 	for (int i = 0; i < nb_fct; i++)
 	{
@@ -287,15 +288,30 @@ void Server::parse_msg_recv(Client *client, std::string msg_recv)
 	}
 }
 
-void Server::join(Client *client, std::string arg)
+void Server::join( Client *client, std::string arg )
 {
 	std::cout << "=>Join le channel\n"
 			  << std::endl;
 	// client->setMessage("353 lollith = #test :lollith\r\n"); //RPL_NAMREPLY
-	client->setMessage("332 lollith #test :welcome\r\n"); // RPL_NAMREPLY
-														  // lollith has joined #test
-														  //  Topic for #test:welcome
-														  //  Topic set by X[] [time]
+	client->setMessage("332 lollith #test :welcome\r\n"); //RPL_TOPIC
+
+	// rempalcer #test = _arg_registration.back()
+	//remplacer lollith par: ?
+	//lollith has joined #test
+	// Topic for #test:welcome
+	// Topic set by X[] [time]
+	std::vector<Channel*>::iterator it;	
+	for (it = _channels.begin(); it != _channels.end(); it++) // 1er n hexiste pas , ne rentre pas
+	{
+		if ((*it)->getName() == client->get_arg().back()) // si  channel n exoiste pas
+		{
+			(*it)->addClient(client);
+			return;
+		}
+	}
+	_channels.push_back(new Channel( client->get_arg().back()));
+	_channels.back()->addClient(client);
+	std::cout << "creation Channel" << _channels.back()->getName()<< std::endl;
 }
 
 void Server::quit(Client *client, std::string arg)
@@ -307,4 +323,32 @@ void Server::quit(Client *client, std::string arg)
 void Server::stop()
 {
 	this->_flag_keep_loop = false;
+}
+
+// The PRIVMSG command is used to send private messages between users, as well 
+// as to send messages to channels. <target> is the nickname of a client or the name of a channel.(#)
+
+void Server::privmsg( Client *client, std::string arg ){
+int size = client->get_arg().size() - 2;
+	std::cout << "je recois les messages prives depuis le client"<< client->getSocketClient()<< std::endl;
+	
+	//recherche parmi mon vector de channels , le bon channel , puis envoyer le message aux bons client = clients enregistres dans le channel
+	std::vector<Channel*>::iterator it;	
+	for (it = _channels.begin(); it != _channels.end(); it++)
+	{
+		if ((*it)->getName() == client->get_arg()[size])
+		{
+			std::string l(":lollith");
+			std::string p(" PRIVMSG ");
+			// std::cout<< "message recu: "<<client->get_arg().back()<< ",a envoyer a:"<< client->get_arg()[size]<< std::endl;
+			std::string message =  l + p + client->get_arg()[size] + " " +client->get_arg().back() + "\r\n";
+			int i = 0;
+			while (i!= (*it)->_clients.size())
+			{
+				(*it)->_clients[i]->setMessage(message);
+				i++;
+			}
+				client->setMessage("");// interdit le client en cours de recevoir son propre message 
+		}
+	}
 }

@@ -3,12 +3,14 @@
 
 #include "irc.h"
 
+class Channel;
 class Client
 {
 public:
 	//__________________________________________________canonic form
 
-	Client(void);
+	Client(int sock_client);
+
 	// Client(Client const &cpy);
 
 	// Client &operator=(Client const &rhs);
@@ -17,34 +19,36 @@ public:
 
 	//__________________________________________________GETTERS_SETTERS	
 
-	int					getSocketClient( void ) const;
-	void				setSocketClient( int socket );
+	int							getSocketClient( void ) const;
+	void						setSocketClient( int socket );
 
-	void				setMsgRecv( std::string buf);
-	std::string			getMsgRecv( void )const;
+	void						setMsgRecv( std::string buf );
+	std::string					getMsgRecv( void )const;
 
-	std::string			getMessage( void ) const;
-	void				setMessage( std::string );
+	std::string					getMessage( void ) const;
+	void						setMessage( std::string );
 
-	void		 		setFlagPsswd(bool boolean);
-	void		 		setFlagPsswdProvided(bool boolean);
+	void				 		setFlagPsswd(bool boolean);
+	void		 				setFlagPsswdProvided(bool boolean);
+
+	std::vector<std::string>  	get_arg( void ) const;
 
 
+	//__________________________________________________MEMBERS
 	// dans cette fonction split du buf pour récuperer une pair commande - argument
-	void 	tokenization_cmd(std::string& cmd_line);
-	void 	getCmdLine(std::string const& password);
+	void 						tokenization_cmd( std::string& cmd_line );
+	void 						getCmdLine( std::string const& password );
 
 	//here fonctions qui vont check d'éventuelles d'erreurs et construire un objet
 	// Conncexioin pour envoyer la réponse adéquate
-	void 	checkParams(std::string const& password);
-	void	ignoreCap(std::string const&);
-	void	checkPassword(std::string const& password);
-	void	checkNick(std::string const&);
-	void	checkUser(std::string const&);
+	void 						checkParams( std::string const& password );
+	void						ignoreCap( std::string const& );
+	void						checkPassword( std::string const& password );
+	void						checkNick( std::string const& );
+	void						checkUser( std::string const& );
 
 	//define typedef ici pour struct sockaddr_in??
 	
-	//__________________________________________________MEMBERS
 
 
 
@@ -52,10 +56,11 @@ public:
 
 private:
 	// useless constructor
+	Client(void);
 
 	//attributes________________________________________________________________
 	Message 			_message;
-	Connection			_msg_connection;			
+	// Connection			_msg_connection;			
 
 
 	// Client	_client_data;	//données à récupérer et à stocker ? container: set ?
@@ -65,8 +70,9 @@ private:
 	bool						_flag_password_provided;
 	std::string					_message_recv;
 	std::string 				_cmd_registration;
-	std::vector<std::string>	_arg_registration;
 
+	std::vector<std::string>	_arg_registration;
 };
 
+#include "channel.hpp"
 #endif
