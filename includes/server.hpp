@@ -51,6 +51,7 @@ public:
 	void				privmsg( Client *client, std::string arg );
 
 	void 				stop();
+	void 				welcome_new_chan( Client *client );
 
 private:
 	// useless constructor
