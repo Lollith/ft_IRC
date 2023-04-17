@@ -50,6 +50,8 @@ public:
 	void 				quit( Client *client, std::string arg );
 	void				privmsg( Client *client, std::string arg );
 
+	void 				stop();
+
 private:
 	// useless constructor
 	Server(void);
@@ -61,6 +63,7 @@ private:
 	struct sockaddr_in		_addr_server;
 	struct sockaddr_in		_client_addr; // info adresse du client // ici ?
 	socklen_t				_sin_size;
+	bool					_flag_keep_loop;
 	std::string 			_password;
 	std::vector<Client*>	_client;
 

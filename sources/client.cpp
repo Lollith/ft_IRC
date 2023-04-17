@@ -160,17 +160,14 @@ void Client::checkParams(std::string const &password)
 
 		if (_cmd_registration == cmd_to_check[i])
 		{
-			std::cout << "password flag state each time: " << _flag_password_ok << std::endl;
 			if (i > 1 && _flag_password_provided == false)
 			{
-				std::cout<< "PASS not detected should not enter in the if otherwise" << std::endl;
 				setMessage("PASS: 451::You have not registered\r\n");
 				// i++;
 				return;
 			}
 			else
 			{
-				std::cout << "should enter in checkPass" << std::endl;
 				(this->*(func_list[i]))(password);
 				break;
 			}
