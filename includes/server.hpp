@@ -44,11 +44,14 @@ public:
 	bool				startServer();
 	bool				loop_recept_send();
 
+	//-----fct _channels------------------------------------------------------------
 	void 				parse_msg_recv( Client *client, std::string msg_recv );
 	void 				join( Client *client, std::string arg );
 	void 				quit( Client *client, std::string arg );
+	void				privmsg( Client *client, std::string arg );
 
 	void 				stop();
+	void 				welcome_new_chan( Client *client );
 
 private:
 	// useless constructor
@@ -64,8 +67,8 @@ private:
 	bool					_flag_keep_loop;
 	std::string 			_password;
 	std::vector<Client*>	_client;
-	std::vector<Channel*>	_channel;
 
+	std::vector<Channel*>	_channels;
 };
 
 #endif

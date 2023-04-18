@@ -7,10 +7,12 @@ Client::Client(void): _flag_password_ok("false")
 	// std::cout << "constructeur client par default"<< std::endl;
 }
 
-// Client::Client(int sock_client): _socket_client(sock_client)
-// {
+Client::Client(int sock_client): _socket_client(sock_client), _flag_password_ok("false")
+{
+	
 // 	std::cout << "create client" << std::endl;
-// }
+// 
+}
 
 // Client::Client(Client const &cpy)
 // {
@@ -44,26 +46,41 @@ void Client::setMessage(std::string buffer)
 	this->_message.setBuffer(buffer);
 }
 
-void Client::setMsgRecv(std::string buf)
+void Client::setMsgRecv( std::string buf )
 {
 	_message_recv = buf;
 }
 
-std::string Client::getMsgRecv(void) const
+std::string Client::getMsgRecv( void ) const
 {
 	return this->_message_recv;
 }
 
-void	Client::setFlagPsswd(bool boolean)
+void	Client::setFlagPsswd( bool boolean )
 {
 	this->_flag_password_ok = boolean;
 }void	
 
-Client::setFlagPsswdProvided(bool boolean)
+Client::setFlagPsswdProvided( bool boolean )
 {
 	this->_flag_password_provided = boolean;
 }
 
+std::vector<std::string> Client::get_arg( void ) const{
+	return this->_arg_registration;
+}
+
+std::string Client::get_user( void ) const{
+	return this->_user;
+}
+
+std::string Client::get_hostname( void ) const{
+	return this->_hostname;
+}
+
+std::string Client::get_nickname( void ) const{
+	return this->_nickname;
+}
 //__________________________________________________MEMBERS FUNCTIONS
 
 
@@ -86,7 +103,10 @@ void Client::tokenization_cmd(std::string &cmd)
 	}
 	// vérifs attributs cmd and args
 	std::cout << "in tokenization: cmd is : " << this->_cmd_registration << std::endl;
-	std::cout << "in tokenization: args are : " << this->_arg_registration.back() << std::endl;
+	
+	std::vector<std::string>::iterator it;	
+	for (it = _arg_registration.begin(); it != _arg_registration.end(); it++) // 1er n hexiste pas , ne rentre pas
+		std::cout << "in tokenization: args are : " << (*it) << std::endl;
 }
 
 void Client::ignoreCap(std::string const &)
@@ -142,6 +162,14 @@ void Client::checkUser(std::string const &)
 	std::cout << "here is USER check func" << std::endl;
 
 	this->_step_registration += 1;
+	_user = _arg_registration[3];
+	_hostname = _arg_registration[5];
+	_nickname = _arg_registration[2];
+	//   "<client> :Welcome to the <networkname> Network, <nick>[!<user>@<host>]"
+	std::string  buffer = "001 " + get_user() + " :Welcome to the " + _hostname + " Network, " + _nickname+"[!" + _user + "@" + _hostname + "]\r\n";
+	_message.setBuffer(buffer);
+
+
 }
 
 void Client::checkParams(std::string const &password)
@@ -168,6 +196,7 @@ void Client::checkParams(std::string const &password)
 				(this->*(func_list[i]))(password);
 				break;
 			}
+			
 		}
 		i++;
 	}
