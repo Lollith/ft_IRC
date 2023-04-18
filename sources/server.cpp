@@ -24,19 +24,20 @@ Server::Server(const int port, const std::string password)
 
 Server::~Server(void)
 {
+	std::cout << YELLOW_TXT << "Destructor server called." << RESET_TXT << std::endl;
 
+	shutdown(this->_socket_server, SHUT_RDWR);
+	close(this->_socket_server);
 	std::vector<Client *>::iterator it;
-
 	for (it = _client.begin(); it != _client.end(); it++)
 	{
-		// à modifier?_____________________________
-		shutdown(this->_socket_server, SHUT_RDWR);
-		close(this->_socket_server);
+		// // à modifier?_____________________________
 		shutdown((*it)->getSocketClient(), SHUT_RDWR);
 		close((*it)->getSocketClient());
 		//________________________________________
-		delete (*it);
+		// delete (*it);
 	}
+	_client.clear();
 } // close() ou/et freeinfo() à faire?
 
 //__________________________________________________GETTERS_SETTERS
@@ -187,12 +188,12 @@ bool Server::startServer()
 bool Server::loop_recept_send()
 {
 	fd_set rd, wr, er;
-	std::vector<Client *>::iterator it;
-	for (it = _client.begin(); it != _client.end(); it++)
-	{
-		(*it)->setFlagPsswd(false);
-		(*it)->setFlagPsswdProvided(false);
-	}
+	// std::vector<Client *>::iterator it;
+	// for (it = _client.begin(); it != _client.end(); it++)
+	// {
+	// 	(*it)->setFlagPsswd(false);
+	// 	(*it)->setFlagPsswdProvided(false);
+	// }
 
 	while (_flag_keep_loop == true)
 	{
