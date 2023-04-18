@@ -2,14 +2,13 @@
 
 //__________________________________________________canonic form
 
-Client::Client(void): _flag_password_ok("false")
+Client::Client(void): _flag_password_ok(false), _flag_password_provided(false), _step_registration(0)
 {
-	// std::cout << "constructeur client par default"<< std::endl;
 }
 
-Client::Client(int sock_client): _socket_client(sock_client), _flag_password_ok("false")
-{
-	
+Client::Client(int sock_client): 
+	_socket_client(sock_client), _flag_password_ok(false), _flag_password_provided(false), _step_registration(0)
+{	
 // 	std::cout << "create client" << std::endl;
 // 
 }
@@ -22,7 +21,7 @@ Client::Client(int sock_client): _socket_client(sock_client), _flag_password_ok(
 // {
 // }
 
-Client::~Client(void) {} // close() ou/et freeinfo() à faire?
+Client::~Client(void) {std::cout << YELLOW_TXT << "Client destructor called" << RESET_TXT << std::endl;} // close() ou/et freeinfo() à faire?
 
 //__________________________________________________GETTERS_SETTERS
 
@@ -59,9 +58,9 @@ std::string Client::getMsgRecv( void ) const
 void	Client::setFlagPsswd( bool boolean )
 {
 	this->_flag_password_ok = boolean;
-}void	
+}
 
-Client::setFlagPsswdProvided( bool boolean )
+void	Client::setFlagPsswdProvided( bool boolean )
 {
 	this->_flag_password_provided = boolean;
 }
@@ -111,24 +110,23 @@ void Client::tokenization_cmd(std::string &cmd)
 
 void Client::ignoreCap(std::string const &)
 {
-	std::cout << "here is CAP check func" << std::endl;
+	std::cout << GREEN_TXT << "here is CAP check func" << RESET_TXT << std::endl;
 
 	this->_step_registration += 1;
 }
 
-
-
 // FERMER LE SOCKET CLIENT SI PASSWD FAUX + GARDER LE SERVEUR ALIVE
 void Client::checkPassword(std::string const &psswd)
 {
-	std::cout << "here is PASS check func" << std::endl;
+	std::cout << GREEN_TXT << "here is PASS check func" << RESET_TXT << std::endl;
 
 	this->_flag_password_provided = true;
+
 	if (_arg_registration.back() == psswd)
 	{
 		this->_step_registration += 1;
 		this->_flag_password_ok = true;
-		std::cout << "PASSWORD OK : " << _flag_password_ok << std::endl;
+		std::cout << GREEN_TXT <<  "PASSWORD OK : " << _flag_password_ok << RESET_TXT << std::endl;
 	}
 	else if (_flag_password_ok == true)
 	{
@@ -139,37 +137,39 @@ void Client::checkPassword(std::string const &psswd)
 	else if ((_cmd_registration == "PASS") && (_arg_registration.empty()))
 	{
 		// send response ERR_NEEDMOREPARAMS //461
+		//
 		setMessage(" 461::Not enough parameters\r\n"); // message incomplet, nick à préciser
 		return;
 	}
 	else
 	{
 		// send response ERR_PASSWDMISMATCH //464
-		setMessage(" 462::Password incorrect\r\n"); // message incomplet, nick à préciser
+		setMessage(" 464::Password incorrect\r\n"); // message incomplet, nick à préciser
 		return;
 	}
 }
 
 void Client::checkNick(std::string const &)
 {
-	std::cout << "here is NICK check func" << std::endl;
+	std::cout << GREEN_TXT << "here is NICK check func" << RESET_TXT << std::endl;
 
 	this->_step_registration += 1;
 }
 
 void Client::checkUser(std::string const &)
 {
-	std::cout << "here is USER check func" << std::endl;
+	std::cout << GREEN_TXT <<"here is USER check func" << RESET_TXT << std::endl;
 
 	this->_step_registration += 1;
 	_user = _arg_registration[3];
 	_hostname = _arg_registration[5];
 	_nickname = _arg_registration[2];
 	//   "<client> :Welcome to the <networkname> Network, <nick>[!<user>@<host>]"
-	std::string  buffer = "001 " + get_user() + " :Welcome to the " + _hostname + " Network, " + _nickname+"[!" + _user + "@" + _hostname + "]\r\n";
-	_message.setBuffer(buffer);
-
-
+	if (_step_registration == 4)
+	{
+		std::string  buffer = "001 " + get_user() + " :Welcome to the " + _hostname + " Network, " + _nickname+"[!" + _user + "@" + _hostname + "]\r\n";
+		_message.setBuffer(buffer);
+	}
 }
 
 void Client::checkParams(std::string const &password)
