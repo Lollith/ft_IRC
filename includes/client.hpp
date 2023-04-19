@@ -22,19 +22,21 @@ public:
 	int							getSocketClient( void ) const;
 	void						setSocketClient( int socket );
 
-	void						setMsgRecv( std::string buf );
 	std::string					getMsgRecv( void )const;
+	void						setMsgRecv( std::string buf );
 
 	std::string					getMessage( void ) const;
 	void						setMessage( std::string );
 
-	void				 		setFlagPsswd(bool boolean);
 	void		 				setFlagPsswdProvided(bool boolean);
+	void				 		setFlagPsswd(bool boolean);
 
 	std::vector<std::string>  	get_arg( void ) const;
 	std::string					get_user( void ) const;
 	std::string					get_hostname( void ) const;
+
 	std::string					get_nickname( void ) const;
+	void						set_nickname(std::string msg_rcv);
 
 
 	//__________________________________________________MEMBERS

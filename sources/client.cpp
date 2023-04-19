@@ -80,6 +80,21 @@ std::string Client::get_hostname( void ) const{
 std::string Client::get_nickname( void ) const{
 	return this->_nickname;
 }
+
+void	Client::set_nickname(std::string msg_rcv)
+{
+	size_t begin;
+	size_t end;
+	size_t i = 0;
+
+	begin = msg_rcv.find("NICK", i) + 4;
+	std::cout << msg_rcv[begin] << std::endl;
+	end = msg_rcv.find("\r\n", i) + 1;
+	std::cout << msg_rcv[end] << std::endl;
+	this->_nickname = msg_rcv.substr(i, (end - begin));
+	std::cout << BLUE_TXT  << _nickname << RESET_TXT << std::endl;
+
+}
 //__________________________________________________MEMBERS FUNCTIONS
 
 
@@ -223,13 +238,12 @@ void Client::getCmdLine(std::string const &password)
 	size_t pos;
 	std::string cmd_line;
 
+
 	pos = this->_message_recv.find(eol_marker);
 	while (pos != std::string::npos)
 	{
 		cmd_line = _message_recv.substr(0, pos);
 		tokenization_cmd(cmd_line);
-		std::cout << BLUE_TXT << "before calling getcmdline: passwd flag ok: "
-			<< _flag_password_ok << RESET_TXT << std::endl;
 		checkParams(password);
 		_message_recv.erase(_message_recv.begin(), (_message_recv.begin() + pos + eol_marker.length()));
 		pos = this->_message_recv.find(eol_marker);
