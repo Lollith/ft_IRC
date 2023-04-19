@@ -56,12 +56,13 @@ enum reply_code
 	ERR_NONICKNAMEGIVEN = 431,
 	ERR_ERRONEUSNICKNAME = 432,
 	ERR_NICKNAMEINUSE = 433,
+	ERR_NICKOLLISION = 436,
 	ERR_USERNOTINCHANNEL = 441,
 	ERR_NOTONCHANNEL = 442,
 	ERR_USERONCHANNEL = 443,
 	ERR_NOTREGISTERED = 451,
 	ERR_NEEDMOREPARAMS = 461,
-	ERR_ALREADYREGISTRED = 462,
+	ERR_ALREADYREGISTERED = 462,
 	ERR_PASSWDMISMATCH = 464,
 	ERR_UNKNOWNMODE = 472,
 	ERR_BADCHANMASK = 476,
@@ -71,6 +72,7 @@ enum reply_code
 	ERR_USERSDONTMATCH = 502
 };
 
-std::string reply (int reply, Client *client, Channel* _channels);
+std::string reply (int reply, Client *client, std::vector<Channel*> _channels);
+std::string reply (int reply, Client *client);
 
 #endif

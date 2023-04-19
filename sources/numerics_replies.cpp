@@ -20,3 +20,27 @@ std::string reply (int reply, Client *client, Channel *channel)
 	}
 	return (msg);
 }
+
+std::string reply (int reply, Client *client)
+{
+	std::string msg;
+
+	switch(reply)
+	{
+		case ERR_NOTREGISTERED:
+			msg = "451 " + client->get_nickname() + " :You have not registered\r\n";
+			break;
+		case ERR_NEEDMOREPARAMS:
+			msg = "461 " + client->get_nickname() + " :Not enough parameters\r\n";
+			break;
+		case ERR_ALREADYREGISTERED:
+			msg = "462 " + client->get_nickname() + " :You may not reregister\r\n";
+			break;
+		case ERR_PASSWDMISMATCH:
+			msg = "464 " + client->get_nickname() + " :Password incorrect\r\n";
+			break;
+		default:
+			msg = "erreur";   // a redefinir
+	}
+	return (msg);
+}
