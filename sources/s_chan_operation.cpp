@@ -12,6 +12,7 @@ void Server::parse_msg_recv(Client *client, std::string msg_recv)
 		if (msg_recv.find(funct_names[i]) != std::string::npos)
 			(this->*fct_member[i])(client, msg_recv);
 	}
+	// Clean_arg(client);
 }
 
 
@@ -22,7 +23,6 @@ void Server::parse_msg_recv(Client *client, std::string msg_recv)
 void Server::join( Client *client, std::string arg )
 {
 	std::string channel = client->get_arg().back();	
-	// Topic set by X[] [time]
 	std::vector<Channel*>::iterator it;	
 	for (it = _channels.begin(); it != _channels.end(); it++) // 1er n existe pas , ne rentre pas
 	{
@@ -81,28 +81,40 @@ void Server::stop()
 // as to send messages to channels. <target> is the nickname of a client or the name of a channel.(#)
 
 void Server::privmsg( Client *client, std::string arg ){
-int size = client->get_arg().size() - 2;
-	std::cout << "je recois les messages prives depuis le client"<< client->getSocketClient()<< std::endl;
-	
+	int size = client->get_arg().size() - 2;
+	INFO("je recois les messages prives depuis le client " + client->get_user()+ "\n");
+// 1=> check si commence par un # => chan	A FAIRE
 	//recherche parmi mon vector de channels , le bon channel , puis envoyer le message aux bons client = clients enregistres dans le channel
-	std::vector<Channel*>::iterator it;	
-	for (it = _channels.begin(); it != _channels.end(); it++)
+	std::vector<Channel*>::iterator it_chan;	
+	for (it_chan = _channels.begin(); it_chan != _channels.end(); it_chan++)
 	{
-		if ((*it)->getName() == client->get_arg()[size])
+		if ((*it_chan)->getName() == client->get_arg()[size])
 		{
-			std::string l(":lollith");
-			std::string p(" PRIVMSG ");
-			// std::cout<< "message recu: "<<client->get_arg().back()<< ",a envoyer a:"<< client->get_arg()[size]<< std::endl;
-			std::string message =  l + p + client->get_arg()[size] + " " +client->get_arg().back() + "\r\n";
+			std::cout<< "message recu: "<<client->get_arg().back()<< ",a envoyer a:"<< client->get_arg()[size]<< std::endl;
+			std::string message = ":" + client->get_user() + " PRIVMSG " + client->get_arg()[size] + " " +client->get_arg().back() + "\r\n";
 			int i = 0;
-			while (i!= (*it)->_clients.size()) //broadcast the messag
+			while (i!= (*it_chan)->_clients.size()) //broadcast the messag
 			{
-				(*it)->_clients[i]->setMessage(message);
+				(*it_chan)->_clients[i]->setMessage(message);
 				i++;
 			}
 				client->setMessage("");// interdit le client en cours de recevoir son propre message 
 		}
 	}
+	// ?? NE MARCHE PAS
+	// na pas trouver le bon channel : check les pseudo pour envoyer a un nickname
+	std::vector<Client*>::iterator it_client;	
+	for (it_client = _client.begin(); it_client != _client.end(); it_client++)
+	{
+		if ((*it_client)->get_nickname() == client->get_arg()[size])
+		{
+
+			std::cout<< "message recu: "<<client->get_arg().back()<< ",a envoyer a:"<< client->get_arg()[size]<< std::endl;
+			std::string message = ":" + client->get_user() + " PRIVMSG " + client->get_arg()[size] + " " +client->get_arg().back() + "\r\n";
+			client->setMessage(message);
+		}
+	}
+
 }
 
 void Server::names(Client *client, std::string arg){ // a faire ????

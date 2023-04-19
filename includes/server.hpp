@@ -54,6 +54,7 @@ public:
 	void 				welcome_new_chan( Client *client, Channel *channel );
 	void 				names( Client *client, std::string arg );
 
+	void 				Clean_arg(Client *client); // a supprimer
 private:
 	// useless constructor
 	Server(void);
@@ -67,8 +68,8 @@ private:
 	socklen_t				_sin_size;
 	bool					_flag_keep_loop;
 	std::string 			_password;
+	
 	std::vector<Client*>	_client;
-
 	std::vector<Channel*>	_channels;
 };
 

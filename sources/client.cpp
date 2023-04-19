@@ -170,15 +170,20 @@ void Client::checkUser(std::string const &)
 		std::string  buffer = "001 " + get_user() + " :Welcome to the " + _hostname + " Network, " + _nickname+"[!" + _user + "@" + _hostname + "]\r\n";
 		_message.setBuffer(buffer);
 	}
+
 }
 
+void Client::clean_ping(std::string const &arg)
+{
+		Clean_arg();
+}
 void Client::checkParams(std::string const &password)
 {
 	int i = 0;
-	void (Client::*func_list[4])(std::string const &arg) =
-		{&Client::ignoreCap, &Client::checkPassword, &Client::checkNick, &Client::checkUser};
-	std::string cmd_to_check[4] = {"CAP", "PASS", "NICK", "USER"};
-	while (i < 4)
+	void (Client::*func_list[5])(std::string const &arg) =
+		{&Client::ignoreCap, &Client::checkPassword, &Client::checkNick, &Client::checkUser, &Client::clean_ping};
+	std::string cmd_to_check[5] = {"CAP", "PASS", "NICK", "USER", "PING"};
+	while (i < 5)
 	{
 		// QQPART CHECKER L EXISTANCE DE PASS DANS LES CMD RECV
 		//  -> CHECK FLAG_PASSWORD_OK
@@ -200,8 +205,14 @@ void Client::checkParams(std::string const &password)
 		}
 		i++;
 	}
-	
 }
+
+void Client::Clean_arg()
+{
+		std::vector<std::string>::iterator it = _arg_registration.begin();
+		while( it != _arg_registration.end()) 
+			_arg_registration.erase (it);
+	}
 
 void Client::getCmdLine(std::string const &password)
 {
@@ -218,5 +229,6 @@ void Client::getCmdLine(std::string const &password)
 		checkParams(password);
 		_message_recv.erase(_message_recv.begin(), (_message_recv.begin() + pos + eol_marker.length()));
 		pos = this->_message_recv.find(eol_marker);
+		// _arg0 = _arg_registration[0];
 	}
 }

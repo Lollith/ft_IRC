@@ -227,7 +227,7 @@ bool Server::loop_recept_send()
 
 		if (FD_ISSET(_socket_server, &rd)) // check si notre socket est pret a lire // recoi le client, et ces logs
 		{
-			std::cout << "=>Accept le nouvel entrant: ";
+			INFO("=>Accept le nouvel entrant: \n");
 			if (AcceptSocketClient() == false)
 				return false;
 		}
@@ -278,8 +278,13 @@ bool Server::loop_recept_send()
 			}
 			
 		}
-		
 	}
 	return true;
 }
 
+void Server::Clean_arg(Client *client)
+{
+		std::vector<std::string>::iterator it = client->get_arg().begin();
+		while( it != client->get_arg().end()) 
+			client->get_arg().erase (it);
+}
