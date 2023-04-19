@@ -52,6 +52,7 @@ public:
 
 	void 				stop();
 	void 				welcome_new_chan( Client *client, Channel *channel );
+	void 				names( Client *client, std::string arg );
 
 private:
 	// useless constructor

@@ -2,10 +2,10 @@
 //-----fct _channels------------------------------------------------------------
 void Server::parse_msg_recv(Client *client, std::string msg_recv)
 {
-	int nb_fct = 3;
-	std::string funct_names[] = {"JOIN", "QUIT", "PRIVMSG"};
+	int nb_fct = 4;
+	std::string funct_names[] = {"JOIN", "QUIT", "PRIVMSG", "NAMES"};
 
-	void (Server::*fct_member[])(Client *client, std::string arg) = { &Server::join, &Server::quit, &Server::privmsg };
+	void (Server::*fct_member[])(Client *client, std::string arg) = { &Server::join, &Server::quit, &Server::privmsg, &Server::names};
 
 	for (int i = 0; i < nb_fct; i++)
 	{
@@ -58,6 +58,7 @@ void Server::welcome_new_chan(Client *client, Channel *channel)
 {
 	std::string join_msg = ":"+ client->get_user() + "@" +"~" + client->get_hostname() + " JOIN "+ _channels.back()->getName() +"\r\n";
 	join_msg += reply(RPL_TOPIC, client, channel);
+
 	join_msg += reply(RPL_NAMREPLY, client, channel);
 	join_msg += reply(RPL_ENDOFNAMES, client, channel);
 	client->setMessage(join_msg);
@@ -94,7 +95,7 @@ int size = client->get_arg().size() - 2;
 			// std::cout<< "message recu: "<<client->get_arg().back()<< ",a envoyer a:"<< client->get_arg()[size]<< std::endl;
 			std::string message =  l + p + client->get_arg()[size] + " " +client->get_arg().back() + "\r\n";
 			int i = 0;
-			while (i!= (*it)->_clients.size())
+			while (i!= (*it)->_clients.size()) //broadcast the messag
 			{
 				(*it)->_clients[i]->setMessage(message);
 				i++;
@@ -102,4 +103,8 @@ int size = client->get_arg().size() - 2;
 				client->setMessage("");// interdit le client en cours de recevoir son propre message 
 		}
 	}
+}
+
+void Server::names(Client *client, std::string arg){ // a faire ????
+	// INFO("execute la fct names\n");
 }

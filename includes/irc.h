@@ -16,6 +16,7 @@
 #include "client.hpp"
 #include "channel.hpp"
 #include "server.hpp"
+#include <utility> //pair
 
 #define RESET_TXT "\e[0m"
 
