@@ -253,7 +253,7 @@ bool Server::loop_recept_send()
 					std::cout << buf << std::endl;
 					client->setMsgRecv(buf);
 				}
-		
+			
 				client->getCmdLine(_password);
 	
 				parse_msg_recv(client, buf); // client issu de mon vector de client

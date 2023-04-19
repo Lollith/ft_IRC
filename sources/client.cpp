@@ -119,6 +119,9 @@ void Client::ignoreCap(std::string const &)
 void Client::checkPassword(std::string const &psswd)
 {
 	std::cout << GREEN_TXT << "here is PASS check func" << RESET_TXT << std::endl;
+	std::cout << YELLOW_TXT << _flag_password_ok << RESET_TXT << std::endl;
+	std::cout << YELLOW_TXT << _flag_password_provided << RESET_TXT << std::endl;
+
 
 	this->_flag_password_provided = true;
 
@@ -130,23 +133,31 @@ void Client::checkPassword(std::string const &psswd)
 	}
 	else if (_flag_password_ok == true)
 	{
+		std::cout << YELLOW_TXT << " here ALREADYREGISTERED " << RESET_TXT << std::endl;
+
+		std::cout << YELLOW_TXT << _flag_password_ok << RESET_TXT << std::endl;
+
 		// send response ERR_ALREADYREGISTERED //462
-		setMessage(" 462:You may not reregistered\r\n"); // message incomplet, nick à préciser
+		setMessage(reply(ERR_ALREADYREGISTERED, this));
+		// setMessage(" 462:You may not reregistered\r\n"); // message incomplet, nick à préciser
 		return;
 	}
 	else if ((_cmd_registration == "PASS") && (_arg_registration.empty()))
 	{
 		// send response ERR_NEEDMOREPARAMS //461
 		//
-		setMessage(" 461::Not enough parameters\r\n"); // message incomplet, nick à préciser
+		setMessage(reply(ERR_NEEDMOREPARAMS, this));
+		// setMessage(" 461::Not enough parameters\r\n"); // message incomplet, nick à préciser
 		return;
 	}
 	else
 	{
 		// send response ERR_PASSWDMISMATCH //464
-		setMessage(" 464::Password incorrect\r\n"); // message incomplet, nick à préciser
+		setMessage(reply(ERR_PASSWDMISMATCH, this));
+		// setMessage(" 464::Password incorrect\r\n"); // message incomplet, nick à préciser
 		return;
 	}
+	std::cout << RED_TXT << "flag password ok at the end of func pass: " << _flag_password_ok << RESET_TXT << std::endl;
 }
 
 void Client::checkNick(std::string const &)
@@ -187,7 +198,9 @@ void Client::checkParams(std::string const &password)
 		{
 			if (i > 1 && _flag_password_provided == false)
 			{
-				setMessage("PASS: 451::You have not registered\r\n");
+				setMessage(reply(ERR_NOTREGISTERED, this));
+
+				// setMessage("PASS: 451::You have not registered\r\n");
 				// i++;
 				return;
 			}
@@ -215,6 +228,8 @@ void Client::getCmdLine(std::string const &password)
 	{
 		cmd_line = _message_recv.substr(0, pos);
 		tokenization_cmd(cmd_line);
+		std::cout << BLUE_TXT << "before calling getcmdline: passwd flag ok: "
+			<< _flag_password_ok << RESET_TXT << std::endl;
 		checkParams(password);
 		_message_recv.erase(_message_recv.begin(), (_message_recv.begin() + pos + eol_marker.length()));
 		pos = this->_message_recv.find(eol_marker);

@@ -61,7 +61,7 @@ enum reply_code
 	ERR_USERONCHANNEL = 443,
 	ERR_NOTREGISTERED = 451,
 	ERR_NEEDMOREPARAMS = 461,
-	ERR_ALREADYREGISTRED = 462,
+	ERR_ALREADYREGISTERED = 462,
 	ERR_PASSWDMISMATCH = 464,
 	ERR_UNKNOWNMODE = 472,
 	ERR_BADCHANMASK = 476,
@@ -72,5 +72,6 @@ enum reply_code
 };
 
 std::string reply (int reply, Client *client, Channel* _channels);
+std::string reply (int reply, Client *client);
 
 #endif
