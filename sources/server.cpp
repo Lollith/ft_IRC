@@ -33,9 +33,9 @@ Server::~Server(void)
 	{
 		shutdown((*it)->getSocketClient(), SHUT_RDWR);
 		close((*it)->getSocketClient());
-
+		delete((*it));
 	}
-	_client.clear();
+	// _client.clear();
 }
 
 //__________________________________________________GETTERS_SETTERS
@@ -199,7 +199,12 @@ bool Server::loop_recept_send()
 		std::vector<Client *>::iterator it;
 		for (it = _client.begin(); it != _client.end(); it++)
 		{
-			if ((*it)->getSocketClient()) // n existe pas au 1er tour de boucle
+			if ((*it)->getFlagKeepLoop() == false)
+			{
+				this->_flag_keep_loop = false;
+				return false;
+			}
+			else if ((*it)->getSocketClient()) // n existe pas au 1er tour de boucle
 			{
 				FD_SET((*it)->getSocketClient(), &rd);
 				FD_SET((*it)->getSocketClient(), &wr);
@@ -270,6 +275,7 @@ bool Server::loop_recept_send()
 			
 		}
 	}
+	std::cout << RED_TXT << "quit the loop" << RESET_TXT << std::endl;
 	return true;
 }
 

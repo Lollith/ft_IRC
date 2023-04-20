@@ -31,6 +31,8 @@ public:
 	void		 				setFlagPsswdProvided(bool boolean);
 	void				 		setFlagPsswd(bool boolean);
 
+	bool				 		getFlagKeepLoop();
+
 	std::vector<std::string>  	get_arg( void ) const;
 	std::string					get_user( void ) const;
 	std::string					get_hostname( void ) const;
@@ -54,10 +56,6 @@ public:
 	void 						clean_ping_mode(std::string const &arg);
 	void 						Clean_arg( void );
 	//define typedef ici pour struct sockaddr_in??
-	
-
-
-
 
 	std::vector<std::string>	_arg_registration;
 
@@ -75,6 +73,7 @@ private:
 	int							_step_registration; //compteur des étapes d'authentification
 	bool						_flag_password_ok;
 	bool						_flag_password_provided;
+	bool						_flag_keep_loop;
 	std::string					_message_recv;
 	std::string 				_cmd_registration;
 	std::string					_user;

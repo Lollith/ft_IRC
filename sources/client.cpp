@@ -2,12 +2,15 @@
 
 //__________________________________________________canonic form
 
-Client::Client(void):  _step_registration(0),_flag_password_ok(false), _flag_password_provided(false)
+Client::Client(void):  _step_registration(0),_flag_password_ok(false), _flag_password_provided(false),
+	_flag_keep_loop(true)
 {
 }
 
 Client::Client(int sock_client): 
-	_socket_client(sock_client), _step_registration(0), _flag_password_ok(false), _flag_password_provided(false)
+	_socket_client(sock_client), _step_registration(0), _flag_password_ok(false), _flag_password_provided(false),
+		_flag_keep_loop(true)
+
 {	
 // 	std::cout << "create client" << std::endl;
 // 
@@ -69,6 +72,12 @@ std::vector<std::string> Client::get_arg( void ) const{
 	return this->_arg_registration;
 }
 
+bool	Client::getFlagKeepLoop()
+{
+	return this->_flag_keep_loop;
+}
+
+
 std::string Client::get_user( void ) const{
 	return this->_user;
 }
@@ -89,9 +98,6 @@ void	Client::set_nickname(std::string const& msg_rcv)
 	begin = msg_rcv.find("NICK", 0) + 5;
 	end = msg_rcv.find("\r\n", begin);
 	this->_nickname = msg_rcv.substr(begin, (end - begin));
-	std::cout << GREEN_TXT  << "begin=" << begin << ", end=" << end << ", substr(" << begin << ", " << (end-begin) << ")" << RESET_TXT << std::endl;
-	std::cout << BLUE_TXT  << _nickname << RESET_TXT << std::endl;
-
 }
 //__________________________________________________MEMBERS FUNCTIONS
 
@@ -128,6 +134,8 @@ void Client::ignoreCap(std::string const &)
 void Client::checkPassword(std::string const &psswd)
 {
 	std::cout << GREEN_TXT << "here is PASS check func" << RESET_TXT << std::endl;
+
+	std::string rpl;
 	
 	this->_flag_password_provided = true;
 
@@ -144,15 +152,22 @@ void Client::checkPassword(std::string const &psswd)
 	}
 	else if ((_cmd_registration == "PASS") && (_arg_registration.empty()))
 	{
-		setMessage(reply(ERR_NEEDMOREPARAMS, this));
+		rpl = reply(ERR_NEEDMOREPARAMS, this);
+		rpl+= "ERROR: Server closing a client connection because need registration.\r\n";
+		setMessage(rpl);
+		_step_registration = 0;
+		_flag_keep_loop = false;
 		return;
 	}
 	else
 	{
-		setMessage(reply(ERR_PASSWDMISMATCH, this));
+		rpl = reply(ERR_PASSWDMISMATCH, this);
+		rpl+= "ERROR: Server closing a client connection because need registration.\r\n";
+		setMessage(rpl);
+		_step_registration = 0;
+		_flag_keep_loop = false;
 		return;
 	}
-	std::cout << RED_TXT << "flag password ok at the end of func pass: " << _flag_password_ok << RESET_TXT << std::endl;
 }
 
 void Client::checkNick(std::string const &)
