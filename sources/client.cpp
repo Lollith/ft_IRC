@@ -55,6 +55,16 @@ std::string Client::getMsgRecv( void ) const
 	return this->_message_recv;
 }
 
+void Client::setMsgRecvSave( std::string buf )
+{
+	_message_recv_save = buf;
+}
+
+std::string Client::getMsgRecvSave( void ) const
+{
+	return this->_message_recv_save;
+}
+
 void	Client::setFlagPsswd( bool boolean )
 {
 	this->_flag_password_ok = boolean;

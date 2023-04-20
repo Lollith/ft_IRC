@@ -25,6 +25,9 @@ public:
 	void						setMsgRecv( std::string buf );
 	std::string					getMsgRecv( void )const;
 
+	void						setMsgRecvSave( std::string buf );
+	std::string					getMsgRecvSave( void )const;
+	
 	std::string					getMessage( void ) const;
 	void						setMessage( std::string );
 
@@ -75,6 +78,7 @@ private:
 	bool						_flag_password_ok;
 	bool						_flag_password_provided;
 	std::string					_message_recv; // modifiee apres getcmdline
+	std::string					_message_recv_save; //non modifiee apres getcmdline
 	std::string 				_cmd_registration;
 	std::string					_user;
 	std::string					_nickname;

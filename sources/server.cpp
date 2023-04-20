@@ -162,9 +162,6 @@ bool Server::startServer()
 
 //-----loop recept, send , select------------------------------------------------
 
-// envoi dun message dun client => serveur => client 2// passe tjs par le serveur qui renvoi
-// doit etre connecter a un channel pour que les messages soient envoyes
-
 // https://manpages.ubuntu.com/manpages/xenial/fr/man2/select_tut.2.html
 // Afin de gérer ses clients, notre serveur va maintenant devoir maintenir une
 // liste de clients connectés en enregistrant les retours de accept qui représente
@@ -184,6 +181,73 @@ bool Server::startServer()
 // on doit vérifier que notre socket serveur est prêt en écriture :
 
 // select verifie si des donnes sont dispo en lecture , ecruiture sur notre socket et retourne le nombre
+void	Server::mySelect(fd_set &rd, fd_set &wr)
+{
+	FD_ZERO(&rd);
+	FD_ZERO(&wr);
+	FD_SET(_socket_server, &rd); // ajoute mon fd de serveur a lensemble
+	FD_SET(_socket_server, &wr);
+
+	std::vector<Client *>::iterator it;
+	for (it = _client.begin(); it != _client.end(); it++)
+	{
+		if ((*it)->getSocketClient()) // n existe pas au 1er tour de boucle
+		{
+			FD_SET((*it)->getSocketClient(), &rd);
+			FD_SET((*it)->getSocketClient(), &wr);
+		}
+	}
+	int select_ready = select(FD_SETSIZE, &rd, &wr, NULL, NULL); 
+	if (select_ready == -1)
+	{
+		perror("select");
+		// return false; // continue?? si errno == eintr
+	}
+	// else if (select_ready == 0) //utile?
+	// {
+	// 	std::cout <<"timeout"<< std::endl;
+	// 	continue;
+	// }
+}
+
+void Server::myrecv(Client *client)
+{
+	char buf[1024] = {0};
+
+	int res_rd = recv(client->getSocketClient(), buf, sizeof(buf), 0);
+	if (res_rd < 0)
+	{
+		perror("receive client failed");
+		close(client->getSocketClient());
+		// return false;
+	}
+	if (buf[0])
+	{
+		INFO("=>Recois un message depuis le client "
+			<< client->getSocketClient()<< ": "<< std::endl);
+		// std::cout << buf << std::endl;
+		client->setMsgRecv(buf);
+		client->setMsgRecvSave(buf);
+	}
+}
+
+void Server::mysend(Client *client)
+{
+	if(!client->getMessage().empty()) // comme je reinitialise a la fin le message
+	{
+		INFO("=>Repond au client:" << std::endl);
+		size_t res_send = send(client->getSocketClient(), client->getMessage().c_str(), client->getMessage().size(), 0);
+		if (res_send != client->getMessage().size())
+		{
+			perror("send client failed");
+			close(client->getSocketClient());
+			// return false;
+		}
+		INFO("=>Message envoye a client " <<client->getSocketClient()
+			<< ": " << client->getMessage()<<std::endl);
+		client->setMessage(""); // reinitialise le message , sinon boucle
+	}
+}
 
 bool Server::loop_recept_send()
 {
@@ -197,33 +261,9 @@ bool Server::loop_recept_send()
 
 	while (_flag_keep_loop == true)
 	{
-		char buf[1024] = {0};
-		FD_ZERO(&rd);
-		FD_ZERO(&wr);
-		FD_SET(_socket_server, &rd); // ajoute mon fd de serveur a lensemble
-		FD_SET(_socket_server, &wr);
-
-		
 		std::vector<Client *>::iterator it;
-		for (it = _client.begin(); it != _client.end(); it++)
-		{
-			if ((*it)->getSocketClient()) // n existe pas au 1er tour de boucle
-			{
-				FD_SET((*it)->getSocketClient(), &rd);
-				FD_SET((*it)->getSocketClient(), &wr);
-			}
-		}
-		int select_ready = select(FD_SETSIZE, &rd, &wr, NULL, NULL); 
-		if (select_ready == -1)
-		{
-			perror("select");
-			// return false; // continue?? si errno == eintr
-		}
-		// else if (select_ready == 0) //utile?
-		// {
-		// 	std::cout <<"timeout"<< std::endl;
-		// 	continue;
-		// }
+		
+		mySelect(rd, wr);
 
 		if (FD_ISSET(_socket_server, &rd)) // check si notre socket est pret a lire // recoi le client, et ces logs
 		{
@@ -231,50 +271,17 @@ bool Server::loop_recept_send()
 			if (AcceptSocketClient() == false)
 				return false;
 		}
-
 		for (it = _client.begin(); it != _client.end(); it++)
 		{
 			Client *client = *it;
-			
-			//----------------recev------------------------------------------------------------
 			if (FD_ISSET(client->getSocketClient(), &rd))
 			{
-				int res_rd = recv(client->getSocketClient(), buf, sizeof(buf), 0);
-				if (res_rd < 0)
-				{
-					perror("receive client failed");
-					close(client->getSocketClient());
-					return false;
-				}
-				if (buf[0])
-				{
-					INFO("=>Recois un message depuis le client "
-						<< client->getSocketClient()<< ": "<< std::endl);
-					// std::cout << buf << std::endl;
-					client->setMsgRecv(buf);
-				}
-		
+				myrecv(client);
 				client->getCmdLine(_password);
-				parse_msg_recv(client, buf); // client issu de mon vector de client
+				parse_msg_recv(client, client->getMsgRecvSave());
 			}
-
 			if (FD_ISSET(client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
-			{
-				if(!client->getMessage().empty()) // comme je reinitialise a la fin le message
-				{
-					 INFO("=>Repond au client:" << std::endl);
-					size_t res_send = send(client->getSocketClient(), client->getMessage().c_str(), client->getMessage().size(), 0);
-					if (res_send != client->getMessage().size())
-					{
-						perror("send client failed");
-						close(client->getSocketClient());
-						// return false;
-					}
-					INFO("=>Message envoye a client " <<client->getSocketClient()
-						<< ": " << client->getMessage()<<std::endl);
-					client->setMessage(""); // reinitialise le message , sinon boucle
-				}
-			}	
+				mysend(client);
 		}
 	}
 	return true;

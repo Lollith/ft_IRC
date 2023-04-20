@@ -13,11 +13,11 @@ void Server::parse_msg_recv(Client *client, std::string msg_recv)
 		{
 			(this->*fct_member[i])(client);
 			client->set_arg();
+			client->setMsgRecvSave(""); // reinitialise le message recu sinon boucle sur /quit
 		}
 	}
 
 }
-
 
 
 void Server::join( Client *client)
@@ -68,6 +68,7 @@ void Server::quit(Client *client)
 {
 	(void) client;
 	std::cout << "=>Quit le channel" << std::endl;
+	// this->_flag_keep_loop = false ; // a modifier pour quiter le chan proprement
 }
 
 //______________________________TEST CTRLC
