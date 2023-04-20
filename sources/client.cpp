@@ -131,20 +131,19 @@ void Client::checkPassword(std::string const &psswd)
 	else if (_flag_password_ok == true)
 	{
 		// send response ERR_ALREADYREGISTERED //462
-		setMessage(" 462:You may not reregistered\r\n"); // message incomplet, nick à préciser
+		setMessage(reply(ERR_ALREADYREGISTERED, this));
 		return;
 	}
 	else if ((_cmd_registration == "PASS") && (_arg_registration.empty()))
 	{
 		// send response ERR_NEEDMOREPARAMS //461
-		//
-		setMessage(" 461::Not enough parameters\r\n"); // message incomplet, nick à préciser
+		setMessage(reply(ERR_NEEDMOREPARAMS, this));
 		return;
 	}
 	else
 	{
 		// send response ERR_PASSWDMISMATCH //464
-		setMessage(" 464::Password incorrect\r\n"); // message incomplet, nick à préciser
+		setMessage(reply(ERR_PASSWDMISMATCH, this));
 		return;
 	}
 }
@@ -164,7 +163,7 @@ void Client::checkUser(std::string const &)
 	_user = _arg_registration[3];
 	_hostname = _arg_registration[5];
 	_nickname = _arg_registration[2];
-	//   "<client> :Welcome to the <networkname> Network, <nick>[!<user>@<host>]"
+
 	if (_step_registration == 4)
 	{
 		std::string  buffer = "001 " + get_user() + " :Welcome to the " + _hostname + " Network, " + _nickname+"[!" + _user + "@" + _hostname + "]\r\n";
@@ -182,20 +181,17 @@ void Client::clean_ping_mode(std::string const &arg)
 void Client::checkParams(std::string const &password)
 {
 	int i = 0;
+
 	void (Client::*func_list[6])(std::string const &arg) =
 		{&Client::ignoreCap, &Client::checkPassword, &Client::checkNick, &Client::checkUser, &Client::clean_ping_mode, &Client::clean_ping_mode};
 	std::string cmd_to_check[6] = {"CAP", "PASS", "NICK", "USER", "PING", "MODE"};
 	while (i < 5)
 	{
-		// QQPART CHECKER L EXISTANCE DE PASS DANS LES CMD RECV
-		//  -> CHECK FLAG_PASSWORD_OK
-
 		if (_cmd_registration == cmd_to_check[i])
 		{
 			if (i > 1 && _flag_password_provided == false)
 			{
-				setMessage("PASS: 451::You have not registered\r\n");
-				// i++;
+				setMessage(reply(ERR_NOTREGISTERED, this));
 				return;
 			}
 			else
