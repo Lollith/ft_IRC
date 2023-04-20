@@ -3,13 +3,13 @@
 //__________________________________________________canonic form
 
 Client::Client(void):  _step_registration(0),_flag_password_ok(false), _flag_password_provided(false),
-	_flag_keep_loop(true)
+	_flag_keep_loop(true), _user(""), _nickname(""), _hostname("")
 {
 }
 
 Client::Client(int sock_client): 
 	_socket_client(sock_client), _step_registration(0), _flag_password_ok(false), _flag_password_provided(false),
-		_flag_keep_loop(true)
+		_flag_keep_loop(true), _user(""), _nickname(""), _hostname("")
 
 {	
 // 	std::cout << "create client" << std::endl;
@@ -95,9 +95,18 @@ void	Client::set_nickname(std::string const& msg_rcv)
 	size_t begin;
 	size_t end;
 
+	std::cout << RED_TXT << "message rec is: " << msg_rcv <<  RESET_TXT << std::endl;
+	std::cout << "nickname: " << _nickname << std::endl;
 	begin = msg_rcv.find("NICK", 0) + 5;
-	end = msg_rcv.find("\r\n", begin);
-	this->_nickname = msg_rcv.substr(begin, (end - begin));
+	if (begin != std::string::npos)
+	{
+		std::cout << "NICK NOT FOUND: " << _nickname <<  std::endl;
+
+		end = msg_rcv.find("\r\n", begin);
+		this->_nickname = msg_rcv.substr(begin, (end - begin));
+	}
+	else
+		return;
 }
 //__________________________________________________MEMBERS FUNCTIONS
 
@@ -214,6 +223,7 @@ void Client::checkParams(std::string const &password)
 			if (i > 1 && _flag_password_provided == false)
 			{
 				setMessage(reply(ERR_NOTREGISTERED, this));
+				_step_registration = 0;
 				return;
 			}
 			else
@@ -242,7 +252,10 @@ void Client::getCmdLine(std::string const &password)
 	std::string cmd_line;
 
 	if (_step_registration == 0)
+	{
+		std::cout << BLUE_TXT << "here set_nickname" << RESET_TXT << std::endl;
 		set_nickname(_message_recv);
+	}
 
 	pos = this->_message_recv.find(eol_marker);
 	while (pos != std::string::npos)
