@@ -38,10 +38,7 @@ void Server::join( Client *client, std::string arg )
 	INFO("creation Channel " + _channels.back()->getName()+ "\n");
 	_channels.back()->addClient(client);
 	welcome_new_chan(client, _channels.back());
-
-
 }
-
 
 //A JOIN message with the client as the message <source> and the channel they 
 //have joined as the first parameter of the message.
