@@ -5,24 +5,23 @@ void Server::parse_msg_recv(Client *client, std::string msg_recv)
 	int nb_fct = 4;
 	std::string funct_names[] = {"JOIN", "QUIT", "PRIVMSG", "NAMES"};
 
-	void (Server::*fct_member[])(Client *client, std::string arg) = { &Server::join, &Server::quit, &Server::privmsg, &Server::names};
+	void (Server::*fct_member[])(Client *client) = { &Server::join, &Server::quit, &Server::privmsg, &Server::names};
 
 	for (int i = 0; i < nb_fct; i++)
 	{
 		if (msg_recv.find(funct_names[i]) != std::string::npos)
 		{
-			(this->*fct_member[i])(client, msg_recv);
+			(this->*fct_member[i])(client);
+			client->set_arg();
+			client->setMsgRecvSave(""); // reinitialise le message recu sinon boucle sur /quit
 		}
 	}
 
 }
 
 
-
-
-void Server::join( Client *client, std::string arg )
+void Server::join( Client *client)
 {
-	(void) arg;
 	std::string channel = client->get_arg().back();	
 	std::vector<Channel*>::iterator it;	
 	for (it = _channels.begin(); it != _channels.end(); it++) // 1er n existe pas , ne rentre pas
@@ -39,7 +38,6 @@ void Server::join( Client *client, std::string arg )
 	INFO("creation Channel " + channel + "\n");
 	_channels.back()->addClient(client);
 	welcome_new_chan(client, _channels.back());	
-
 
 }
 
@@ -66,11 +64,11 @@ void Server::welcome_new_chan(Client *client, Channel *channel)
 
 
 
-void Server::quit(Client *client, std::string arg)
+void Server::quit(Client *client)
 {
 	(void) client;
-	(void ) arg;
 	std::cout << "=>Quit le channel" << std::endl;
+	// this->_flag_keep_loop = false ; // a modifier pour quiter le chan proprement
 }
 
 //______________________________TEST CTRLC
@@ -82,12 +80,11 @@ void Server::stop()
 // The PRIVMSG command is used to send private messages between users, as well 
 // as to send messages to channels. <target> is the nickname of a client or the name of a channel.(#)
 
-void Server::privmsg( Client *client, std::string arg ){
-	(void) arg;
+void Server::privmsg( Client *client){
 	int size = client->get_arg().size() - 2;
 	std::string target = client->get_arg()[size];
 	std::string msg = client->get_arg().back();
-	INFO("je recois les messages prives depuis le client " + client->get_user()+ "\n");
+	// INFO("je recois les messages prives depuis le client " + client->get_user()+ "\n");
 	// check si commence par un # => chan
 	if (target[0] == '#')
 	{
@@ -118,11 +115,9 @@ void Server::privmsg( Client *client, std::string arg ){
 			(*it_client)->setMessage(message);
 		}
 	}
-		client->get_arg().erase(client->get_arg().end()-1);
 }
 
-void Server::names(Client *client, std::string arg){ // a faire ????
-(void) arg;
+void Server::names(Client *client){ // a faire ????
 (void) client;
 	// INFO("execute la fct names\n");
 }

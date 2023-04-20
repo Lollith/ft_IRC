@@ -55,6 +55,16 @@ std::string Client::getMsgRecv( void ) const
 	return this->_message_recv;
 }
 
+void Client::setMsgRecvSave( std::string buf )
+{
+	_message_recv_save = buf;
+}
+
+std::string Client::getMsgRecvSave( void ) const
+{
+	return this->_message_recv_save;
+}
+
 void	Client::setFlagPsswd( bool boolean )
 {
 	this->_flag_password_ok = boolean;
@@ -67,6 +77,12 @@ void	Client::setFlagPsswdProvided( bool boolean )
 
 std::vector<std::string> Client::get_arg( void ) const{
 	return this->_arg_registration;
+}
+
+void Client::set_arg( void ){
+	std::vector<std::string>::iterator it = _arg_registration.begin();
+	while( it != _arg_registration.end()) 
+			_arg_registration.erase(it);
 }
 
 std::string Client::get_user( void ) const{
@@ -227,6 +243,5 @@ void Client::getCmdLine(std::string const &password)
 		checkParams(password);
 		_message_recv.erase(_message_recv.begin(), (_message_recv.begin() + pos + eol_marker.length()));
 		pos = this->_message_recv.find(eol_marker);
-		// _arg0 = _arg_registration[0]; // arriver a recup le message
 	}
 }

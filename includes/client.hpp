@@ -25,6 +25,9 @@ public:
 	void						setMsgRecv( std::string buf );
 	std::string					getMsgRecv( void )const;
 
+	void						setMsgRecvSave( std::string buf );
+	std::string					getMsgRecvSave( void )const;
+	
 	std::string					getMessage( void ) const;
 	void						setMessage( std::string );
 
@@ -32,6 +35,8 @@ public:
 	void		 				setFlagPsswdProvided(bool boolean);
 
 	std::vector<std::string>  	get_arg( void ) const;
+	void 						set_arg( void );
+
 	std::string					get_user( void ) const;
 	std::string					get_hostname( void ) const;
 	std::string					get_nickname( void ) const;
@@ -57,7 +62,6 @@ public:
 
 
 
-	std::vector<std::string>	_arg_registration;
 
 private:
 	// useless constructor
@@ -73,12 +77,14 @@ private:
 	int							_step_registration; //compteur des étapes d'authentification
 	bool						_flag_password_ok;
 	bool						_flag_password_provided;
-	std::string					_message_recv;
+	std::string					_message_recv; // modifiee apres getcmdline
+	std::string					_message_recv_save; //non modifiee apres getcmdline
 	std::string 				_cmd_registration;
 	std::string					_user;
 	std::string					_nickname;
 	std::string					_hostname;
-	std::string					_arg0;
+	
+	std::vector<std::string>	_arg_registration;
 
 };
 
