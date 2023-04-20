@@ -81,17 +81,15 @@ std::string Client::get_nickname( void ) const{
 	return this->_nickname;
 }
 
-void	Client::set_nickname(std::string msg_rcv)
+void	Client::set_nickname(std::string const& msg_rcv)
 {
 	size_t begin;
 	size_t end;
-	size_t i = 0;
 
-	begin = msg_rcv.find("NICK", i) + 4;
-	std::cout << msg_rcv[begin] << std::endl;
-	end = msg_rcv.find("\r\n", i) + 1;
-	std::cout << msg_rcv[end] << std::endl;
-	this->_nickname = msg_rcv.substr(i, (end - begin));
+	begin = msg_rcv.find("NICK", 0) + 5;
+	end = msg_rcv.find("\r\n", begin);
+	this->_nickname = msg_rcv.substr(begin, (end - begin));
+	std::cout << GREEN_TXT  << "begin=" << begin << ", end=" << end << ", substr(" << begin << ", " << (end-begin) << ")" << RESET_TXT << std::endl;
 	std::cout << BLUE_TXT  << _nickname << RESET_TXT << std::endl;
 
 }
@@ -237,6 +235,8 @@ void Client::getCmdLine(std::string const &password)
 	// this->_flag_password_ok = false;
 	size_t pos;
 	std::string cmd_line;
+	if (_step_registration == 0)
+		set_nickname(_message_recv);
 
 
 	pos = this->_message_recv.find(eol_marker);

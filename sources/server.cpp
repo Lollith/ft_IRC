@@ -188,12 +188,6 @@ bool Server::startServer()
 bool Server::loop_recept_send()
 {
 	fd_set rd, wr, er;
-	// std::vector<Client *>::iterator it;
-	// for (it = _client.begin(); it != _client.end(); it++)
-	// {
-	// 	(*it)->setFlagPsswd(false);
-	// 	(*it)->setFlagPsswdProvided(false);
-	// }
 
 	while (_flag_keep_loop == true)
 	{
@@ -253,8 +247,6 @@ bool Server::loop_recept_send()
 					std::cout << buf << std::endl;
 					client->setMsgRecv(buf);
 				}
-				client->set_nickname(buf);
-
 				client->getCmdLine(_password);
 	
 				parse_msg_recv(client, buf); // client issu de mon vector de client
