@@ -74,7 +74,7 @@ enum reply_code
 	ERR_USERSDONTMATCH = 502
 };
 
-std::string reply (int reply, Client *client, std::vector<Channel*> _channels);
 std::string reply (int reply, Client *client);
+std::string reply (int reply, Client *client, Channel *channel);
 
 #endif
