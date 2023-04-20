@@ -185,7 +185,7 @@ bool Server::startServer()
 
 bool Server::loop_recept_send()
 {
-	fd_set rd, wr, er;
+	fd_set rd, wr;
 
 	while (_flag_keep_loop == true)
 	{
