@@ -8,12 +8,13 @@ Server *sp = NULL;
 
 void sigHandler(int sig)
 {
+	(void) sig;
 	sp->stop();
 }
 
 int main(int ac, char **av)
 {
-	char *buf;
+	// char *buf;
 
 	if (ac != 3)
 		return (1);

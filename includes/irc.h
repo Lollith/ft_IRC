@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <cstring>
+#include <stdlib.h>
 #include <unistd.h>
 #include <string>
 #include <signal.h>
@@ -16,6 +17,7 @@
 #include "client.hpp"
 #include "channel.hpp"
 #include "server.hpp"
+#include <utility> //pair
 
 #define RESET_TXT "\e[0m"
 
@@ -56,6 +58,7 @@ enum reply_code
 	ERR_NONICKNAMEGIVEN = 431,
 	ERR_ERRONEUSNICKNAME = 432,
 	ERR_NICKNAMEINUSE = 433,
+	ERR_NICKOLLISION = 436,
 	ERR_USERNOTINCHANNEL = 441,
 	ERR_NOTONCHANNEL = 442,
 	ERR_USERONCHANNEL = 443,
@@ -71,7 +74,7 @@ enum reply_code
 	ERR_USERSDONTMATCH = 502
 };
 
-std::string reply (int reply, Client *client, Channel* _channels);
 std::string reply (int reply, Client *client);
+std::string reply (int reply, Client *client, Channel *channel);
 
 #endif

@@ -21,7 +21,7 @@ CXXFLAGS = -MMD -g3 -Wall -Wextra -Werror -std=c++98
 
 build/%.o:	./sources/%.cpp
 			mkdir -p build
-			$(CC) $(CFLAGS) -c $< -o $@ $(INC)
+			$(CXX) $(CXXFLAGS) -c $< -o $@ $(INC)
 
 $(NAME): $(OBJ)
 		$(CXX) $(CXXFLAG) $(OBJ) -o $(NAME)
