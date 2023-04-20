@@ -55,11 +55,18 @@ void Server::join( Client *client)
 //RPL_NAMREPLY messages sent by the server MUST include the requesting client that has just joined the channel.
 void Server::welcome_new_chan(Client *client, Channel *channel)
 {
-	std::string join_msg = ":"+ client->get_user() + "@" +"~" + client->get_hostname() + " JOIN "+ _channels.back()->getName() +"\r\n";
+	// erreur ici : reinitialise si 2 meme nom???? a tester avec 2 pseudo differents
+	// std::string join_msg2 = ":" + client->get_user() + "@" + "~" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
+	// for (size_t i = 0; i!= channel->_clients.size(); i++) //broadcast the message :nouveau client joigned aux autres du chan
+	// 	channel->_clients[i]->setMessage(join_msg2);
+	
+	std::string join_msg = ":" + client->get_user() + "@" + "~" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
+	
 	join_msg += reply(RPL_TOPIC, client, channel);
 	join_msg += reply(RPL_NAMREPLY, client, channel);
 	join_msg += reply(RPL_ENDOFNAMES, client, channel);
 	client->setMessage(join_msg);
+
 }
 
 
