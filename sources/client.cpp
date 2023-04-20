@@ -3,13 +3,13 @@
 //__________________________________________________canonic form
 
 Client::Client(void):  _step_registration(0),_flag_password_ok(false), _flag_password_provided(false),
-	_flag_keep_loop(true), _user(""), _nickname(""), _hostname("")
+	_flag_shut_client(false), _user(""), _nickname(""), _hostname("")
 {
 }
 
 Client::Client(int sock_client): 
 	_socket_client(sock_client), _step_registration(0), _flag_password_ok(false), _flag_password_provided(false),
-		_flag_keep_loop(true), _user(""), _nickname(""), _hostname("")
+		_flag_shut_client(false), _user(""), _nickname(""), _hostname("")
 
 {	
 // 	std::cout << "create client" << std::endl;
@@ -58,6 +58,16 @@ std::string Client::getMsgRecv( void ) const
 	return this->_message_recv;
 }
 
+void Client::setMsgRecvSave( std::string buf )
+{
+	_message_recv_save = buf;
+}
+
+std::string Client::getMsgRecvSave( void ) const
+{
+	return this->_message_recv_save;
+}
+
 void	Client::setFlagPsswd( bool boolean )
 {
 	this->_flag_password_ok = boolean;
@@ -72,11 +82,17 @@ std::vector<std::string> Client::get_arg( void ) const{
 	return this->_arg_registration;
 }
 
-bool	Client::getFlagKeepLoop()
+bool	Client::getFlagMustShutClient ()
 {
-	return this->_flag_keep_loop;
+	return this->_flag_shut_client;
 }
 
+
+void Client::set_arg( void ){
+	std::vector<std::string>::iterator it = _arg_registration.begin();
+	while( it != _arg_registration.end()) 
+			_arg_registration.erase(it);
+}
 
 std::string Client::get_user( void ) const{
 	return this->_user;
@@ -165,7 +181,7 @@ void Client::checkPassword(std::string const &psswd)
 		rpl+= "ERROR: Server closing a client connection because need registration.\r\n";
 		setMessage(rpl);
 		_step_registration = 0;
-		_flag_keep_loop = false;
+		_flag_shut_client = true;
 		return;
 	}
 	else
@@ -174,7 +190,7 @@ void Client::checkPassword(std::string const &psswd)
 		rpl+= "ERROR: Server closing a client connection because need registration.\r\n";
 		setMessage(rpl);
 		_step_registration = 0;
-		_flag_keep_loop = false;
+		_flag_shut_client = true;
 		return;
 	}
 }
@@ -212,6 +228,7 @@ void Client::clean_ping_mode(std::string const &arg)
 void Client::checkParams(std::string const &password)
 {
 	int i = 0;
+	std::string rpl;
 
 	void (Client::*func_list[6])(std::string const &arg) =
 		{&Client::ignoreCap, &Client::checkPassword, &Client::checkNick, &Client::checkUser, &Client::clean_ping_mode, &Client::clean_ping_mode};
@@ -222,7 +239,10 @@ void Client::checkParams(std::string const &password)
 		{
 			if (i > 1 && _flag_password_provided == false)
 			{
-				setMessage(reply(ERR_NOTREGISTERED, this));
+				rpl = reply(ERR_NOTREGISTERED, this);
+				rpl+= "ERROR: Server closing a client connection because need registration.\r\n";
+				setMessage(rpl);
+				_flag_shut_client = true;
 				_step_registration = 0;
 				return;
 			}
@@ -254,7 +274,7 @@ void Client::getCmdLine(std::string const &password)
 	if (_step_registration == 0)
 	{
 		std::cout << BLUE_TXT << "here set_nickname" << RESET_TXT << std::endl;
-		set_nickname(_message_recv);
+		set_nickname(_message_recv_save);
 	}
 
 	pos = this->_message_recv.find(eol_marker);
@@ -265,6 +285,5 @@ void Client::getCmdLine(std::string const &password)
 		checkParams(password);
 		_message_recv.erase(_message_recv.begin(), (_message_recv.begin() + pos + eol_marker.length()));
 		pos = this->_message_recv.find(eol_marker);
-		// _arg0 = _arg_registration[0]; // arriver a recup le message
 	}
 }

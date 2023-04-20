@@ -42,20 +42,23 @@ public:
 	//__________________________________________________members functions
 
 	void 				crash_protector();
+
 	bool				startServer();
+	void				mySelect(fd_set &rd, fd_set &wr);
+	void  				myrecv(Client *client);
+	void 				mysend(Client *client);
 	bool				loop_recept_send();
 
 	//-----fct _channels------------------------------------------------------------
-	void 				parse_msg_recv( Client *client, std::string msg_recv );
-	void 				join( Client *client, std::string arg );
-	void 				quit( Client *client, std::string arg );
-	void				privmsg( Client *client, std::string arg);
+	void 				parse_msg_recv( Client *client, std::string msg_recv ); // msg_recv et arg useless => a suprimer
+	void 				join( Client *client);
+	void 				quit( Client *client);
+	void				privmsg( Client *client);
 
 	void 				stop();
 	void 				welcome_new_chan( Client *client, Channel *channel );
-	void 				names( Client *client, std::string arg );
+	void 				names( Client *client );
 
-	void 				Clean_arg(Client *client); // a supprimer
 private:
 	// useless constructor
 	Server(void);

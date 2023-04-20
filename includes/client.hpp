@@ -22,18 +22,23 @@ public:
 	int							getSocketClient( void ) const;
 	void						setSocketClient( int socket );
 
-	std::string					getMsgRecv( void )const;
 	void						setMsgRecv( std::string buf );
+	std::string					getMsgRecv( void )const;
 
-	std::string					getMessage( void ) const;
+	void						setMsgRecvSave( std::string buf );
+	std::string					getMsgRecvSave( void )const;
+	
 	void						setMessage( std::string );
+	std::string					getMessage( void ) const;
 
 	void		 				setFlagPsswdProvided(bool boolean);
 	void				 		setFlagPsswd(bool boolean);
 
-	bool				 		getFlagKeepLoop();
+	bool				 		getFlagMustShutClient();
 
+	void 						set_arg( void );
 	std::vector<std::string>  	get_arg( void ) const;
+
 	std::string					get_user( void ) const;
 	std::string					get_hostname( void ) const;
 
@@ -57,7 +62,6 @@ public:
 	void 						Clean_arg( void );
 	//define typedef ici pour struct sockaddr_in??
 
-	std::vector<std::string>	_arg_registration;
 
 private:
 	// useless constructor
@@ -73,13 +77,15 @@ private:
 	int							_step_registration; //compteur des étapes d'authentification
 	bool						_flag_password_ok;
 	bool						_flag_password_provided;
-	bool						_flag_keep_loop;
-	std::string					_message_recv;
+	bool						_flag_shut_client;
+	std::string					_message_recv; // modifiee apres getcmdline
+	std::string					_message_recv_save; //non modifiee apres getcmdline
 	std::string 				_cmd_registration;
 	std::string					_user;
 	std::string					_nickname;
 	std::string					_hostname;
-	std::string					_arg0;
+	
+	std::vector<std::string>	_arg_registration;
 
 };
 
