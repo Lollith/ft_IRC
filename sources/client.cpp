@@ -101,10 +101,6 @@ void Client::tokenization_cmd(std::string &cmd)
 	size_t pos;
 	size_t i = 0;
 
-	// verif contenu cmd line ex: CAP LS \r\n
-
-	// std::cout << "complete cmd line in tokenisation is : " << cmd << std::endl;
-
 	pos = cmd.find(' ', i);
 	this->_cmd_registration = cmd.substr(i, (pos - i));
 	while (pos != std::string::npos)
@@ -132,10 +128,7 @@ void Client::ignoreCap(std::string const &)
 void Client::checkPassword(std::string const &psswd)
 {
 	std::cout << GREEN_TXT << "here is PASS check func" << RESET_TXT << std::endl;
-	std::cout << YELLOW_TXT << _flag_password_ok << RESET_TXT << std::endl;
-	std::cout << YELLOW_TXT << _flag_password_provided << RESET_TXT << std::endl;
-
-
+	
 	this->_flag_password_provided = true;
 
 	if (_arg_registration.back() == psswd)
@@ -146,28 +139,17 @@ void Client::checkPassword(std::string const &psswd)
 	}
 	else if (_flag_password_ok == true)
 	{
-		std::cout << YELLOW_TXT << " here ALREADYREGISTERED " << RESET_TXT << std::endl;
-
-		std::cout << YELLOW_TXT << _flag_password_ok << RESET_TXT << std::endl;
-
-		// send response ERR_ALREADYREGISTERED //462
 		setMessage(reply(ERR_ALREADYREGISTERED, this));
-		// setMessage(" 462:You may not reregistered\r\n"); // message incomplet, nick à préciser
 		return;
 	}
 	else if ((_cmd_registration == "PASS") && (_arg_registration.empty()))
 	{
-		// send response ERR_NEEDMOREPARAMS //461
-		//
 		setMessage(reply(ERR_NEEDMOREPARAMS, this));
-		// setMessage(" 461::Not enough parameters\r\n"); // message incomplet, nick à préciser
 		return;
 	}
 	else
 	{
-		// send response ERR_PASSWDMISMATCH //464
 		setMessage(reply(ERR_PASSWDMISMATCH, this));
-		// setMessage(" 464::Password incorrect\r\n"); // message incomplet, nick à préciser
 		return;
 	}
 	std::cout << RED_TXT << "flag password ok at the end of func pass: " << _flag_password_ok << RESET_TXT << std::endl;
@@ -187,8 +169,8 @@ void Client::checkUser(std::string const &)
 	this->_step_registration += 1;
 	_user = _arg_registration[3];
 	_hostname = _arg_registration[5];
-	_nickname = _arg_registration[2];
-	//   "<client> :Welcome to the <networkname> Network, <nick>[!<user>@<host>]"
+	// _nickname = _arg_registration[2];
+
 	if (_step_registration == 4)
 	{
 		std::string  buffer = "001 " + get_user() + " :Welcome to the " + _hostname + " Network, " + _nickname+"[!" + _user + "@" + _hostname + "]\r\n";
@@ -204,17 +186,11 @@ void Client::checkParams(std::string const &password)
 	std::string cmd_to_check[4] = {"CAP", "PASS", "NICK", "USER"};
 	while (i < 4)
 	{
-		// QQPART CHECKER L EXISTANCE DE PASS DANS LES CMD RECV
-		//  -> CHECK FLAG_PASSWORD_OK
-
 		if (_cmd_registration == cmd_to_check[i])
 		{
 			if (i > 1 && _flag_password_provided == false)
 			{
 				setMessage(reply(ERR_NOTREGISTERED, this));
-
-				// setMessage("PASS: 451::You have not registered\r\n");
-				// i++;
 				return;
 			}
 			else
@@ -232,12 +208,12 @@ void Client::checkParams(std::string const &password)
 void Client::getCmdLine(std::string const &password)
 {
 	const std::string eol_marker = "\r\n"; // à mettre ds un define?
-	// this->_flag_password_ok = false;
+
 	size_t pos;
 	std::string cmd_line;
+
 	if (_step_registration == 0)
 		set_nickname(_message_recv);
-
 
 	pos = this->_message_recv.find(eol_marker);
 	while (pos != std::string::npos)

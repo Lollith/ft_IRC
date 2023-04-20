@@ -31,14 +31,12 @@ Server::~Server(void)
 	std::vector<Client *>::iterator it;
 	for (it = _client.begin(); it != _client.end(); it++)
 	{
-		// // à modifier?_____________________________
 		shutdown((*it)->getSocketClient(), SHUT_RDWR);
 		close((*it)->getSocketClient());
-		//________________________________________
-		// delete (*it);
+
 	}
 	_client.clear();
-} // close() ou/et freeinfo() à faire?
+}
 
 //__________________________________________________GETTERS_SETTERS
 
