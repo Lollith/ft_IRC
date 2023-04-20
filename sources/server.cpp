@@ -7,8 +7,8 @@ Server::Server(const int port, const std::string password)
 {
 	if (!setSocketServer())
 	{
-		std::cout << "cannot create server object because it is not possible to create socket server."
-				  << std::endl;
+		FATAL_ERR( "cannot create server object because it is not possible to create socket server." 
+			<< std::endl);
 		return;
 	}
 	setAddrServ();
@@ -24,7 +24,7 @@ Server::Server(const int port, const std::string password)
 
 Server::~Server(void)
 {
-	std::cout << YELLOW_TXT << "Destructor server called." << RESET_TXT << std::endl;
+	INFO("Destructor server called." <<  std::endl);
 
 	shutdown(this->_socket_server, SHUT_RDWR);
 	close(this->_socket_server);
@@ -79,8 +79,7 @@ bool Server::AcceptSocketClient()
 		perror("accept()");
 		return false;
 	}
-
-	std::cout << socket << std::endl;	
+		INFO(socket<<std::endl);	
 		_client.push_back(new Client(socket));
 
 	return true;
@@ -228,7 +227,7 @@ bool Server::loop_recept_send()
 
 		if (FD_ISSET(_socket_server, &rd)) // check si notre socket est pret a lire // recoi le client, et ces logs
 		{
-			INFO("=>Accept le nouvel entrant: \n");
+			INFO("=>Accept le nouvel entrant: ");
 			if (AcceptSocketClient() == false)
 				return false;
 		}
@@ -249,8 +248,9 @@ bool Server::loop_recept_send()
 				}
 				if (buf[0])
 				{
-					std::cout << "=>Recois un message depuis le client "<< client->getSocketClient()<< ": "<< std::endl;
-					std::cout << buf << std::endl;
+					INFO("=>Recois un message depuis le client "
+						<< client->getSocketClient()<< ": "<< std::endl);
+					// std::cout << buf << std::endl;
 					client->setMsgRecv(buf);
 				}
 		
@@ -262,7 +262,7 @@ bool Server::loop_recept_send()
 			{
 				if(!client->getMessage().empty()) // comme je reinitialise a la fin le message
 				{
-					std::cout << "=>Repond au client:" << std::endl;
+					 INFO("=>Repond au client:" << std::endl);
 					size_t res_send = send(client->getSocketClient(), client->getMessage().c_str(), client->getMessage().size(), 0);
 					if (res_send != client->getMessage().size())
 					{
@@ -270,18 +270,12 @@ bool Server::loop_recept_send()
 						close(client->getSocketClient());
 						// return false;
 					}
-					std::cout << "=>Message envoye: " << client->getMessage() <<", a client "<< client->getSocketClient()<< std::endl;
+					INFO("=>Message envoye a client " <<client->getSocketClient()
+						<< ": " << client->getMessage()<<std::endl);
 					client->setMessage(""); // reinitialise le message , sinon boucle
 				}
 			}	
 		}
 	}
 	return true;
-}
-
-void Server::Clean_arg(Client *client)
-{
-		std::vector<std::string>::iterator it = client->get_arg().begin()+ 1;
-		while( it != client->get_arg().end()) 
-			client->get_arg().erase (it);
 }

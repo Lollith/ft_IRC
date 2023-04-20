@@ -74,7 +74,7 @@ private:
 	int							_step_registration; //compteur des étapes d'authentification
 	bool						_flag_password_ok;
 	bool						_flag_password_provided;
-	std::string					_message_recv;
+	std::string					_message_recv; // modifiee apres getcmdline
 	std::string 				_cmd_registration;
 	std::string					_user;
 	std::string					_nickname;
