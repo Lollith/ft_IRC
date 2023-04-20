@@ -243,6 +243,5 @@ void Client::getCmdLine(std::string const &password)
 		checkParams(password);
 		_message_recv.erase(_message_recv.begin(), (_message_recv.begin() + pos + eol_marker.length()));
 		pos = this->_message_recv.find(eol_marker);
-		// _arg0 = _arg_registration[0]; // arriver a recup le message
 	}
 }

@@ -83,7 +83,6 @@ private:
 	std::string					_user;
 	std::string					_nickname;
 	std::string					_hostname;
-	// std::string					_arg0;
 	
 	std::vector<std::string>	_arg_registration;
 
