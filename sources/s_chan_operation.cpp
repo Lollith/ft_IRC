@@ -2,27 +2,28 @@
 //-----fct _channels------------------------------------------------------------
 void Server::parse_msg_recv(Client *client, std::string msg_recv)
 {
-	int nb_fct = 3;
-	std::string funct_names[] = {"JOIN", "QUIT", "PRIVMSG"};
+	int nb_fct = 4;
+	std::string funct_names[] = {"JOIN", "QUIT", "PRIVMSG", "NAMES"};
 
-	void (Server::*fct_member[])(Client *client, std::string arg) = { &Server::join, &Server::quit, &Server::privmsg };
+	void (Server::*fct_member[])(Client *client, std::string arg) = { &Server::join, &Server::quit, &Server::privmsg, &Server::names};
 
 	for (int i = 0; i < nb_fct; i++)
 	{
 		if (msg_recv.find(funct_names[i]) != std::string::npos)
+		{
 			(this->*fct_member[i])(client, msg_recv);
+		}
 	}
+
 }
-
-
 
 
 
 
 void Server::join( Client *client, std::string arg )
 {
+	(void) arg;
 	std::string channel = client->get_arg().back();	
-	// Topic set by X[] [time]
 	std::vector<Channel*>::iterator it;	
 	for (it = _channels.begin(); it != _channels.end(); it++) // 1er n existe pas , ne rentre pas
 	{
@@ -35,9 +36,9 @@ void Server::join( Client *client, std::string arg )
 		}
 	}
 	_channels.push_back(new Channel( channel)); // si chan n existe pas => le creer
-	INFO("creation Channel " + _channels.back()->getName()+ "\n");
+	INFO("creation Channel " + channel + "\n");
 	_channels.back()->addClient(client);
-	welcome_new_chan(client, _channels.back());
+	welcome_new_chan(client, _channels.back());	
 
 
 }
@@ -67,6 +68,8 @@ void Server::welcome_new_chan(Client *client, Channel *channel)
 
 void Server::quit(Client *client, std::string arg)
 {
+	(void) client;
+	(void ) arg;
 	std::cout << "=>Quit le channel" << std::endl;
 }
 
@@ -80,26 +83,46 @@ void Server::stop()
 // as to send messages to channels. <target> is the nickname of a client or the name of a channel.(#)
 
 void Server::privmsg( Client *client, std::string arg ){
-int size = client->get_arg().size() - 2;
-	std::cout << "je recois les messages prives depuis le client"<< client->getSocketClient()<< std::endl;
-	
-	//recherche parmi mon vector de channels , le bon channel , puis envoyer le message aux bons client = clients enregistres dans le channel
-	std::vector<Channel*>::iterator it;	
-	for (it = _channels.begin(); it != _channels.end(); it++)
+	(void) arg;
+	int size = client->get_arg().size() - 2;
+	std::string target = client->get_arg()[size];
+	std::string msg = client->get_arg().back();
+	INFO("je recois les messages prives depuis le client " + client->get_user()+ "\n");
+	// check si commence par un # => chan
+	if (target[0] == '#')
 	{
-		if ((*it)->getName() == client->get_arg()[size])
+	//recherche parmi mon vector de channels , le bon channel , puis envoyer le message aux bons client = clients enregistres dans le channel
+		std::vector<Channel*>::iterator it_chan;	
+		for (it_chan = _channels.begin(); it_chan != _channels.end(); it_chan++)
 		{
-			std::string l(":lollith");
-			std::string p(" PRIVMSG ");
-			// std::cout<< "message recu: "<<client->get_arg().back()<< ",a envoyer a:"<< client->get_arg()[size]<< std::endl;
-			std::string message =  l + p + client->get_arg()[size] + " " +client->get_arg().back() + "\r\n";
-			int i = 0;
-			while (i!= (*it)->_clients.size())
+			if ((*it_chan)->getName() == target)
 			{
-				(*it)->_clients[i]->setMessage(message);
-				i++;
+				std::string message = ":" + client->get_user() + " PRIVMSG " + target + " " + msg + "\r\n";
+				size_t i = 0;
+				while (i!= (*it_chan)->_clients.size()) //broadcast the messag
+				{
+					(*it_chan)->_clients[i]->setMessage(message);
+					i++;
+				}
+					client->setMessage("");// interdit le client en cours de recevoir son propre message 
 			}
-				client->setMessage("");// interdit le client en cours de recevoir son propre message 
 		}
 	}
+	// na pas trouver le bon channel : check les pseudo pour envoyer a un nickname
+	std::vector<Client*>::iterator it_client;	
+	for (it_client = _client.begin(); it_client != _client.end(); it_client++)
+	{
+		if ((*it_client)->get_nickname() == target)
+		{
+			std::string message = ":" + client->get_user() + " PRIVMSG " + (*it_client)->get_nickname() + " " + msg + "\r\n";
+			(*it_client)->setMessage(message);
+		}
+	}
+		client->get_arg().erase(client->get_arg().end()-1);
+}
+
+void Server::names(Client *client, std::string arg){ // a faire ????
+(void) arg;
+(void) client;
+	// INFO("execute la fct names\n");
 }

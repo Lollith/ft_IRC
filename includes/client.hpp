@@ -49,7 +49,8 @@ public:
 	void						checkPassword( std::string const& password );
 	void						checkNick( std::string const& );
 	void						checkUser( std::string const& );
-
+	void 						clean_ping_mode(std::string const &arg);
+	void 						Clean_arg( void );
 	//define typedef ici pour struct sockaddr_in??
 	
 
@@ -77,6 +78,7 @@ private:
 	std::string					_user;
 	std::string					_nickname;
 	std::string					_hostname;
+	std::string					_arg0;
 
 };
 

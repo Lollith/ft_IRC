@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <cstring>
+#include <stdlib.h>
 #include <unistd.h>
 #include <string>
 #include <signal.h>
@@ -16,6 +17,7 @@
 #include "client.hpp"
 #include "channel.hpp"
 #include "server.hpp"
+#include <utility> //pair
 
 #define RESET_TXT "\e[0m"
 
