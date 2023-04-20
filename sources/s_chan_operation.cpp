@@ -12,6 +12,7 @@ void Server::parse_msg_recv(Client *client, std::string msg_recv)
 		if (msg_recv.find(funct_names[i]) != std::string::npos)
 		{
 			(this->*fct_member[i])(client, msg_recv);
+			client->set_arg();
 		}
 	}
 
@@ -118,7 +119,6 @@ void Server::privmsg( Client *client, std::string arg ){
 			(*it_client)->setMessage(message);
 		}
 	}
-		client->get_arg().erase(client->get_arg().end()-1);
 }
 
 void Server::names(Client *client, std::string arg){ // a faire ????

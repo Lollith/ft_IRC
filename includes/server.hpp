@@ -47,7 +47,7 @@ public:
 	bool				loop_recept_send();
 
 	//-----fct _channels------------------------------------------------------------
-	void 				parse_msg_recv( Client *client, std::string msg_recv );
+	void 				parse_msg_recv( Client *client, std::string msg_recv ); // msg_recv et arg useless => a suprimer
 	void 				join( Client *client, std::string arg );
 	void 				quit( Client *client, std::string arg );
 	void				privmsg( Client *client, std::string arg);

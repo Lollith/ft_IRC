@@ -142,18 +142,17 @@ void Server::crash_protector()
 }
 
 // return false en cas d'erreur
+//bind= associer la socket avec un port de votre machine locale.
+//listen = les connections vont attendre dans la file de BACKLOG jusqu'à ce qu' on
+//les accept()
 bool Server::startServer()
 {
 	crash_protector();
-
-	// associer la socket avec un port de votre machine locale.
 	if (bind(_socket_server, (struct sockaddr *)&_addr_server, sizeof(struct sockaddr)) == -1)
 	{
 		perror("bind");
 		return false;
 	}
-	// les connections vont attendre dans la file de BACKLOG jusqu'à ce que vous
-	// les acceptiez avec accept()
 	if (listen(_socket_server, BACKLOG) == -1)
 	{
 		perror("listen");
@@ -185,6 +184,8 @@ bool Server::startServer()
 // Pour vérifier qu'une connexion entrante est en attente, que l'appel à accept ne sera pas bloquant,
 // on doit vérifier que notre socket serveur est prêt en écriture :
 
+// select verifie si des donnes sont dispo en lecture , ecruiture sur notre socket et retourne le nombre
+
 bool Server::loop_recept_send()
 {
 	fd_set rd, wr;
@@ -198,7 +199,7 @@ bool Server::loop_recept_send()
 	while (_flag_keep_loop == true)
 	{
 		char buf[1024] = {0};
-		FD_ZERO(&rd); // initialise ; a mettre ds la boucle
+		FD_ZERO(&rd);
 		FD_ZERO(&wr);
 		FD_SET(_socket_server, &rd); // ajoute mon fd de serveur a lensemble
 		FD_SET(_socket_server, &wr);
@@ -213,11 +214,11 @@ bool Server::loop_recept_send()
 				FD_SET((*it)->getSocketClient(), &wr);
 			}
 		}
-		int select_ready = select(FD_SETSIZE, &rd, &wr, NULL, NULL); // select verifie si des donnes sont dispo en lecture , ecruiture sur notre socket et retourne le nombre
+		int select_ready = select(FD_SETSIZE, &rd, &wr, NULL, NULL); 
 		if (select_ready == -1)
 		{
 			perror("select");
-			return false; // continue?? si errno == eintr
+			// return false; // continue?? si errno == eintr
 		}
 		// else if (select_ready == 0) //utile?
 		// {
@@ -235,7 +236,6 @@ bool Server::loop_recept_send()
 		for (it = _client.begin(); it != _client.end(); it++)
 		{
 			Client *client = *it;
-			
 			
 			//----------------recev------------------------------------------------------------
 			if (FD_ISSET(client->getSocketClient(), &rd))
@@ -255,9 +255,7 @@ bool Server::loop_recept_send()
 				}
 		
 				client->getCmdLine(_password);
-	
 				parse_msg_recv(client, buf); // client issu de mon vector de client
-			
 			}
 
 			if (FD_ISSET(client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
@@ -275,8 +273,7 @@ bool Server::loop_recept_send()
 					std::cout << "=>Message envoye: " << client->getMessage() <<", a client "<< client->getSocketClient()<< std::endl;
 					client->setMessage(""); // reinitialise le message , sinon boucle
 				}
-			}
-			
+			}	
 		}
 	}
 	return true;

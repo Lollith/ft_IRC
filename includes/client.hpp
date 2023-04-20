@@ -32,6 +32,8 @@ public:
 	void		 				setFlagPsswdProvided(bool boolean);
 
 	std::vector<std::string>  	get_arg( void ) const;
+	void 						set_arg( void );
+
 	std::string					get_user( void ) const;
 	std::string					get_hostname( void ) const;
 	std::string					get_nickname( void ) const;
@@ -57,7 +59,6 @@ public:
 
 
 
-	std::vector<std::string>	_arg_registration;
 
 private:
 	// useless constructor
@@ -78,7 +79,9 @@ private:
 	std::string					_user;
 	std::string					_nickname;
 	std::string					_hostname;
-	std::string					_arg0;
+	// std::string					_arg0;
+	
+	std::vector<std::string>	_arg_registration;
 
 };
 

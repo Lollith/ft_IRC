@@ -69,6 +69,12 @@ std::vector<std::string> Client::get_arg( void ) const{
 	return this->_arg_registration;
 }
 
+void Client::set_arg( void ){
+	std::vector<std::string>::iterator it = _arg_registration.begin();
+	while( it != _arg_registration.end()) 
+			_arg_registration.erase(it);
+}
+
 std::string Client::get_user( void ) const{
 	return this->_user;
 }
