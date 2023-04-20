@@ -2,12 +2,12 @@
 
 //__________________________________________________canonic form
 
-Client::Client(void): _flag_password_ok(false), _flag_password_provided(false), _step_registration(0)
+Client::Client(void):  _step_registration(0),_flag_password_ok(false), _flag_password_provided(false)
 {
 }
 
 Client::Client(int sock_client): 
-	_socket_client(sock_client), _flag_password_ok(false), _flag_password_provided(false), _step_registration(0)
+	_socket_client(sock_client), _step_registration(0), _flag_password_ok(false), _flag_password_provided(false)
 {	
 // 	std::cout << "create client" << std::endl;
 // 
@@ -173,16 +173,18 @@ void Client::checkUser(std::string const &)
 
 }
 
-void Client::clean_ping(std::string const &arg)
+void Client::clean_ping_mode(std::string const &arg)
 {
+	(void) arg;
 		Clean_arg();
 }
+
 void Client::checkParams(std::string const &password)
 {
 	int i = 0;
-	void (Client::*func_list[5])(std::string const &arg) =
-		{&Client::ignoreCap, &Client::checkPassword, &Client::checkNick, &Client::checkUser, &Client::clean_ping};
-	std::string cmd_to_check[5] = {"CAP", "PASS", "NICK", "USER", "PING"};
+	void (Client::*func_list[6])(std::string const &arg) =
+		{&Client::ignoreCap, &Client::checkPassword, &Client::checkNick, &Client::checkUser, &Client::clean_ping_mode, &Client::clean_ping_mode};
+	std::string cmd_to_check[6] = {"CAP", "PASS", "NICK", "USER", "PING", "MODE"};
 	while (i < 5)
 	{
 		// QQPART CHECKER L EXISTANCE DE PASS DANS LES CMD RECV
@@ -209,10 +211,10 @@ void Client::checkParams(std::string const &password)
 
 void Client::Clean_arg()
 {
-		std::vector<std::string>::iterator it = _arg_registration.begin();
-		while( it != _arg_registration.end()) 
-			_arg_registration.erase (it);
-	}
+	std::vector<std::string>::iterator it = _arg_registration.begin();
+	while( it != _arg_registration.end()) 
+		_arg_registration.erase (it);
+}
 
 void Client::getCmdLine(std::string const &password)
 {
@@ -229,6 +231,6 @@ void Client::getCmdLine(std::string const &password)
 		checkParams(password);
 		_message_recv.erase(_message_recv.begin(), (_message_recv.begin() + pos + eol_marker.length()));
 		pos = this->_message_recv.find(eol_marker);
-		// _arg0 = _arg_registration[0];
+		// _arg0 = _arg_registration[0]; // arriver a recup le message
 	}
 }

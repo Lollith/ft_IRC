@@ -187,7 +187,7 @@ bool Server::startServer()
 
 bool Server::loop_recept_send()
 {
-	fd_set rd, wr, er;
+	fd_set rd, wr;
 	// std::vector<Client *>::iterator it;
 	// for (it = _client.begin(); it != _client.end(); it++)
 	// {
@@ -265,14 +265,14 @@ bool Server::loop_recept_send()
 				if(!client->getMessage().empty()) // comme je reinitialise a la fin le message
 				{
 					std::cout << "=>Repond au client:" << std::endl;
-					int res_send = send(client->getSocketClient(), client->getMessage().c_str(), client->getMessage().size(), 0);
+					size_t res_send = send(client->getSocketClient(), client->getMessage().c_str(), client->getMessage().size(), 0);
 					if (res_send != client->getMessage().size())
 					{
 						perror("send client failed");
 						close(client->getSocketClient());
-						return false;
+						// return false;
 					}
-					std::cout << "=>Message envoye: " << client->getMessage() << std::endl;
+					std::cout << "=>Message envoye: " << client->getMessage() <<", a client "<< client->getSocketClient()<< std::endl;
 					client->setMessage(""); // reinitialise le message , sinon boucle
 				}
 			}
@@ -284,7 +284,7 @@ bool Server::loop_recept_send()
 
 void Server::Clean_arg(Client *client)
 {
-		std::vector<std::string>::iterator it = client->get_arg().begin();
+		std::vector<std::string>::iterator it = client->get_arg().begin()+ 1;
 		while( it != client->get_arg().end()) 
 			client->get_arg().erase (it);
 }

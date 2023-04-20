@@ -5,6 +5,8 @@
 
 #define BACKLOG 10
 
+class Client;
+class Channel;
 class Server
 {
 public:
@@ -48,7 +50,7 @@ public:
 	void 				parse_msg_recv( Client *client, std::string msg_recv );
 	void 				join( Client *client, std::string arg );
 	void 				quit( Client *client, std::string arg );
-	void				privmsg( Client *client, std::string arg );
+	void				privmsg( Client *client, std::string arg);
 
 	void 				stop();
 	void 				welcome_new_chan( Client *client, Channel *channel );
@@ -66,11 +68,12 @@ private:
 	struct sockaddr_in		_addr_server;
 	struct sockaddr_in		_client_addr; // info adresse du client // ici ?
 	socklen_t				_sin_size;
-	bool					_flag_keep_loop;
 	std::string 			_password;
+	bool					_flag_keep_loop;
 	
 	std::vector<Client*>	_client;
 	std::vector<Channel*>	_channels;
 };
 
+#include "irc.h"
 #endif

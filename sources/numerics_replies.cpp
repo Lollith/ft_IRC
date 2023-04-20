@@ -11,7 +11,7 @@ std::string reply (int reply, Client *client, Channel *channel)
 			msg = "332 " + client->get_user() + " " + channel->getName() + " :welcome\r\n";
 			break;
 		case RPL_NAMREPLY:
-			for (int  j = 0; j < channel->_clients.size(); j++)
+			for (size_t  j = 0; j < channel->_clients.size(); j++)
 				name += channel->_clients[j]->get_nickname()+ " "; 
 			msg = "353 " + client->get_user()+" = " + channel->getName() + " :" + name + "\r\n";
 			break;
