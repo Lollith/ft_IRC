@@ -23,25 +23,28 @@
 
 3. channels = group d un ou +ieurs clients, receive all message; creee lorsque le 1er client joins et rm when last leave, name rules
 	<!-- - JOIN = create ou se connecter  -->
+	- To create a new channel or become part of an existing channel, a user is required to join the channel using the JOIN command. If the channel doesn’t exist prior to joining, the channel is created and the creating user becomes a channel operator
 	<!-- RPL_TOPIC, NAMREPLY, ENDOFNAMES -->
 		- 1er connecter devient Operators
 		- si pas de topic : vide => a faire?
 		- another join :affiche ds le chan :lollith_ [~lollith@88.120.229.1] has joined #mytest => bug pour le moment
+		
 	
 	<!-- 1 user => join serveral channel ( 1 limite) -->
 
 4. messages prives
-	- If a message cannot be delivered to a channel, the server SHOULD respond with an ERR_CANNOTSENDTOCHAN (404) numeric to let the user know that this message could not be delivered.
+	
 	- If <target> is a channel name, it may be prefixed with one or more channel membership prefix character (@, +, etc) and the message will be delivered only to the members of that channel with the given or higher status in the channel.
 	Servers that support this feature will list the prefixes which this is supported for in the STATUSMSG RPL_ISUPPORT parameter, and this SHOULD NOT be attempted by clients unless the prefix has been advertised in this token.
-	- ERR_NOSUCHNICK (401)
-	- ERR_CANNOTSENDTOCHAN (404) 
-	- ERR_NOSUCHCHANNEL
+	<!-- - ERR_NOSUCHNICK (401) -->
+	<!-- - ERR_NOSUCHCHANNEL -->
+	- ERR_CANNOTSENDTOCHAN (404)=>  This is generally sent in response to channel modes, such as a channel being moderated and the client not having permission to speak on the channel, or not being joined to a channel with the no external messages mode set.
+	- If a message cannot be delivered to a channel, the server SHOULD respond with an ERR_CANNOTSENDTOCHAN (404) numeric to let the user know that this message could not be delivered.
 
 5. operators // utilisateurs basiques: 
 a special class of clients (operators) are allowed to perform general maintenance functions on the network.
 - Channel moderators are identified by the channel member prefix ('@' for standard channel operators
-- To create a new channel or become part of an existing channel, a user is required to join the channel using the JOIN command. If the channel doesn’t exist prior to joining, the channel is created and the creating user becomes a channel operator
+
 	- KICK: Eject a client from the channel,
 	- MODE: Change the channel’s modes,
 	- INVITE: Invite a client to an invite-only channel (mode +i),
