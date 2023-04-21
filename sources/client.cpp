@@ -184,11 +184,40 @@ void Client::checkPassword(std::string const &psswd)
 	}
 }
 
+bool Client::NicknameIsValid()
+{
+	if (_nickname.find(' ') != std::string::npos || _nickname.find(',')  != std::string::npos 
+	|| _nickname.find('.')  != std::string::npos || _nickname.find('*')  != std::string::npos
+	|| _nickname.find('?')  != std::string::npos || _nickname.find('!')  != std::string::npos 
+	|| _nickname.find('@')  != std::string::npos || _nickname.empty())
+	{
+		return false;
+	}
+	if (_nickname[0] == '$' || _nickname[0] == ':' || _nickname[0] == '#' || _nickname[0] == '&')
+	{
+		return false;
+	}
+	else
+		return true;
+}
+
 void Client::checkNick(std::string const &)
 {
 	std::cout << GREEN_TXT << "here is NICK check func" << RESET_TXT << std::endl;
 	this->_nickname = _arg_registration.back();
-	this->_step_registration += 1;
+	if (!NicknameIsValid())
+	{
+		std::cout << BLUE_TXT << "condition nickname not valid should respond" << RESET_TXT << std::endl;
+		std::cout << _nickname << std::endl;
+		setMessage(reply(ERR_ERRONEUSNICKNAME, this));
+		_step_registration = 0;
+	}
+	else
+	{
+		std::cout << BLUE_TXT << "condition nickname  valid should connect" << RESET_TXT << std::endl;
+		std::cout << _nickname << std::endl;
+		this->_step_registration += 1;
+	}
 }
 
 void Client::checkUser(std::string const &)

@@ -31,7 +31,7 @@ std::string reply (int reply, Client *client)
 	switch(reply)
 	{
 		case ERR_ERRONEUSNICKNAME:
-			msg = "432 " + client->get_nickname() + " " + client->get_nickname() + " :Erroneus nickname\r\n";
+			msg = "432 " + client->get_nickname() + " " + client->get_nickname() + " " + " :Erroneus nickname\r\n";
 			break;
 		case ERR_NICKNAMEINUSE:
 			msg = "433 " + client->get_nickname() + " " + client->get_nickname() +  " :Nickname is already in use\r\n";

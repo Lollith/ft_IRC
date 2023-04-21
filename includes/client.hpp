@@ -54,6 +54,7 @@ public:
 	void 						checkParams( std::string const& password );
 	void						ignoreCap( std::string const& );
 	void						checkPassword( std::string const& password );
+	bool						NicknameIsValid();
 	void						checkNick( std::string const& );
 	void						checkUser( std::string const& );
 	void 						clean_ping_mode(std::string const &arg);
