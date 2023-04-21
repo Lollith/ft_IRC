@@ -26,7 +26,6 @@ public:
 	int					getSocketServer();
 
 	bool 				AcceptSocketClient();
-	// int					getSocketClient();
 
 	int					getPort();
 

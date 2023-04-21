@@ -41,7 +41,6 @@ void Server::join( Client *client)
 
 }
 
-
 //A JOIN message with the client as the message <source> and the channel they 
 //have joined as the first parameter of the message.
 // The <source> of the message represents the user or server that sent the message, 

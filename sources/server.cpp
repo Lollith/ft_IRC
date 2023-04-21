@@ -7,8 +7,8 @@ Server::Server(const int port, const std::string password)
 {
 	if (!setSocketServer())
 	{
-		FATAL_ERR( "cannot create server object because it is not possible to create socket server." 
-			<< std::endl);
+		FATAL_ERR("cannot create server object because it is not possible to create socket server."
+				  << std::endl);
 		return;
 	}
 	setAddrServ();
@@ -24,21 +24,17 @@ Server::Server(const int port, const std::string password)
 
 Server::~Server(void)
 {
-	INFO("Destructor server called." <<  std::endl);
+	INFO("Destructor server called." << std::endl);
 
 	shutdown(this->_socket_server, SHUT_RDWR);
 	close(this->_socket_server);
 	std::vector<Client *>::iterator it;
 	for (it = _client.begin(); it != _client.end(); it++)
 	{
-		// // à modifier?_____________________________
-		shutdown((*it)->getSocketClient(), SHUT_RDWR);
-		close((*it)->getSocketClient());
-		//________________________________________
-		// delete (*it);
+		delete (*it);
 	}
 	_client.clear();
-} // close() ou/et freeinfo() à faire?
+}
 
 //__________________________________________________GETTERS_SETTERS
 
@@ -79,8 +75,8 @@ bool Server::AcceptSocketClient()
 		perror("accept()");
 		return false;
 	}
-		INFO(socket<<std::endl);	
-		_client.push_back(new Client(socket));
+	INFO(socket << std::endl);
+	_client.push_back(new Client(socket));
 
 	return true;
 }
@@ -141,9 +137,9 @@ void Server::crash_protector()
 }
 
 // return false en cas d'erreur
-//bind= associer la socket avec un port de votre machine locale.
-//listen = les connections vont attendre dans la file de BACKLOG jusqu'à ce qu' on
-//les accept()
+// bind= associer la socket avec un port de votre machine locale.
+// listen = les connections vont attendre dans la file de BACKLOG jusqu'à ce qu' on
+// les accept()
 bool Server::startServer()
 {
 	crash_protector();
@@ -181,7 +177,7 @@ bool Server::startServer()
 // on doit vérifier que notre socket serveur est prêt en écriture :
 
 // select verifie si des donnes sont dispo en lecture , ecruiture sur notre socket et retourne le nombre
-void	Server::mySelect(fd_set &rd, fd_set &wr)
+void Server::mySelect(fd_set &rd, fd_set &wr)
 {
 	FD_ZERO(&rd);
 	FD_ZERO(&wr);
@@ -197,7 +193,7 @@ void	Server::mySelect(fd_set &rd, fd_set &wr)
 			FD_SET((*it)->getSocketClient(), &wr);
 		}
 	}
-	int select_ready = select(FD_SETSIZE, &rd, &wr, NULL, NULL); 
+	int select_ready = select(FD_SETSIZE, &rd, &wr, NULL, NULL);
 	if (select_ready == -1)
 	{
 		perror("select");
@@ -224,7 +220,7 @@ void Server::myrecv(Client *client)
 	if (buf[0])
 	{
 		INFO("=>Recois un message depuis le client "
-			<< client->getSocketClient()<< ": "<< std::endl);
+			 << client->getSocketClient() << ": " << std::endl);
 		// std::cout << buf << std::endl;
 		client->setMsgRecv(buf);
 		client->setMsgRecvSave(buf);
@@ -233,7 +229,7 @@ void Server::myrecv(Client *client)
 
 void Server::mysend(Client *client)
 {
-	if(!client->getMessage().empty()) // comme je reinitialise a la fin le message
+	if (!client->getMessage().empty()) // comme je reinitialise a la fin le message
 	{
 		INFO("=>Repond au client:" << std::endl);
 		size_t res_send = send(client->getSocketClient(), client->getMessage().c_str(), client->getMessage().size(), 0);
@@ -243,8 +239,8 @@ void Server::mysend(Client *client)
 			close(client->getSocketClient());
 			// return false;
 		}
-		INFO("=>Message envoye a client " <<client->getSocketClient()
-			<< ": " << client->getMessage()<<std::endl);
+		INFO("=>Message envoye a client " << client->getSocketClient()
+										  << ": " << client->getMessage() << std::endl);
 		client->setMessage(""); // reinitialise le message , sinon boucle
 	}
 }
@@ -252,28 +248,23 @@ void Server::mysend(Client *client)
 bool Server::loop_recept_send()
 {
 	fd_set rd, wr;
-	// std::vector<Client *>::iterator it;
-	// for (it = _client.begin(); it != _client.end(); it++)
-	// {
-	// 	(*it)->setFlagPsswd(false);
-	// 	(*it)->setFlagPsswdProvided(false);
-	// }
 
 	while (_flag_keep_loop == true)
 	{
 		std::vector<Client *>::iterator it;
-		
+
 		mySelect(rd, wr);
 
 		if (FD_ISSET(_socket_server, &rd)) // check si notre socket est pret a lire // recoi le client, et ces logs
 		{
 			INFO("=>Accept le nouvel entrant: ");
 			if (AcceptSocketClient() == false)
-				return false;
+				return false; // exit here ? server should not stop?
 		}
 		for (it = _client.begin(); it != _client.end(); it++)
 		{
 			Client *client = *it;
+
 			if (FD_ISSET(client->getSocketClient(), &rd))
 			{
 				myrecv(client);
@@ -282,6 +273,16 @@ bool Server::loop_recept_send()
 			}
 			if (FD_ISSET(client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
 				mysend(client);
+		}
+		for (size_t i = 0; i < _client.size();)
+		{
+			if (_client[i]->getFlagMustShutClient() == true)
+			{
+				delete _client[i];
+				_client.erase(_client.begin() + i);
+			}
+			else
+				i++;
 		}
 	}
 	return true;

@@ -22,13 +22,13 @@ int main(int ac, char **av)
 	{
 		int sock_serv = atoi(av[1]);
 		Server serv(sock_serv, av[2]);
-		//test ctrl c___________
+
 		struct sigaction act;
 		act.sa_handler = sigHandler;
 		sigemptyset(&act.sa_mask);
 		act.sa_flags = 0;
 		sigaction(SIGINT, &act, 0);
-		//_______________________
+
 		if (!serv.startServer())
 		{
 			std::cout << "startServer failed" << std::endl;

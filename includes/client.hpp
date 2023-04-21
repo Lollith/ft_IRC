@@ -28,19 +28,21 @@ public:
 	void						setMsgRecvSave( std::string buf );
 	std::string					getMsgRecvSave( void )const;
 	
-	std::string					getMessage( void ) const;
 	void						setMessage( std::string );
+	std::string					getMessage( void ) const;
 
-	void				 		setFlagPsswd(bool boolean);
 	void		 				setFlagPsswdProvided(bool boolean);
+	void				 		setFlagPsswd(bool boolean);
 
-	std::vector<std::string>  	get_arg( void ) const;
+	bool				 		getFlagMustShutClient();
+
 	void 						set_arg( void );
+	std::vector<std::string>  	get_arg( void ) const;
 
 	std::string					get_user( void ) const;
 	std::string					get_hostname( void ) const;
-	std::string					get_nickname( void ) const;
 
+	std::string					get_nickname( void ) const;
 
 	//__________________________________________________MEMBERS
 	// dans cette fonction split du buf pour récuperer une pair commande - argument
@@ -57,10 +59,6 @@ public:
 	void 						clean_ping_mode(std::string const &arg);
 	void 						Clean_arg( void );
 	//define typedef ici pour struct sockaddr_in??
-	
-
-
-
 
 
 private:
@@ -77,6 +75,7 @@ private:
 	int							_step_registration; //compteur des étapes d'authentification
 	bool						_flag_password_ok;
 	bool						_flag_password_provided;
+	bool						_flag_shut_client;
 	std::string					_message_recv; // modifiee apres getcmdline
 	std::string					_message_recv_save; //non modifiee apres getcmdline
 	std::string 				_cmd_registration;
