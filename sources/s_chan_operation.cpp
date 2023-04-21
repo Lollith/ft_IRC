@@ -54,11 +54,18 @@ void Server::join( Client *client)
 //RPL_NAMREPLY messages sent by the server MUST include the requesting client that has just joined the channel.
 void Server::welcome_new_chan(Client *client, Channel *channel)
 {
-	std::string join_msg = ":"+ client->get_user() + "@" +"~" + client->get_hostname() + " JOIN "+ _channels.back()->getName() +"\r\n";
-	join_msg += reply(RPL_TOPIC, client, channel);
+	// erreur ici : reinitialise si 2 meme nom???? a tester avec 2 pseudo differents
+	// std::string join_msg2 = ":" + client->get_user() + "@" + "~" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
+	// for (size_t i = 0; i!= channel->_clients.size(); i++) //broadcast the message :nouveau client joigned aux autres du chan
+	// 	channel->_clients[i]->setMessage(join_msg2);
+	
+	std::string join_msg = ":" + client->get_user() + "@" + "~" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
+	
+	join_msg += reply(RPL_TOPIC, client, channel->getName());
 	join_msg += reply(RPL_NAMREPLY, client, channel);
-	join_msg += reply(RPL_ENDOFNAMES, client, channel);
+	join_msg += reply(RPL_ENDOFNAMES, client, channel->getName());
 	client->setMessage(join_msg);
+
 }
 
 
@@ -102,16 +109,23 @@ void Server::privmsg( Client *client){
 				}
 					client->setMessage("");// interdit le client en cours de recevoir son propre message 
 			}
+			else
+				client->setMessage(reply(ERR_NOSUCHCHANNEL, client, target));
 		}
 	}
-	// na pas trouver le bon channel : check les pseudo pour envoyer a un nickname
-	std::vector<Client*>::iterator it_client;	
-	for (it_client = _client.begin(); it_client != _client.end(); it_client++)
+	else
 	{
-		if ((*it_client)->get_nickname() == target)
+	// na pas trouver le bon channel : check les pseudo pour envoyer a un nickname
+		std::vector<Client*>::iterator it_client;	
+		for (it_client = _client.begin(); it_client != _client.end(); it_client++)
 		{
-			std::string message = ":" + client->get_user() + " PRIVMSG " + (*it_client)->get_nickname() + " " + msg + "\r\n";
-			(*it_client)->setMessage(message);
+			if ((*it_client)->get_nickname() == target)
+			{
+				std::string message = ":" + client->get_user() + " PRIVMSG " + (*it_client)->get_nickname() + " " + msg + "\r\n";
+				(*it_client)->setMessage(message);
+			}
+			else
+				client->setMessage(reply(ERR_NOSUCHNICK, client, target));
 		}
 	}
 }

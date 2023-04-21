@@ -75,6 +75,7 @@ enum reply_code
 };
 
 std::string reply (int reply, Client *client);
+std::string reply (int reply, Client *client, std::string target);
 std::string reply (int reply, Client *client, Channel *channel);
 
 #endif
