@@ -204,7 +204,16 @@ bool Client::NicknameIsValid()
 void Client::checkNick(std::string const &)
 {
 	std::cout << GREEN_TXT << "here is NICK check func" << RESET_TXT << std::endl;
-	this->_nickname = _arg_registration.back();
+	if (_arg_registration.empty())
+	{
+		setMessage(reply(ERR_NONICKNAMEGIVEN, this));
+		_step_registration = 0;
+	}
+	else
+	{
+		this->_nickname = _arg_registration.back();
+		std::cout << YELLOW_TXT << "should remplace nickname: " << _nickname << RESET_TXT << std::endl;
+	}
 	if (!NicknameIsValid())
 	{
 		std::cout << BLUE_TXT << "condition nickname not valid should respond" << RESET_TXT << std::endl;
