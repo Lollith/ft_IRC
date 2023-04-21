@@ -43,8 +43,6 @@ public:
 	std::string					get_hostname( void ) const;
 
 	std::string					get_nickname( void ) const;
-	void						set_nickname(std::string const& msg_rcv);
-
 
 	//__________________________________________________MEMBERS
 	// dans cette fonction split du buf pour récuperer une pair commande - argument

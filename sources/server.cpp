@@ -31,14 +31,10 @@ Server::~Server(void)
 	std::vector<Client *>::iterator it;
 	for (it = _client.begin(); it != _client.end(); it++)
 	{
-		// // à modifier?_____________________________
-		shutdown((*it)->getSocketClient(), SHUT_RDWR);
-		close((*it)->getSocketClient());
-		//________________________________________
-		// delete (*it);
+		delete (*it);
 	}
 	_client.clear();
-} // close() ou/et freeinfo() à faire?
+}
 
 //__________________________________________________GETTERS_SETTERS
 
@@ -263,17 +259,12 @@ bool Server::loop_recept_send()
 		{
 			INFO("=>Accept le nouvel entrant: ");
 			if (AcceptSocketClient() == false)
-				return false;
+				return false; // exit here ? server should not stop?
 		}
-		// for (it = _client.begin(); it != _client.end(); it++)
-		for (int i = 0; i < _client.size() ; i++)
+		for (it = _client.begin(); it != _client.end(); it++)
 		{
-			Client *client = *it; // ?
+			Client *client = *it;
 
-			if (client->getFlagMustShutClient() == true)
-			{
-				_client.erase(it); //segfault car erase quand on itere sur le vector
-			}
 			if (FD_ISSET(client->getSocketClient(), &rd))
 			{
 				myrecv(client);
@@ -282,6 +273,16 @@ bool Server::loop_recept_send()
 			}
 			if (FD_ISSET(client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
 				mysend(client);
+		}
+		for (size_t i = 0; i < _client.size();)
+		{
+			if (_client[i]->getFlagMustShutClient() == true)
+			{
+				delete _client[i];
+				_client.erase(_client.begin() + i);
+			}
+			else
+				i++;
 		}
 	}
 	return true;
