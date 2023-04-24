@@ -59,24 +59,36 @@ void Server::welcome_new_chan(Client *client, Channel *channel)
 	// for (size_t i = 0; i!= channel->_clients.size(); i++) //broadcast the message :nouveau client joigned aux autres du chan
 	// 	channel->_clients[i]->setMessage(join_msg2);
 	
-	std::string join_msg = ":" + client->get_user() + "@" + "~" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
+	std::string join_msg = ":" + client->get_nickname() + "@" + "~" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
 	
 	join_msg += reply(RPL_TOPIC, client, channel->getName());
 	join_msg += reply(RPL_NAMREPLY, client, channel);
 	join_msg += reply(RPL_ENDOFNAMES, client, channel->getName());
 	client->setMessage(join_msg);
-
 }
-
-
 
 void Server::quit(Client *client)
-{
-	(void) client;
-	std::cout << "=>Quit le channel" << std::endl;
-	// this->_flag_keep_loop = false ; // a modifier pour quiter le chan proprement
-}
+{	
+	std::string msg = client->get_arg().back();
 
+		std::string message = ":" + client->get_nickname()+ "@" + "~" +client->get_hostname()+ " QUIT " +  msg + "\r\n";
+
+	std::vector<Channel*>::iterator it_chan;	
+	for (it_chan = this->_channels.begin(); it_chan != _channels.end(); it_chan++)
+	{
+		if((*it_chan)->hasClient(client))
+		{
+			std::vector<Client*>::iterator it_client;	
+			for (it_client = (*it_chan)->_clients.begin(); it_client != (*it_chan)->_clients.end(); it_client++) // segfault ICI getCLients() au lieu de _clients
+			{
+				// if ((*it_client)->getSocketClient() != client->getSocketClient())
+					(*it_client)->setMessage(message);
+			}		
+		}
+	INFO("=>Quit le channel" << std::endl);
+		client->setMessage("");// interdit le client en cours de recevoir son propre message 
+	}
+}
 //______________________________TEST CTRLC
 void Server::stop()
 {
@@ -102,9 +114,9 @@ void Server::privmsg( Client *client){
 			{
 				std::string message = ":" + client->get_user() + " PRIVMSG " + target + " " + msg + "\r\n";
 				size_t i = 0;
-				while (i!= (*it_chan)->_clients.size()) //broadcast the messag
+				while (i!= (*it_chan)->getClients().size()) //broadcast the messag
 				{
-					(*it_chan)->_clients[i]->setMessage(message);
+					(*it_chan)->getClients()[i]->setMessage(message);
 					i++;
 				}
 					client->setMessage("");// interdit le client en cours de recevoir son propre message 
@@ -134,3 +146,19 @@ void Server::names(Client *client){ // a faire ????
 (void) client;
 	// INFO("execute la fct names\n");
 }
+
+// void Server::broadcast_msg(){
+// 	std::vector<Channel*>::iterator it_chan;	
+// 		for (it_chan = _channels.begin(); it_chan != _channels.end(); it_chan++)
+// 		{
+// 			if ((*it_chan)->getName() == target)
+// 			{
+// 				std::string message = ":" + client->get_user() + " PRIVMSG " + target + " " + msg + "\r\n";
+// 				size_t i = 0;
+// 				while (i!= (*it_chan)->_clients.size()) //broadcast the messag
+// 				{
+// 					(*it_chan)->_clients[i]->setMessage(message);
+// 					i++;
+// 				}
+// 					client->setMessage("");// interdit le client en cours de recevoir son propre message 
+// }

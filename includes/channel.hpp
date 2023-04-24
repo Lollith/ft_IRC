@@ -7,9 +7,12 @@ class Channel{
 	public:
 		Channel( std::string name );
 
-		std::string getName( void ) const;
+
+		std::vector<Client *>	getClients( void ) const;
+		std::string				getName( void ) const;
 	
-		void addClient(Client *client);
+		bool 					hasClient(Client *client);
+		void 					addClient(Client *client);
 
 		std::vector<Client *>	_clients;// remettre en prive + ceer get
 
