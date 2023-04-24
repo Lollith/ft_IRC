@@ -55,12 +55,15 @@ public:
 	void						ignoreCap( std::string const& );
 	void						checkPassword( std::string const& password );
 	bool						NicknameIsValid();
-	void						checkNick( std::string const& );
+	void						Nick(std::string const&);
+	bool						checkNick();
+	void						changeNick(std::string const& old_nick);
 	void						checkUser( std::string const& );
 	void 						clean_ping_mode(std::string const &arg);
 	void 						Clean_arg( void );
 	//define typedef ici pour struct sockaddr_in??
 
+	void						setVectorClient(std::vector<Client*> _ptr_client);
 
 private:
 	// useless constructor
@@ -85,6 +88,7 @@ private:
 	std::string					_hostname;
 	
 	std::vector<std::string>	_arg_registration;
+	std::vector<Client*>		_client;
 
 };
 

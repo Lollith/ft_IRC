@@ -5,7 +5,8 @@ void Server::parse_msg_recv(Client *client, std::string msg_recv)
 	int nb_fct = 4;
 	std::string funct_names[] = {"JOIN", "QUIT", "PRIVMSG", "NAMES"};
 
-	void (Server::*fct_member[])(Client *client) = { &Server::join, &Server::quit, &Server::privmsg, &Server::names};
+	void (Server::*fct_member[])(Client *client) = { &Server::join, &Server::quit, &Server::privmsg, 
+		&Server::names};
 
 	for (int i = 0; i < nb_fct; i++)
 	{
@@ -16,7 +17,6 @@ void Server::parse_msg_recv(Client *client, std::string msg_recv)
 			client->setMsgRecvSave(""); // reinitialise le message recu sinon boucle sur /quit
 		}
 	}
-
 }
 
 
@@ -54,7 +54,7 @@ void Server::join( Client *client)
 //RPL_NAMREPLY messages sent by the server MUST include the requesting client that has just joined the channel.
 void Server::welcome_new_chan(Client *client, Channel *channel)
 {
-	std::string join_msg = ":"+ client->get_user() + "@" +"~" + client->get_hostname() + " JOIN "+ _channels.back()->getName() +"\r\n";
+	std::string join_msg = ":"+ client->get_nickname() + "@" +"~" + client->get_hostname() + " JOIN "+ _channels.back()->getName() +"\r\n";
 	join_msg += reply(RPL_TOPIC, client, channel);
 	join_msg += reply(RPL_NAMREPLY, client, channel);
 	join_msg += reply(RPL_ENDOFNAMES, client, channel);

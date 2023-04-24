@@ -221,7 +221,7 @@ void Server::myrecv(Client *client)
 	{
 		INFO("=>Recois un message depuis le client "
 			 << client->getSocketClient() << ": " << std::endl);
-		// std::cout << buf << std::endl;
+		std::cout << YELLOW_TXT << buf << RESET_TXT << std::endl;
 		client->setMsgRecv(buf);
 		client->setMsgRecvSave(buf);
 	}
@@ -268,6 +268,7 @@ bool Server::loop_recept_send()
 			if (FD_ISSET(client->getSocketClient(), &rd))
 			{
 				myrecv(client);
+				client->setVectorClient(_client);
 				client->getCmdLine(_password);
 				parse_msg_recv(client, client->getMsgRecvSave());
 			}

@@ -7,8 +7,9 @@ Client::Client(void) : _step_registration(0), _flag_password_ok(false), _flag_pa
 {
 }
 
-Client::Client(int sock_client) : _socket_client(sock_client), _step_registration(0), _flag_password_ok(false), _flag_password_provided(false),
-								  _flag_shut_client(false), _user(""), _nickname("anonymous"), _hostname("")
+Client::Client(int sock_client) : _socket_client(sock_client), _step_registration(0), _flag_password_ok(false),
+								  _flag_password_provided(false), _flag_shut_client(false),
+								  _user(""), _nickname("anonymous"), _hostname("")
 
 {
 	// 	std::cout << "create client" << std::endl;
@@ -114,6 +115,11 @@ std::string Client::get_nickname(void) const
 	return this->_nickname;
 }
 
+void	Client::setVectorClient(std::vector<Client *> clients)
+{
+	_client = clients;
+}
+
 //__________________________________________________MEMBERS FUNCTIONS
 
 void Client::tokenization_cmd(std::string &cmd)
@@ -186,10 +192,7 @@ void Client::checkPassword(std::string const &psswd)
 
 bool Client::NicknameIsValid()
 {
-	if (_nickname.find(' ') != std::string::npos || _nickname.find(',')  != std::string::npos 
-	|| _nickname.find('.')  != std::string::npos || _nickname.find('*')  != std::string::npos
-	|| _nickname.find('?')  != std::string::npos || _nickname.find('!')  != std::string::npos 
-	|| _nickname.find('@')  != std::string::npos || _nickname.empty())
+	if (_nickname.find(' ') != std::string::npos || _nickname.find(',') != std::string::npos || _nickname.find('.') != std::string::npos || _nickname.find('*') != std::string::npos || _nickname.find('?') != std::string::npos || _nickname.find('!') != std::string::npos || _nickname.find('@') != std::string::npos || _nickname.empty())
 	{
 		return false;
 	}
@@ -201,9 +204,52 @@ bool Client::NicknameIsValid()
 		return true;
 }
 
-void Client::checkNick(std::string const &)
+bool Client::checkNick()
 {
-	std::cout << GREEN_TXT << "here is NICK check func" << RESET_TXT << std::endl;
+	std::cout << GREEN_TXT << "here is NICK CHECK func" << RESET_TXT << std::endl;
+
+	if (!NicknameIsValid())
+	{
+		std::cout << BLUE_TXT << "condition nickname not valid should respond" << RESET_TXT << std::endl;
+		std::cout << _nickname << std::endl;
+		setMessage(reply(ERR_ERRONEUSNICKNAME, this));
+		_step_registration = 0;
+		return false;
+	}
+	// here errror already in use 433 : get vector from serv ?? flag ?? tout bouger ds server ??
+	// size_t i = 0;
+	// while (i != _client.size()) // broadcast the messag
+	// {
+	// 	if (_client[i]->get_nickname() == this->_nickname)
+	// 	{
+	// 		std::cout << BLUE_TXT << "differents clients have same nickname" << RESET_TXT << std::endl;
+	// 		setMessage(reply(ERR_NICKNAMEINUSE, this));
+	// 		_step_registration = 0;
+	// 		return false;
+	// 	}
+	// 	i++;
+	// }
+	return true;
+}
+
+void Client::changeNick(std::string const& old_nick)
+{
+	// broadcast
+	std::string message = ":" + old_nick + "!" + _user +  "@" + _hostname + " NICK " + _nickname 
+		+ "\r\n" + "; " + old_nick + " changed his nickname to " + _nickname + "\r\n";
+	size_t i = 0;
+	while (i != _client.size())
+	{
+		std::cout << GREEN_TXT << _client[i]->get_nickname() << RESET_TXT << std::endl;
+		this->_client[i]->setMessage(message);
+		i++;
+	}
+	// setMessage(""); // interdit le client en cours de recevoir son propre message
+}
+
+void Client::Nick(std::string const &)
+{
+	std::cout << GREEN_TXT << "here is NICK func" << RESET_TXT << std::endl;
 	if (_arg_registration.empty())
 	{
 		setMessage(reply(ERR_NONICKNAMEGIVEN, this));
@@ -211,21 +257,30 @@ void Client::checkNick(std::string const &)
 	}
 	else
 	{
+		std::string old_nick = _nickname;
+		std::cout << old_nick << std::endl;
 		this->_nickname = _arg_registration.back();
-		std::cout << YELLOW_TXT << "should remplace nickname: " << _nickname << RESET_TXT << std::endl;
-	}
-	if (!NicknameIsValid())
-	{
-		std::cout << BLUE_TXT << "condition nickname not valid should respond" << RESET_TXT << std::endl;
 		std::cout << _nickname << std::endl;
-		setMessage(reply(ERR_ERRONEUSNICKNAME, this));
-		_step_registration = 0;
-	}
-	else
-	{
-		std::cout << BLUE_TXT << "condition nickname  valid should connect" << RESET_TXT << std::endl;
-		std::cout << _nickname << std::endl;
-		this->_step_registration += 1;
+		if (checkNick())
+		{
+			std::cout << BLUE_TXT << "nickname valid" << RESET_TXT << std::endl;
+			if (this->_step_registration < 4) // si entre dds cette condition : first authentification
+			{
+				this->_step_registration += 1;
+				std::cout << RED_TXT << "rentre ds la premiere auth de nick" << RESET_TXT << std::endl;
+
+			}
+			else // si entre dans cette condition il s'agit d'un changement de nickname
+			{
+				std::cout << RED_TXT << "rentre ds change nick" << RESET_TXT << std::endl;
+				changeNick(old_nick);
+			}	
+		}
+		else
+		{
+			std::cout << RED_TXT << "dans le else" << RESET_TXT << std::endl;
+			return;
+		}
 	}
 }
 
@@ -257,7 +312,7 @@ void Client::checkParams(std::string const &password)
 	std::string rpl;
 
 	void (Client::*func_list[6])(std::string const &arg) =
-		{&Client::ignoreCap, &Client::checkPassword, &Client::checkNick, &Client::checkUser, &Client::clean_ping_mode, &Client::clean_ping_mode};
+		{&Client::ignoreCap, &Client::checkPassword, &Client::Nick, &Client::checkUser, &Client::clean_ping_mode, &Client::clean_ping_mode};
 	std::string cmd_to_check[6] = {"CAP", "PASS", "NICK", "USER", "PING", "MODE"};
 	while (i < 5)
 	{
