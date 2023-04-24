@@ -232,6 +232,8 @@ void Server::mysend(Client *client)
 	if (!client->getMessage().empty()) // comme je reinitialise a la fin le message
 	{
 		INFO("=>Repond au client:" << std::endl);
+		INFO("=>Message envoye a client " << client->getSocketClient()
+										  << ": " << client->getMessage() << std::endl);
 		size_t res_send = send(client->getSocketClient(), client->getMessage().c_str(), client->getMessage().size(), 0);
 		if (res_send != client->getMessage().size())
 		{
@@ -239,8 +241,6 @@ void Server::mysend(Client *client)
 			close(client->getSocketClient());
 			// return false;
 		}
-		INFO("=>Message envoye a client " << client->getSocketClient()
-										  << ": " << client->getMessage() << std::endl);
 		client->setMessage(""); // reinitialise le message , sinon boucle
 	}
 }
@@ -270,6 +270,8 @@ bool Server::loop_recept_send()
 				myrecv(client);
 				client->setVectorClient(_client);
 				client->getCmdLine(_password);
+				//verif l'authent avant d'appeler ces fonctions
+				//mélanger les deux ptr sur fonction
 				parse_msg_recv(client, client->getMsgRecvSave());
 			}
 			if (FD_ISSET(client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
