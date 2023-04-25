@@ -70,9 +70,7 @@ void Server::welcome_new_chan(Client *client, Channel *channel)
 void Server::quit(Client *client)
 {	
 	std::string msg = client->get_arg().back();
-	
-
-		std::string message = ":" + client->get_nickname()+ "@" + "~" +client->get_hostname()+ " QUIT " +  msg + "\r\n";
+	std::string message = ":" + client->get_nickname()+ "@" + "~" +client->get_hostname()+ " QUIT " +  msg + "\r\n";
 
 	std::vector<Channel*>::iterator it_chan;	
 	for (it_chan = this->_channels.begin(); it_chan != _channels.end(); it_chan++)
@@ -82,20 +80,13 @@ void Server::quit(Client *client)
 			std::vector<Client*> vectclients = (*it_chan)->getClients();
 			std::vector<Client*>::iterator it_client;	
 			for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++) 
-			{
-				// if ((*it_client)->getSocketClient() != client->getSocketClient())
-					(*it_client)->setMessage(message);
-			}		
+				(*it_client)->setMessage(message);
 		}
-	INFO("=>Quit le channel" << std::endl);
+		INFO("=>Quit le channel" << std::endl);
 		client->setMessage("");// interdit le client en cours de recevoir son propre message 
 	}
 }
-//______________________________TEST CTRLC
-void Server::stop()
-{
-	this->_flag_keep_loop = false;
-}
+
 
 // The PRIVMSG command is used to send private messages between users, as well 
 // as to send messages to channels. <target> is the nickname of a client or the name of a channel.(#)
@@ -147,4 +138,10 @@ void Server::privmsg( Client *client){
 void Server::names(Client *client){ // a faire ????
 (void) client;
 	// INFO("execute la fct names\n");
+}
+
+//______________________________TEST CTRLC
+void Server::stop()
+{
+	this->_flag_keep_loop = false;
 }
