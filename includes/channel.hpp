@@ -14,9 +14,9 @@ class Channel{
 		bool 					hasClient(Client *client);
 		void 					addClient(Client *client);
 
-		std::vector<Client *>	_clients;// remettre en prive + ceer get
 
 	private:
+		std::vector<Client *>	_clients;// remettre en prive + ceer get
 		
 		std::string				_name;
 		
