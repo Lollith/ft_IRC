@@ -53,6 +53,11 @@ void Client::setMessage(std::string buffer)
 	this->_message.setBuffer(buffer);
 }
 
+void Client::clearMessage()
+{
+	this->_message.resetBuffer();
+}
+
 void Client::setMsgRecv(std::string buf)
 {
 	_message_recv = buf;
@@ -115,7 +120,7 @@ std::string Client::get_nickname(void) const
 	return this->_nickname;
 }
 
-void Client::setVectorClient(std::vector<Client *> clients)
+void Client::setVectorClient(std::vector<Client *> *clients)
 {
 	_client = clients;
 }
@@ -192,7 +197,10 @@ void Client::checkPassword(std::string const &psswd)
 
 bool Client::NicknameIsValid()
 {
-	if (_nickname.find(' ') != std::string::npos || _nickname.find(',') != std::string::npos || _nickname.find('.') != std::string::npos || _nickname.find('*') != std::string::npos || _nickname.find('?') != std::string::npos || _nickname.find('!') != std::string::npos || _nickname.find('@') != std::string::npos || _nickname.empty())
+	if (_nickname.find(' ') != std::string::npos || _nickname.find(',') != std::string::npos 
+		|| _nickname.find('.') != std::string::npos || _nickname.find('*') != std::string::npos
+		|| _nickname.find('?') != std::string::npos || _nickname.find('!') != std::string::npos
+		|| _nickname.find('@') != std::string::npos || _nickname.empty())
 	{
 		return false;
 	}
@@ -235,15 +243,15 @@ bool Client::checkNick()
 void Client::changeNick(std::string const &old_nick)
 {
 	// broadcast
-	std::string message = ":" + old_nick + "!" + _user + "@" + _hostname + " NICK " + ":" + _nickname + "\r\n";
+	std::string message = ":" + old_nick + "!" + _user + "@" + _hostname + " NICK " + _nickname + "\r\n";
+	// setMessage(message);
 	size_t i = 0;
-	while (i != _client.size())
+	while (i != _client->size())
 	{
-		std::cout << GREEN_TXT << _client[i]->get_nickname() << RESET_TXT << std::endl;
-		this->_client[i]->setMessage(message);
+		std::cout << GREEN_TXT << (*_client)[i]->get_nickname() << RESET_TXT << std::endl;
+		(*_client)[i]->setMessage(message);
 		i++;
 	}
-	// setMessage(""); // interdit le client en cours de recevoir son propre message
 }
 
 void Client::Nick(std::string const &)
@@ -298,7 +306,8 @@ void Client::checkUser(std::string const &)
 
 	if (_step_registration == 4)
 	{
-		std::string buffer = "001 " + get_nickname() + " :Welcome to the " + _hostname + " Network, " + _nickname + "[!" + _user + "@" + _hostname + "]\r\n";
+		std::string buffer = "001 " + get_nickname() + " :Welcome to the " + _hostname + " Network, " 
+		+ _nickname + "[!" + _user + "@" + _hostname + "]\r\n";
 		_message.setBuffer(buffer);
 	}
 }

@@ -242,7 +242,7 @@ void Server::mysend(Client *client)
 			close(client->getSocketClient());
 			// return false;
 		}
-		client->setMessage(""); // reinitialise le message , sinon boucle
+		client->clearMessage(); // reinitialise le message , sinon boucle
 	}
 }
 
@@ -269,7 +269,7 @@ bool Server::loop_recept_send()
 			if (FD_ISSET(client->getSocketClient(), &rd))
 			{
 				myrecv(client);
-				client->setVectorClient(_client);
+				client->setVectorClient(&_client);
 				client->getCmdLine(_password);
 				//verif l'authent avant d'appeler ces fonctions
 				//mélanger les deux ptr sur fonction

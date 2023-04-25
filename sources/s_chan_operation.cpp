@@ -97,10 +97,11 @@ void Server::privmsg( Client *client){
 				size_t i = 0;
 				while (i!= (*it_chan)->_clients.size()) //broadcast the messag
 				{
-					(*it_chan)->_clients[i]->setMessage(message);
+					if ((*it_chan)->_clients[i] != client) // remplace le set chaine vide 
+						(*it_chan)->_clients[i]->setMessage(message);
 					i++;
 				}
-					client->setMessage("");// interdit le client en cours de recevoir son propre message 
+				// client->setMessage("");// interdit le client en cours de recevoir son propre message 
 			}
 		}
 	}

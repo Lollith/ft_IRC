@@ -29,6 +29,7 @@ public:
 	std::string					getMsgRecvSave( void )const;
 	
 	void						setMessage( std::string );
+	void						clearMessage();
 	std::string					getMessage( void ) const;
 
 	void		 				setFlagPsswdProvided(bool boolean);
@@ -63,7 +64,7 @@ public:
 	void 						Clean_arg( void );
 	//define typedef ici pour struct sockaddr_in??
 
-	void						setVectorClient(std::vector<Client*> _ptr_client);
+	void						setVectorClient(std::vector<Client*> *_ptr_client);
 
 private:
 	// useless constructor
@@ -88,7 +89,7 @@ private:
 	std::string					_hostname;
 	
 	std::vector<std::string>	_arg_registration;
-	std::vector<Client*>		_client;
+	std::vector<Client*>		*_client;
 
 };
 

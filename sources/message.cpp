@@ -31,7 +31,11 @@ std::string Message::getBuffer( void )const{
 }
 
 void 	Message::setBuffer( std::string buffer ){
-	this->_buffer = buffer;
+	this->_buffer += buffer;
+}
+
+void 	Message::resetBuffer(){
+	this->_buffer.clear();
 }
 
 // / CLASSES ENFANTS: Connection__
