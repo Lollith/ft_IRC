@@ -115,7 +115,7 @@ std::string Client::get_nickname(void) const
 	return this->_nickname;
 }
 
-void	Client::setVectorClient(std::vector<Client *> clients)
+void Client::setVectorClient(std::vector<Client *> clients)
 {
 	_client = clients;
 }
@@ -232,11 +232,10 @@ bool Client::checkNick()
 	return true;
 }
 
-void Client::changeNick(std::string const& old_nick)
+void Client::changeNick(std::string const &old_nick)
 {
 	// broadcast
-	std::string message = ":" + old_nick + "!" + _user +  "@" + _hostname + " NICK " + ":" + _nickname + "\r\n"
-		;
+	std::string message = ":" + old_nick + "!" + _user + "@" + _hostname + " NICK " + ":" + _nickname + "\r\n";
 	size_t i = 0;
 	while (i != _client.size())
 	{
@@ -254,6 +253,7 @@ void Client::Nick(std::string const &)
 	{
 		setMessage(reply(ERR_NONICKNAMEGIVEN, this));
 		_step_registration = 0;
+		_flag_shut_client = true;
 	}
 	else
 	{
@@ -268,19 +268,22 @@ void Client::Nick(std::string const &)
 			{
 				this->_step_registration += 1;
 				std::cout << RED_TXT << "rentre ds la premiere auth de nick" << RESET_TXT << std::endl;
-
 			}
 			else // si entre dans cette condition il s'agit d'un changement de nickname
 			{
 				std::cout << RED_TXT << "rentre ds change nick" << RESET_TXT << std::endl;
 				changeNick(old_nick);
-			}	
+			}
 		}
-		else
+		else if (this->_step_registration < 4) // si invalid mais pdt l'étape d'authent
 		{
-			std::cout << RED_TXT << "dans le else" << RESET_TXT << std::endl;
+			_step_registration = 0;
+			_flag_shut_client = true;
+			std::cout << RED_TXT << "dans le else nick invalid et first authent" << RESET_TXT << std::endl;
 			return;
 		}
+		else
+			return;
 	}
 }
 
@@ -303,7 +306,6 @@ void Client::checkUser(std::string const &)
 void Client::clean_ping_mode(std::string const &arg)
 {
 	(void)arg;
-	// Clean_arg();
 	std::string msg = "PONG " + this->_arg_registration.back();
 	setMessage(msg);
 }

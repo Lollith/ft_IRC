@@ -26,14 +26,14 @@ Server::~Server(void)
 {
 	INFO("Destructor server called." << std::endl);
 
-	shutdown(this->_socket_server, SHUT_RDWR);
-	close(this->_socket_server);
 	std::vector<Client *>::iterator it;
 	for (it = _client.begin(); it != _client.end(); it++)
 	{
 		delete (*it);
 	}
 	_client.clear();
+	shutdown(this->_socket_server, SHUT_RDWR);
+	close(this->_socket_server);
 }
 
 //__________________________________________________GETTERS_SETTERS
@@ -197,7 +197,8 @@ void Server::mySelect(fd_set &rd, fd_set &wr)
 	if (select_ready == -1)
 	{
 		perror("select");
-		// return false; // continue?? si errno == eintr
+		//here: déclencher le QUIT ? STOP le serveur ou autre
+		// return; // continue?? si errno == eintr
 	}
 	// else if (select_ready == 0) //utile?
 	// {
