@@ -29,15 +29,19 @@ std::string reply (int reply, Client *client, std::string target)
 			break;
 		
 		case RPL_ENDOFNAMES:
-			msg = "366 "+ client->get_nickname() + " " + target +" :End of /NAMES list\r\n";
+			msg = "366 "+ client->get_nickname() + " " + target + " :End of /NAMES list\r\n";
 			break;
 		
 		case ERR_NOSUCHNICK:
-			msg = "401 " + client->get_nickname() + " " + target +" :No such nick\r\n";
+			msg = "401 " + client->get_nickname() + " " + target + " :No such nick\r\n";
 			break;
 
 		case ERR_NOSUCHCHANNEL:
-			msg = "403 " + client->get_nickname() + " " + target +" :No such channel\r\n";
+			msg = "403 " + client->get_nickname() + " " + target + " :No such channel\r\n";
+			break;
+		
+		case ERR_NOTONCHANNEL://ICI NE MARCHE PAS
+			msg = "442 " + client->get_nickname() + " " + target + " :You're not on that channel\r\n";
 			break;
 
 		default:

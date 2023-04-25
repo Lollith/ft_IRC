@@ -269,3 +269,24 @@ void Client::getCmdLine(std::string const &password)
 		pos = this->_message_recv.find(eol_marker);
 	}
 }
+	
+	
+	//QUIT
+	
+	// std::string msg = client->get_arg().back();
+	// std::string message = ":" + client->get_nickname()+ "@" + "~" +client->get_hostname()+ " QUIT " +  msg + "\r\n";
+
+//signale a tous les autres client sur les bons channels que machin a quit
+	// std::vector<Channel*>::iterator it_chan;	
+	// for (it_chan = this->_channels.begin(); it_chan != _channels.end(); it_chan++)
+	// {
+	// 	if((*it_chan)->hasClient(client))
+	// 	{
+	// 		std::vector<Client*> vectclients = (*it_chan)->getClients();
+	// 		std::vector<Client*>::iterator it_client;	
+	// 		for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++) 
+	// 			(*it_client)->setMessage(message);
+	// 	}
+	// 	INFO("=>Quit le channel" << std::endl);
+	// 	client->setMessage("");// interdit le client en cours de recevoir son propre message 
+	// }

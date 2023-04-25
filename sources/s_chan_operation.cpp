@@ -3,9 +3,9 @@
 void Server::parse_msg_recv(Client *client, std::string msg_recv)
 {
 	int nb_fct = 4;
-	std::string funct_names[] = {"JOIN", "QUIT", "PRIVMSG", "NAMES"};
+	std::string funct_names[] = {"JOIN", "PART", "PRIVMSG", "NAMES"};
 
-	void (Server::*fct_member[])(Client *client) = { &Server::join, &Server::quit, &Server::privmsg, &Server::names};
+	void (Server::*fct_member[])(Client *client) = { &Server::join, &Server::part, &Server::privmsg, &Server::names};
 
 	for (int i = 0; i < nb_fct; i++)
 	{
@@ -66,24 +66,40 @@ void Server::welcome_new_chan(Client *client, Channel *channel)
 	client->setMessage(join_msg);
 }
 
-void Server::quit(Client *client)
-{	
-	std::string msg = client->get_arg().back();
-	std::string message = ":" + client->get_nickname()+ "@" + "~" +client->get_hostname()+ " QUIT " +  msg + "\r\n";
 
+//pour part : faire plus de test  en changeant les nickname => bug sinon?+ check raison de quiter 
+//CHECK ICI
+void Server::part(Client *client)
+{	
+	std::string msg = "";
+	
+	std::string chan = client->get_arg().at(0);
 	std::vector<Channel*>::iterator it_chan;	
+	
+	if (client->get_arg().size() == 2)
+		msg = client->get_arg().back();
+	
 	for (it_chan = this->_channels.begin(); it_chan != _channels.end(); it_chan++)
 	{
-		if((*it_chan)->hasClient(client))
+		if ((*it_chan)->getName() == chan)
 		{
-			std::vector<Client*> vectclients = (*it_chan)->getClients();
-			std::vector<Client*>::iterator it_client;	
-			for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++) 
-				(*it_client)->setMessage(message);
+			INFO("=>leave le channel" << std::endl);
+			if((*it_chan)->hasClient(client))
+			{
+				std::string message =  ":" + client->get_nickname() + "@" + "~" + client->get_hostname() +  " PART " + chan + " " + msg + "\r\n";
+				std::vector<Client*> vectclients = (*it_chan)->getClients();
+				std::vector<Client*>::iterator it_client;	
+				for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
+					(*it_client)->setMessage(message);
+			}
 		}
-		INFO("=>Quit le channel" << std::endl);
-		client->setMessage("");// interdit le client en cours de recevoir son propre message 
+		else		// client->setMessage("");// interdit le client en cours de recevoir son propre message 
+			client->setMessage(reply(ERR_NOTONCHANNEL, client, (*it_chan)->getName()));
+			
 	}
+// ERR_NEEDMOREPARAMS (461) FAIRE
+// ERR_NOSUCHCHANNEL (403)
+// ERR_NOTONCHANNEL (442)
 }
 
 
