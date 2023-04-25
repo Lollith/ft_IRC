@@ -70,6 +70,10 @@ Utiliser n'importe quel port au dessus de 1024 jusqu'à 65535.
 /nick newname
 /msg pseudotosend monmessage + ctrl n
 
+~ nc localhost <port>
+PASS <pass>
+NICK <nick>
+USER <nick> <user> <user> <user>
 
 
 //------------------------------------------------------------------------------

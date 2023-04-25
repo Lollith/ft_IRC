@@ -8,8 +8,8 @@ std::string reply (int reply, Client *client, Channel *channel)
 	switch(reply)
 	{
 		case RPL_NAMREPLY:
-			for (size_t  j = 0; j < channel->_clients.size(); j++)
-				name += channel->_clients[j]->get_nickname()+ " "; 
+			for (size_t  j = 0; j < channel->getClients().size(); j++)
+				name += channel->getClients()[j]->get_nickname()+ " "; 
 			msg = "353 " + client->get_nickname()+" = " + channel->getName() + " :" + name + "\r\n";
 			break;
 		default:
