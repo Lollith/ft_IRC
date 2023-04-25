@@ -303,7 +303,9 @@ void Client::checkUser(std::string const &)
 void Client::clean_ping_mode(std::string const &arg)
 {
 	(void)arg;
-	Clean_arg();
+	// Clean_arg();
+	std::string msg = "PONG " + this->_arg_registration.back();
+	setMessage(msg);
 }
 
 void Client::checkParams(std::string const &password)
