@@ -89,6 +89,7 @@ private:
 	std::string					_user;
 	std::string					_nickname;
 	std::string					_hostname;
+	std::string					_realname;
 	
 	std::vector<std::string>	_arg_registration;
 	std::vector<Client*>		*_client;
