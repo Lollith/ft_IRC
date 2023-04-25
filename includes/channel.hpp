@@ -16,8 +16,7 @@ class Channel{
 
 
 	private:
-		std::vector<Client *>	_clients;// remettre en prive + ceer get
-		
+		std::vector<Client *>	_clients;
 		std::string				_name;
 		
 		

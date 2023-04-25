@@ -47,11 +47,6 @@ void Server::join( Client *client)
 // and the <target> represents the target of that PRIVMSG (which may be the client, 
 // a channel, etc).
 
-// The channel’s topic (with RPL_TOPIC (332) and optionally RPL_TOPICWHOTIME (333)), 
-//and no message if the channel does not have a topic.
-// A list of users currently joined to the channel (with one or more RPL_NAMREPLY 
-//(353) numerics followed by a single RPL_ENDOFNAMES (366) numeric). These 
-//RPL_NAMREPLY messages sent by the server MUST include the requesting client that has just joined the channel.
 void Server::welcome_new_chan(Client *client, Channel *channel)
 {
 	// erreur ici : reinitialise si 2 meme nom???? a tester avec 2 pseudo differents
