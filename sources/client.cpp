@@ -243,7 +243,7 @@ bool Client::checkNick()
 void Client::changeNick(std::string const &old_nick)
 {
 	// broadcast
-	std::string message = ":" + old_nick + "!" + _user + "@" + _hostname + " NICK " + _nickname + "\r\n";
+	std::string message = ":" + old_nick + "!" + _user + "@" + _hostname + " NICK :" + _nickname + "\r\n";
 	// setMessage(message);
 	size_t i = 0;
 	while (i != _client->size())
@@ -307,7 +307,7 @@ void Client::checkUser(std::string const &)
 	if (_step_registration == 4)
 	{
 		std::string buffer = "001 " + get_nickname() + " :Welcome to the " + _hostname + " Network, " 
-		+ _nickname + "[!" + _user + "@" + _hostname + "]\r\n";
+		+ _nickname + "!" + _user + "@" + _hostname + "\r\n";
 		_message.setBuffer(buffer);
 	}
 }
