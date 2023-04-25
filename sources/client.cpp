@@ -312,22 +312,32 @@ void Client::checkUser(std::string const &)
 	}
 }
 
-void Client::clean_ping_mode(std::string const &arg)
+void Client::clean_ping_mode(std::string const &)
 {
-	(void)arg;
 	std::string msg = "PONG " + this->_arg_registration.back();
 	setMessage(msg);
+}
+
+void Client::quit(std::string const &)
+{
+	INFO("HERE QUIT FUNC");
+	std::string rpl = "ERROR: Server closing a client connection\r\n";
+	rpl += ":" + _nickname + "!" + _user + "@" + _hostname + "QUIT :Bye, see you!\r\n";
+	setMessage(rpl);
+	this->_flag_shut_client = true;
 }
 
 void Client::checkParams(std::string const &password)
 {
 	int i = 0;
+	int nb_func = 6;
 	std::string rpl;
 
-	void (Client::*func_list[6])(std::string const &arg) =
-		{&Client::ignoreCap, &Client::checkPassword, &Client::Nick, &Client::checkUser, &Client::clean_ping_mode, &Client::clean_ping_mode};
-	std::string cmd_to_check[6] = {"CAP", "PASS", "NICK", "USER", "PING", "MODE"};
-	while (i < 5)
+	void (Client::*func_list[nb_func])(std::string const &arg) =
+		{&Client::ignoreCap, &Client::checkPassword, &Client::Nick, &Client::checkUser, 
+			&Client::clean_ping_mode, &Client::quit};
+	std::string cmd_to_check[nb_func] = {"CAP", "PASS", "NICK", "USER", "PING", "QUIT"};
+	while (i < nb_func)
 	{
 		if (_cmd_registration == cmd_to_check[i])
 		{

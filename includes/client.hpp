@@ -62,6 +62,8 @@ public:
 	void						checkUser( std::string const& );
 	void 						clean_ping_mode(std::string const &arg);
 	void 						Clean_arg( void );
+	void						quit(std::string const &);
+
 	//define typedef ici pour struct sockaddr_in??
 
 	void						setVectorClient(std::vector<Client*> *_ptr_client);
