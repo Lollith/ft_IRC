@@ -5,7 +5,8 @@ void Server::parse_msg_recv(Client *client, std::string msg_recv)
 	int nb_fct = 4;
 	std::string funct_names[] = {"JOIN", "QUIT", "PRIVMSG", "NAMES"};
 
-	void (Server::*fct_member[])(Client *client) = { &Server::join, &Server::quit, &Server::privmsg, &Server::names};
+	void (Server::*fct_member[])(Client *client) = { &Server::join, &Server::quit, &Server::privmsg, 
+		&Server::names};
 
 	for (int i = 0; i < nb_fct; i++)
 	{
@@ -16,7 +17,6 @@ void Server::parse_msg_recv(Client *client, std::string msg_recv)
 			client->setMsgRecvSave(""); // reinitialise le message recu sinon boucle sur /quit
 		}
 	}
-
 }
 
 
@@ -104,10 +104,11 @@ void Server::privmsg( Client *client){
 				size_t i = 0;
 				while (i!= (*it_chan)->getClients().size()) //broadcast the messag
 				{
-					(*it_chan)->getClients()[i]->setMessage(message);
+					if ((*it_chan)->getClients()[i] != client) // remplace le set chaine vide 
+						(*it_chan)->getClients()[i]->setMessage(message);
 					i++;
 				}
-					client->setMessage("");// interdit le client en cours de recevoir son propre message 
+				// client->setMessage("");// interdit le client en cours de recevoir son propre message 
 			}
 			else
 				client->setMessage(reply(ERR_NOSUCHCHANNEL, client, target));
