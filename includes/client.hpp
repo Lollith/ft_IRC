@@ -7,6 +7,8 @@ class Channel;
 class Client
 {
 public:
+
+	std::string _old_nickname;
 	//__________________________________________________canonic form
 
 	Client(int sock_client);

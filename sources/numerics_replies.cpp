@@ -60,8 +60,7 @@ std::string reply (int reply, Client *client)
 			msg = "432 " + client->get_nickname() + " " + client->get_nickname() + " :Erroneus nickname\r\n";
 			break;
 		case ERR_NICKNAMEINUSE:
-			// msg = "433 " + client->get_user() + " " + client->get_nickname() +  " :Nickname is already in use\r\n";
-			msg = "433 " + client->get_nickname() + " " + client->get_nickname() +  "\r\n";
+			msg = "433 " + client->get_nickname() + " " + client->get_nickname() +  " :Nickname is already in use\r\n";
 			break;
 		case ERR_NONICKNAMEGIVEN :
 			msg = "431 " + client->get_nickname() +  " :Nickname non given\r\n";

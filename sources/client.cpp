@@ -120,6 +120,10 @@ std::string Client::get_nickname(void) const
 	return this->_nickname;
 }
 
+// void get_oldNickname()
+// {
+
+// }
 void Client::setVectorClient(std::vector<Client *> *clients)
 {
 	_client = clients;
@@ -234,9 +238,10 @@ bool Client::checkNick()
 	size_t i = 0;
 	while ((_client->size() > 1) && (i != _client->size() -1)) // broadcast the messag
 	{
+		std::cout << BLUE_TXT << "differents clients have same nickname" << RESET_TXT << std::endl;
+		std::cout << CYAN_TXT << "nickname is :" << _nickname << RESET_TXT << std::endl;
 		if ((*_client)[i]->get_nickname() == this->_nickname)
 		{
-			std::cout << BLUE_TXT << "differents clients have same nickname" << RESET_TXT << std::endl;
 			(*_client)[i]->setMessage("");
 			setMessage(reply(ERR_NICKNAMEINUSE, this));
 		}
@@ -248,6 +253,9 @@ bool Client::checkNick()
 void Client::changeNick(std::string const &old_nick)
 {
 	// broadcast
+	std::cout << RED_TXT << "rentre ds change nick" << RESET_TXT << std::endl;
+
+
 	std::string message = ":" + old_nick + "!" + _user + "@" + _hostname + " NICK " + _nickname + "\r\n";
 	// setMessage(message);
 	size_t i = 0;
@@ -270,10 +278,12 @@ void Client::Nick(std::string const &) //FIXME nickname
 	}
 	else
 	{
-		std::string old_nick = _nickname;
-		std::cout << old_nick << std::endl;
-		this->_nickname = _arg_registration.back();
-		std::cout << _nickname << std::endl;
+		// anonymous first time old nick
+		std::string old_nick = _nickname; 
+		_old_nickname = old_nick;
+		std::cout << CYAN_TXT << _old_nickname << " == " << old_nick << RESET_TXT << std::endl;
+		this->_nickname = _arg_registration.back(); // new nick
+		std::cout << "new nick: " << _nickname << std::endl;
 		if (checkNick())
 		{
 			std::cout << BLUE_TXT << "nickname valid" << RESET_TXT << std::endl;
@@ -284,7 +294,6 @@ void Client::Nick(std::string const &) //FIXME nickname
 			}
 			else // si entre dans cette condition il s'agit d'un changement de nickname
 			{
-				std::cout << RED_TXT << "rentre ds change nick" << RESET_TXT << std::endl;
 				changeNick(old_nick);
 			}
 		}
