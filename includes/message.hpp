@@ -22,6 +22,7 @@ public:
 	//__________________________________________________GETTERS_SETTERS
 	std::string getBuffer(void) const;
 	void setBuffer(std::string buffer);
+	void resetBuffer();
 
 	// attributes________________________________________________________________
 protected:

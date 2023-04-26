@@ -29,6 +29,7 @@ public:
 	std::string					getMsgRecvSave( void )const;
 	
 	void						setMessage( std::string );
+	void						clearMessage();
 	std::string					getMessage( void ) const;
 
 	void		 				setFlagPsswdProvided(bool boolean);
@@ -54,12 +55,18 @@ public:
 	void 						checkParams( std::string const& password );
 	void						ignoreCap( std::string const& );
 	void						checkPassword( std::string const& password );
-	void						checkNick( std::string const& );
+	bool						NicknameIsValid();
+	void						Nick(std::string const&);
+	bool						checkNick();
+	void						changeNick(std::string const& old_nick);
 	void						checkUser( std::string const& );
 	void 						clean_ping_mode(std::string const &arg);
 	void 						Clean_arg( void );
+	void						quit(std::string const &);
+
 	//define typedef ici pour struct sockaddr_in??
 
+	void						setVectorClient(std::vector<Client*> *_ptr_client);
 
 private:
 	// useless constructor
@@ -82,8 +89,10 @@ private:
 	std::string					_user;
 	std::string					_nickname;
 	std::string					_hostname;
+	std::string					_realname;
 	
 	std::vector<std::string>	_arg_registration;
+	std::vector<Client*>		*_client;
 
 };
 

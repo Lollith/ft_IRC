@@ -49,11 +49,13 @@ public:
 	void 				mysend(Client *client);
 	bool				loop_recept_send();
 
+
 	//-----fct _channels------------------------------------------------------------
 	void 				parse_msg_recv( Client *client, std::string msg_recv ); // msg_recv et arg useless => a suprimer
 	void 				join( Client *client);
 	void 				part( Client *client);
 	void				privmsg( Client *client);
+	void				changeNick( Client *client);
 
 	void 				stop();
 	void 				welcome_new_chan( Client *client, Channel *channel );

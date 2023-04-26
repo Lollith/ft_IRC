@@ -26,14 +26,14 @@ Server::~Server(void)
 {
 	INFO("Destructor server called." << std::endl);
 
-	shutdown(this->_socket_server, SHUT_RDWR);
-	close(this->_socket_server);
 	std::vector<Client *>::iterator it;
 	for (it = _client.begin(); it != _client.end(); it++)
 	{
 		delete (*it);
 	}
 	_client.clear();
+	shutdown(this->_socket_server, SHUT_RDWR);
+	close(this->_socket_server);
 }
 
 //__________________________________________________GETTERS_SETTERS
@@ -197,7 +197,8 @@ void Server::mySelect(fd_set &rd, fd_set &wr)
 	if (select_ready == -1)
 	{
 		perror("select");
-		// return false; // continue?? si errno == eintr
+		//here: déclencher le QUIT ? STOP le serveur ou autre
+		// return; // continue?? si errno == eintr
 	}
 	// else if (select_ready == 0) //utile?
 	// {
@@ -221,7 +222,7 @@ void Server::myrecv(Client *client)
 	{
 		INFO("=>Recois un message depuis le client "
 			 << client->getSocketClient() << ": " << std::endl);
-		// std::cout << buf << std::endl;
+		std::cout << YELLOW_TXT << buf << RESET_TXT << std::endl;
 		client->setMsgRecv(buf);
 		client->setMsgRecvSave(buf);
 	}
@@ -232,6 +233,8 @@ void Server::mysend(Client *client)
 	if (!client->getMessage().empty()) // comme je reinitialise a la fin le message
 	{
 		INFO("=>Repond au client:" << std::endl);
+		INFO("=>Message envoye a client " << client->getSocketClient()
+										  << ": " << client->getMessage() << std::endl);
 		size_t res_send = send(client->getSocketClient(), client->getMessage().c_str(), client->getMessage().size(), 0);
 		if (res_send != client->getMessage().size())
 		{
@@ -239,9 +242,7 @@ void Server::mysend(Client *client)
 			close(client->getSocketClient());
 			// return false;
 		}
-		INFO("=>Message envoye a client " << client->getSocketClient()
-										  << ": " << client->getMessage() << std::endl);
-		client->setMessage(""); // reinitialise le message , sinon boucle
+		client->clearMessage(); // reinitialise le message , sinon boucle
 	}
 }
 
@@ -268,7 +269,10 @@ bool Server::loop_recept_send()
 			if (FD_ISSET(client->getSocketClient(), &rd))
 			{
 				myrecv(client);
+				client->setVectorClient(&_client);
 				client->getCmdLine(_password);
+				//verif l'authent avant d'appeler ces fonctions
+				//mélanger les deux ptr sur fonction
 				parse_msg_recv(client, client->getMsgRecvSave());
 			}
 			if (FD_ISSET(client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
