@@ -13,7 +13,7 @@ class Channel{
 	
 		bool 					hasClient(Client *client);
 		void 					addClient(Client *client);
-
+		void 					deleteClientFromChan(Client *client);
 
 	private:
 		std::vector<Client *>	_clients;

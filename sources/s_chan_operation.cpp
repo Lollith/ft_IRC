@@ -47,16 +47,13 @@ void Server::join( Client *client)
 
 void Server::welcome_new_chan(Client *client, Channel *channel)
 {
-	//////CHECK ICI
+// FIXME: adeline
 	// erreur ici : reinitialise si 2 meme nom???? a tester avec 2 pseudo differents
-	std::string join_msg2 = ":" + client->get_user() + "@" + "~" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
+	std::string join_msg2 = ":" + client->get_nickname() + "@" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
 	for (size_t i = 0; i!= channel->getClients().size(); i++) //broadcast the message :nouveau client joigned aux autres du chan
 		channel->getClients()[i]->setMessage(join_msg2);
 	
-	///CHECK ICI
-
-
-	std::string join_msg = ":" + client->get_nickname() + "@" + "~" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
+	std::string join_msg = ":" + client->get_nickname() + "@" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
 	
 	join_msg += reply(RPL_TOPIC, client, channel->getName());
 	join_msg += reply(RPL_NAMREPLY, client, channel);
@@ -66,7 +63,7 @@ void Server::welcome_new_chan(Client *client, Channel *channel)
 
 
 //pour part : faire plus de test  en changeant les nickname => bug sinon?+ check raison de quiter 
-//CHECK ICI
+// FIXME: adeline
 
 // + a clean le vect- client
 void Server::part(Client *client)
@@ -86,11 +83,12 @@ void Server::part(Client *client)
 			INFO("=>leave le channel" << std::endl);
 			if((*it_chan)->hasClient(client))
 			{
-				std::string message =  ":" + client->get_nickname() + "@" + "~" + client->get_hostname() +  " PART " + chan + " " + msg + "\r\n";
+				std::string message =  ":" + client->get_nickname() + "@" + client->get_hostname() +  " PART " + chan + " " + msg + "\r\n";
 				std::vector<Client*> vectclients = (*it_chan)->getClients();
 				std::vector<Client*>::iterator it_client;	
 				for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
 					(*it_client)->setMessage(message);
+				(*it_chan)->deleteClientFromChan(client);
 			}
 			else
 			{
@@ -162,3 +160,8 @@ void Server::stop()
 {
 	this->_flag_keep_loop = false;
 }
+
+
+//TODO
+// operator chan? avec ~
+	//std::string message =  ":" + client->get_nickname() + "@" + "~" + client->get_hostname() +  " PART " + chan + " " + msg + "\r\n";
