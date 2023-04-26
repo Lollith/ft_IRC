@@ -40,7 +40,7 @@ std::string reply (int reply, Client *client, std::string target)
 			msg = "403 " + client->get_nickname() + " " + target + " :No such channel\r\n";
 			break;
 		
-		case ERR_NOTONCHANNEL://ICI NE MARCHE PAS
+		case ERR_NOTONCHANNEL:
 			msg = "442 " + client->get_nickname() + " " + target + " :You're not on that channel\r\n";
 			break;
 

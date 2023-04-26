@@ -92,14 +92,18 @@ void Server::part(Client *client)
 				for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
 					(*it_client)->setMessage(message);
 			}
+			else
+			{
+				client->setMessage(reply(ERR_NOTONCHANNEL, client, chan));
+				return;
+			}
 		}
-		else		// client->setMessage("");// interdit le client en cours de recevoir son propre message 
-			client->setMessage(reply(ERR_NOTONCHANNEL, client, (*it_chan)->getName()));
+		else 
+			client->setMessage(reply(ERR_NOSUCHCHANNEL, client, chan));
 			
 	}
-// ERR_NEEDMOREPARAMS (461) FAIRE
-// ERR_NOSUCHCHANNEL (403)
-// ERR_NOTONCHANNEL (442)
+
+
 }
 
 
