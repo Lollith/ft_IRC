@@ -152,6 +152,8 @@ void Client::ignoreCap(std::string const &)
 {
 	std::cout << GREEN_TXT << "here is CAP check func" << RESET_TXT << std::endl;
 
+	
+
 	this->_step_registration += 1;
 }
 
@@ -228,18 +230,26 @@ bool Client::checkNick()
 		return false;
 	}
 	// TODO errror already in use 433 : get vector from serv ?? flag ?? tout bouger ds server ??
-	// size_t i = 0;
-	// while (i != _client.size()) // broadcast the messag
+	// size_t id = 0;
+	// while (id != _client->size()) // broadcast the messag
 	// {
-	// 	if (_client[i]->get_nickname() == this->_nickname)
-	// 	{
-	// 		std::cout << BLUE_TXT << "differents clients have same nickname" << RESET_TXT << std::endl;
-	// 		setMessage(reply(ERR_NICKNAMEINUSE, this));
-	// 		_step_registration = 0;
-	// 		return false;
-	// 	}
-	// 	i++;
+	
+	// 		std::cout << CYAN_TXT << "what is client array: " << (*_client)[id]->get_nickname() <<  RESET_TXT << std::endl;
+		
+	// 	id++;
 	// }
+
+	size_t i = 0;
+	while (i != _client->size() && (_client->size() > 1)) // broadcast the messag
+	{
+		if ((*_client)[i]->get_nickname() == this->_nickname)
+		{
+			std::cout << BLUE_TXT << "differents clients have same nickname" << RESET_TXT << std::endl;
+			setMessage(reply(ERR_NICKNAMEINUSE, this));
+			// return false;
+		}
+		i++;
+	}
 	return true;
 }
 
@@ -301,6 +311,12 @@ void Client::Nick(std::string const &) //FIXME nickname
 void Client::checkUser(std::string const &)
 {
 	std::cout << GREEN_TXT << "here is USER check func" << RESET_TXT << std::endl;
+
+	if (_step_registration == 4)
+	{
+		setMessage(reply(ERR_ALREADYREGISTERED, this));
+		return;
+	}
 
 	this->_step_registration += 1;
 	_user = _arg_registration[1];
