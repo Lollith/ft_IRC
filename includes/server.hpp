@@ -53,7 +53,7 @@ public:
 	//-----fct _channels------------------------------------------------------------
 	void 				parse_msg_recv( Client *client, std::string msg_recv ); // msg_recv et arg useless => a suprimer
 	void 				join( Client *client);
-	void 				quit( Client *client);
+	void 				part( Client *client);
 	void				privmsg( Client *client);
 	void				changeNick( Client *client);
 

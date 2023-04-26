@@ -14,7 +14,7 @@ std::vector<Client *> Channel::getClients( void ) const {
 }
 
 void Channel::addClient(Client *client){
-	std::cout << "client"<< client->getSocketClient()<<" rejoint" << std::endl;
+	INFO("client"<< client->getSocketClient()<<" rejoint" << std::endl);
 	this->_clients.push_back(client);
 	// std::cout << "vector client"<< _clients.back()->getSocketClient()<< std::endl;
 }
@@ -31,4 +31,19 @@ bool Channel::hasClient(Client *client)
 			return true;
 	}
 	return false;
+}
+
+// TODO: adeline
+void Channel::deleteClientFromChan(Client *client)
+{
+
+	std::vector<Client*>::iterator it = this->_clients.begin();
+	while( it != _clients.end())
+	{
+		if ((*it)->getSocketClient() == client->getSocketClient())
+			_clients.erase(it);
+		else
+			it++;
+	}
+
 }

@@ -21,7 +21,14 @@
 2. authentification 
 	nickname (cf rules name, unique)+ username
 
-3. channels = group d un ou +ieurs clients, receive all message; creee lorsque le 1er client joins et rm when last leave, name rules
+3. Channel Operations
+- channels = group d un ou +ieurs clients, receive all message; creee lorsque le 1er client joins et rm when last leave, name rules
+<!-- - JOIN message -->
+- PART message
+- TOPIC message
+- NAMES message
+- LIST message
+- INVITE message
 	<!-- - JOIN = create ou se connecter  -->
 	- To create a new channel or become part of an existing channel, a user is required to join the channel using the JOIN command. If the channel doesn’t exist prior to joining, the channel is created and the creating user becomes a channel operator
 	<!-- RPL_TOPIC, NAMREPLY, ENDOFNAMES -->
