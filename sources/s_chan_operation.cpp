@@ -69,6 +69,8 @@ void Server::welcome_new_chan(Client *client, Channel *channel)
 
 //pour part : faire plus de test  en changeant les nickname => bug sinon?+ check raison de quiter 
 //CHECK ICI
+
+// + a clean le vect- client
 void Server::part(Client *client)
 {	
 	std::string msg = "";
