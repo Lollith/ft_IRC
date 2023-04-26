@@ -25,6 +25,8 @@
 #define GREEN_TXT "\e[32m"
 #define YELLOW_TXT "\e[33m"
 #define BLUE_TXT "\e[34m"
+#define MAG_TXT "\e[35m"
+#define CYAN_TXT "\e[36m"
 #define ITALIC_TXT "\e[2m"
 
 #define DEBUG(x) std::cerr << BLUE_TXT << x << RESET_TXT;

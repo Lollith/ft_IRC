@@ -197,6 +197,9 @@ void Client::checkPassword(std::string const &psswd)
 
 bool Client::NicknameIsValid()
 {
+	if (_nickname.length() >= 9)
+		return false;
+
 	if (_nickname.find(' ') != std::string::npos || _nickname.find(',') != std::string::npos 
 		|| _nickname.find('.') != std::string::npos || _nickname.find('*') != std::string::npos
 		|| _nickname.find('?') != std::string::npos || _nickname.find('!') != std::string::npos
@@ -224,7 +227,7 @@ bool Client::checkNick()
 		_step_registration = 0;
 		return false;
 	}
-	// here errror already in use 433 : get vector from serv ?? flag ?? tout bouger ds server ??
+	// TODO errror already in use 433 : get vector from serv ?? flag ?? tout bouger ds server ??
 	// size_t i = 0;
 	// while (i != _client.size()) // broadcast the messag
 	// {
@@ -254,7 +257,7 @@ void Client::changeNick(std::string const &old_nick)
 	}
 }
 
-void Client::Nick(std::string const &)
+void Client::Nick(std::string const &) //FIXME nickname
 {
 	std::cout << GREEN_TXT << "here is NICK func" << RESET_TXT << std::endl;
 	if (_arg_registration.empty())
@@ -303,27 +306,23 @@ void Client::checkUser(std::string const &)
 	_user = _arg_registration[1];
 	_hostname = _arg_registration[2];
 	
-	//récupérer le real name en gérant les espaces et en checkant les :
-	// voir le nombre d'arg , iterer sur le vector d'arg
-	// std::string res;
-	// size_t idx = 0;
+	std::string res;
+	size_t pos = 0;
 
-	// std::cout << BLUE_TXT << _arg_registration.back() << RESET_TXT << std::endl;
-	// // for (it = _arg_registration.begin(); it != _arg_registration.end(); it++)
-	// // {
-	// 	if (_arg_registration.at(idx) )
-	// 		std::cout << RED_TXT << "first char :" << _arg_registration[idx] << RESET_TXT << std::endl;
-			
-
-	// // }
-
-
-	// //faire une boucle pour constituer realname avec espace entre chaque case
-	// // res = (_arg_registration.back() + idx) + " " _arg_registration.back() + (idx + 1)
-	// std::cout << BLUE_TXT << "realname is ->" << _realname << RESET_TXT << std::endl;
+	for (size_t i = 0; i!= _arg_registration.size(); i++)
+	{
+		if (_arg_registration[i].find_first_of(':', 0) != std::string::npos)
+			pos = i;
+	}
+	res = _arg_registration[pos];
+	pos++;
+	for (; pos != _arg_registration.size(); pos++)
+	{
+		res += " " + _arg_registration[pos];
+	}
+	this->_realname = res;
+	std::cout << BLUE_TXT << "realname is ->" << _realname << RESET_TXT << std::endl;
 	
-
-	// here: peut être sortir  RPL de user v
 	if (_step_registration == 4)
 	{
 		std::string buffer = "001 " + get_nickname() + " :Welcome to the " + _hostname + " Network, " 
@@ -338,7 +337,7 @@ void Client::clean_ping_mode(std::string const &)
 	setMessage(msg);
 }
 
-// à modifier ou à delete 
+// FIXME à modifier ou à delete 
 void Client::quit(std::string const &)
 {
 	INFO("HERE QUIT FUNC\n");
@@ -357,6 +356,7 @@ void Client::checkParams(std::string const &password)
 	int nb_func = 6;
 	std::string rpl;
 
+	//FIXME initialisation 
 	void (Client::*func_list[nb_func])(std::string const &arg) =
 		{&Client::ignoreCap, &Client::checkPassword, &Client::Nick, &Client::checkUser, 
 			&Client::clean_ping_mode, &Client::quit};
