@@ -9,8 +9,8 @@ std::string reply (int reply, Client *client, Channel *channel)
 	{
 		case RPL_NAMREPLY:
 			for (size_t  j = 0; j < channel->getClients().size(); j++)
-				name += channel->getClients()[j]->get_nickname()+ " "; 
-			msg = "353 " + client->get_nickname()+" = " + channel->getName() + " :" + name + "\r\n";
+				name += channel->getClients()[j]->get_nickname()+ " ";
+			msg = "353 " + client->get_nickname() + " = " + channel->getName() + " :" + name + "\r\n";
 			break;
 		default:
 			msg = "erreur";   // a redefinir

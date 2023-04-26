@@ -33,7 +33,17 @@ bool Channel::hasClient(Client *client)
 	return false;
 }
 
-void Channel::deleteClient(Client *client)
+// TODO: adeline
+void Channel::deleteClientFromChan(Client *client)
 {
+
+	std::vector<Client*>::iterator it = this->_clients.begin();
+	while( it != _clients.end())
+	{
+		if ((*it)->getSocketClient() == client->getSocketClient())
+			_clients.erase(it);
+		else
+			it++;
+	}
 
 }
