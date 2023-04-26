@@ -243,7 +243,7 @@ bool Client::checkNick()
 void Client::changeNick(std::string const &old_nick)
 {
 	// broadcast
-	std::string message = ":" + old_nick + "!" + _user + "@" + _hostname + "NICK :" + _nickname + "\r\n";
+	std::string message = ":" + old_nick + "!" + _user + "@" + _hostname + " NICK " + _nickname + "\r\n";
 	// setMessage(message);
 	size_t i = 0;
 	while (i != _client->size())
@@ -305,22 +305,22 @@ void Client::checkUser(std::string const &)
 	
 	//récupérer le real name en gérant les espaces et en checkant les :
 	// voir le nombre d'arg , iterer sur le vector d'arg
-	std::string res;
-	size_t idx = 0;
+	// std::string res;
+	// size_t idx = 0;
 
-	std::cout << BLUE_TXT << _arg_registration.back() << RESET_TXT << std::endl;
-	// for (it = _arg_registration.begin(); it != _arg_registration.end(); it++)
-	// {
-		if (_arg_registration.at(idx) )
-			std::cout << RED_TXT << "first char :" << _arg_registration[idx] << RESET_TXT << std::endl;
+	// std::cout << BLUE_TXT << _arg_registration.back() << RESET_TXT << std::endl;
+	// // for (it = _arg_registration.begin(); it != _arg_registration.end(); it++)
+	// // {
+	// 	if (_arg_registration.at(idx) )
+	// 		std::cout << RED_TXT << "first char :" << _arg_registration[idx] << RESET_TXT << std::endl;
 			
 
-	// }
+	// // }
 
 
-	//faire une boucle pour constituer realname avec espace entre chaque case
-	// res = (_arg_registration.back() + idx) + " " _arg_registration.back() + (idx + 1)
-	std::cout << BLUE_TXT << "realname is ->" << _realname << RESET_TXT << std::endl;
+	// //faire une boucle pour constituer realname avec espace entre chaque case
+	// // res = (_arg_registration.back() + idx) + " " _arg_registration.back() + (idx + 1)
+	// std::cout << BLUE_TXT << "realname is ->" << _realname << RESET_TXT << std::endl;
 	
 
 	// here: peut être sortir  RPL de user v
@@ -338,13 +338,14 @@ void Client::clean_ping_mode(std::string const &)
 	setMessage(msg);
 }
 
+// à modifier ou à delete 
 void Client::quit(std::string const &)
 {
 	INFO("HERE QUIT FUNC\n");
 
 	// envoyer le message à tous les clients (loop etc)
 	std::string rpl = "ERROR: Server closing a client connection\r\n";
-	rpl += ":" + _nickname + "!" + _user + "@" + _hostname + "QUIT :Bye, see you!\r\n";
+	rpl += ":" + _nickname + " QUIT :Bye, see you!\r\n";
 	setMessage(rpl);
 	// faut il quit le server aussi ??
 	this->_flag_shut_client = true;
