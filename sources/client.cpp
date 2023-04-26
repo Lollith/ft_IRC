@@ -239,11 +239,12 @@ bool Client::checkNick()
 	// 	id++;
 	// }
 
-	size_t i = 0;
-	while (i != _client->size() && (_client->size() > 1)) // broadcast the messag
+	size_t i = 0;	
+	while ((_client->size() > 1) && (i != _client->size() -1)) // broadcast the messag
 	{
 		if ((*_client)[i]->get_nickname() == this->_nickname)
 		{
+			(*_client)[i]->setMessage("");
 			std::cout << BLUE_TXT << "differents clients have same nickname" << RESET_TXT << std::endl;
 			setMessage(reply(ERR_NICKNAMEINUSE, this));
 			// return false;
@@ -258,13 +259,16 @@ void Client::changeNick(std::string const &old_nick)
 	// broadcast
 	std::string message = ":" + old_nick + "!" + _user + "@" + _hostname + " NICK " + _nickname + "\r\n";
 	// setMessage(message);
-	size_t i = 0;
-	while (i != _client->size())
-	{
-		std::cout << GREEN_TXT << (*_client)[i]->get_nickname() << RESET_TXT << std::endl;
-		(*_client)[i]->setMessage(message);
-		i++;
-	}
+	// size_t i = 0;
+	// while (i != _client->size())
+	// {
+		// {
+			std::cout << GREEN_TXT << get_nickname() << RESET_TXT << std::endl;
+			setMessage(message);
+		// }
+			// i++;
+
+	// }
 }
 
 void Client::Nick(std::string const &) //FIXME nickname
