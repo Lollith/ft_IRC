@@ -229,15 +229,6 @@ bool Client::checkNick()
 		_step_registration = 0;
 		return false;
 	}
-	// TODO errror already in use 433 : get vector from serv ?? flag ?? tout bouger ds server ??
-	// size_t id = 0;
-	// while (id != _client->size()) // broadcast the messag
-	// {
-	
-	// 		std::cout << CYAN_TXT << "what is client array: " << (*_client)[id]->get_nickname() <<  RESET_TXT << std::endl;
-		
-	// 	id++;
-	// }
 
 	size_t i = 0;	
 	while ((_client->size() > 1) && (i != _client->size() -1)) // broadcast the messag
@@ -247,7 +238,6 @@ bool Client::checkNick()
 			(*_client)[i]->setMessage("");
 			std::cout << BLUE_TXT << "differents clients have same nickname" << RESET_TXT << std::endl;
 			setMessage(reply(ERR_NICKNAMEINUSE, this));
-			// return false;
 		}
 		i++;
 	}
@@ -376,7 +366,7 @@ void Client::checkParams(std::string const &password)
 	int nb_func = 6;
 	std::string rpl;
 
-	//FIXME initialisation 
+	//TODO initialisation 
 	void (Client::*func_list[nb_func])(std::string const &arg) =
 		{&Client::ignoreCap, &Client::checkPassword, &Client::Nick, &Client::checkUser, 
 			&Client::clean_ping_mode, &Client::quit};
