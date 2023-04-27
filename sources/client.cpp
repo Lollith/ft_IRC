@@ -239,9 +239,9 @@ bool Client::checkNick()
 	return true;
 }
 
-void Client::changeNick(std::string const &old_nick)
+void Client::changeNick(std::string const &old_nick) //FIXME //ONGOING
 {
-	std::string message = ":" + old_nick + "!" + _user + "@" + _hostname + " NICK " + _nickname + "\r\n";
+	std::string message = ":" + old_nick + " NICK :" + _nickname + "\r\n";
 	setMessage(message);
 }
 
@@ -280,8 +280,6 @@ void Client::Nick(std::string const &) // FIXME nickname
 		std::cout << RED_TXT << "dans le else nick invalid et first authent" << RESET_TXT << std::endl;
 		return;
 	}
-	// else
-	// 	return;
 }
 
 void Client::checkUser(std::string const &)
