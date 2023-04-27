@@ -49,9 +49,9 @@ void Server::welcome_new_chan(Client *client, Channel *channel)
 {
 // FIXME:adeline
 	// erreur ici : reinitialise si 2 meme nom???? a tester avec 2 pseudo differents
-	// std::string join_msg2 = ":" + client->get_nickname() + "@" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
-	// for (size_t i = 0; i!= channel->getClients().size(); i++) //broadcast the message :nouveau client joigned aux autres du chan
-	// 	channel->getClients()[i]->setMessage(join_msg2);
+	std::string join_msg2 = ":" + client->get_nickname() + "@" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
+	for (size_t i = 0; i!= channel->getClients().size(); i++) //broadcast the message :nouveau client joigned aux autres du chan
+		channel->getClients()[i]->setMessage(join_msg2);
 	
 	std::string join_msg = ":" + client->get_nickname() + "@" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
 	
@@ -119,7 +119,7 @@ void Server::privmsg( Client *client){
 		{
 			if ((*it_chan)->getName() == target)
 			{
-				std::string message = ":" + client->get_user() + " PRIVMSG " + target + " " + msg + "\r\n";
+				std::string message = ":" + client->get_nickname() + " PRIVMSG " + target + " " + msg + "\r\n";
 				size_t i = 0;
 				while (i!= (*it_chan)->getClients().size()) //broadcast the messag
 				{
