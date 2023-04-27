@@ -298,9 +298,7 @@ bool Server::loop_recept_send()
 			}
 			else
 				i++;
-		}
-		
-
+		}//TODO: a faire aussi lorsaue l on /quit ds un chan
 	}
 	return true;
 }
