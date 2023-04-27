@@ -221,7 +221,7 @@ bool Client::checkNick()
 		std::cout << BLUE_TXT << "condition nickname not valid should respond" << RESET_TXT << std::endl;
 		std::cout << _nickname << std::endl;
 		setMessage(reply(ERR_ERRONEUSNICKNAME, this));
-		_step_registration = 0;
+		// _step_registration = 0;
 		return false;
 	}
 
@@ -231,7 +231,7 @@ bool Client::checkNick()
 		if ((*_client)[i]->get_nickname() == this->_nickname)
 		{
 			std::cout << BLUE_TXT << "differents clients have same nickname" << RESET_TXT << std::endl;
-			(*_client)[i]->setMessage("");
+			// (*_client)[i]->setMessage("");
 			setMessage(reply(ERR_NICKNAMEINUSE, this));
 		}
 		i++;
@@ -239,7 +239,7 @@ bool Client::checkNick()
 	return true;
 }
 
-void Client::changeNick(std::string const &old_nick) //FIXME //ONGOING
+void Client::changeNick(std::string const &old_nick) // FIXME //ONGOING
 {
 	std::string message = ":" + old_nick + " NICK :" + _nickname + "\r\n";
 	setMessage(message);
@@ -259,7 +259,8 @@ void Client::Nick(std::string const &) // FIXME nickname
 	std::cout << "old nickname= " << old_nick << std::endl;
 	this->_nickname = _arg_registration.back();
 	std::cout << "new nickname= " << _nickname << std::endl;
-	if (checkNick())
+	// std::cout << CYAN_TXT << " step registration in NICK parse= " << _step_registration << RESET_TXT << std::endl;
+	if (checkNick() == true)
 	{
 		std::cout << BLUE_TXT << "nickname valid" << RESET_TXT << std::endl;
 		if (this->_step_registration < 4) // si entre dds cette condition : first authentification
@@ -273,12 +274,21 @@ void Client::Nick(std::string const &) // FIXME nickname
 			changeNick(old_nick);
 		}
 	}
-	else if (this->_step_registration < 4) // si invalid mais pdt l'étape d'authent
+	else
 	{
-		_step_registration = 0;
-		_flag_shut_client = true;
-		std::cout << RED_TXT << "dans le else nick invalid et first authent" << RESET_TXT << std::endl;
-		return;
+		std::cout << CYAN_TXT << " step registration in NICK parse= " << _step_registration << RESET_TXT << std::endl;
+
+		if (this->_step_registration < 4) // si invalid mais pdt l'étape d'authent
+		{
+			_step_registration = 0;
+			_flag_shut_client = true;
+			std::cout << RED_TXT << "dans le else nick invalid et first authent" << RESET_TXT << std::endl;
+			return;
+		}
+		else
+		{
+			std::cout << CYAN_TXT << "ZEBI" << RESET_TXT << std::endl;
+		}
 	}
 }
 
