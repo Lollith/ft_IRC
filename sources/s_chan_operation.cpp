@@ -47,13 +47,10 @@ void Server::join( Client *client)
 
 void Server::welcome_new_chan(Client *client, Channel *channel)
 {
-// FIXME:adeline
-	// erreur ici : reinitialise si 2 meme nom???? a tester avec 2 pseudo differents
-	std::string join_msg2 = ":" + client->get_nickname() + "@" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
-	for (size_t i = 0; i!= channel->getClients().size(); i++) //broadcast the message :nouveau client joigned aux autres du chan
-		channel->getClients()[i]->setMessage(join_msg2);
-	
+//broadcast the message :nouveau client joigned aux autres du chan
 	std::string join_msg = ":" + client->get_nickname() + "@" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
+	for (size_t i = 0; i!= channel->getClients().size(); i++) 
+		channel->getClients()[i]->setMessage(join_msg);
 	
 	join_msg += reply(RPL_TOPIC, client, channel->getName());
 	join_msg += reply(RPL_NAMREPLY, client, channel);
@@ -61,15 +58,9 @@ void Server::welcome_new_chan(Client *client, Channel *channel)
 	client->setMessage(join_msg);
 }
 
-
-//pour part : faire plus de test  en changeant les nickname => bug sinon?+ check raison de quiter 
-// FIXME: adeline
-
-// + a clean le vect- client
 void Server::part(Client *client)
 {	
 	std::string msg = "";
-	
 	std::string chan = client->get_arg().at(0);
 	std::vector<Channel*>::iterator it_chan;	
 	
@@ -83,12 +74,14 @@ void Server::part(Client *client)
 			INFO("=>leave le channel" << std::endl);
 			if((*it_chan)->hasClient(client))
 			{
-				std::string message =  ":" + client->get_nickname() + "@" + client->get_hostname() +  " PART " + chan + " " + msg + "\r\n";
+				std::string message =  ":" + client->get_nickname()+ "@" + client->get_hostname() + " PART " + chan + " " + msg + "\r\n";
 				std::vector<Client*> vectclients = (*it_chan)->getClients();
 				std::vector<Client*>::iterator it_client;	
 				for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
 					(*it_client)->setMessage(message);
 				(*it_chan)->deleteClientFromChan(client);
+				if((*it_chan)->getClients().size() < 1)
+					(*it_chan)->set_flag_erase_chan(true);
 			}
 			else
 			{
@@ -100,6 +93,8 @@ void Server::part(Client *client)
 			client->setMessage(reply(ERR_NOSUCHCHANNEL, client, chan));
 	}
 }
+
+
 
 
 // The PRIVMSG command is used to send private messages between users, as well 
