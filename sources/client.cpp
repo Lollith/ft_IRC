@@ -152,8 +152,6 @@ void Client::ignoreCap(std::string const &)
 {
 	std::cout << GREEN_TXT << "here is CAP check func" << RESET_TXT << std::endl;
 
-	
-
 	this->_step_registration += 1;
 }
 
@@ -202,10 +200,7 @@ bool Client::NicknameIsValid()
 	if (_nickname.length() >= 9)
 		return false;
 
-	if (_nickname.find(' ') != std::string::npos || _nickname.find(',') != std::string::npos 
-		|| _nickname.find('.') != std::string::npos || _nickname.find('*') != std::string::npos
-		|| _nickname.find('?') != std::string::npos || _nickname.find('!') != std::string::npos
-		|| _nickname.find('@') != std::string::npos || _nickname.empty())
+	if (_nickname.find(' ') != std::string::npos || _nickname.find(',') != std::string::npos || _nickname.find('.') != std::string::npos || _nickname.find('*') != std::string::npos || _nickname.find('?') != std::string::npos || _nickname.find('!') != std::string::npos || _nickname.find('@') != std::string::npos || _nickname.empty())
 	{
 		return false;
 	}
@@ -230,13 +225,13 @@ bool Client::checkNick()
 		return false;
 	}
 
-	size_t i = 0;	
-	while ((_client->size() > 1) && (i != _client->size() -1)) // broadcast the messag
+	size_t i = 0;
+	while ((_client->size() > 1) && (i != _client->size() - 1)) // broadcast the messag
 	{
 		if ((*_client)[i]->get_nickname() == this->_nickname)
 		{
-			(*_client)[i]->setMessage("");
 			std::cout << BLUE_TXT << "differents clients have same nickname" << RESET_TXT << std::endl;
+			(*_client)[i]->setMessage("");
 			setMessage(reply(ERR_NICKNAMEINUSE, this));
 		}
 		i++;
@@ -246,22 +241,11 @@ bool Client::checkNick()
 
 void Client::changeNick(std::string const &old_nick)
 {
-	// broadcast
 	std::string message = ":" + old_nick + "!" + _user + "@" + _hostname + " NICK " + _nickname + "\r\n";
-	// setMessage(message);
-	// size_t i = 0;
-	// while (i != _client->size())
-	// {
-		// {
-			std::cout << GREEN_TXT << get_nickname() << RESET_TXT << std::endl;
-			setMessage(message);
-		// }
-			// i++;
-
-	// }
+	setMessage(message);
 }
 
-void Client::Nick(std::string const &) //FIXME nickname
+void Client::Nick(std::string const &) // FIXME nickname
 {
 	std::cout << GREEN_TXT << "here is NICK func" << RESET_TXT << std::endl;
 	if (_arg_registration.empty())
@@ -270,36 +254,34 @@ void Client::Nick(std::string const &) //FIXME nickname
 		_step_registration = 0;
 		_flag_shut_client = true;
 	}
-	else
+
+	std::string old_nick = _nickname;
+	std::cout << "old nickname= " << old_nick << std::endl;
+	this->_nickname = _arg_registration.back();
+	std::cout << "new nickname= " << _nickname << std::endl;
+	if (checkNick())
 	{
-		std::string old_nick = _nickname;
-		std::cout << old_nick << std::endl;
-		this->_nickname = _arg_registration.back();
-		std::cout << _nickname << std::endl;
-		if (checkNick())
+		std::cout << BLUE_TXT << "nickname valid" << RESET_TXT << std::endl;
+		if (this->_step_registration < 4) // si entre dds cette condition : first authentification
 		{
-			std::cout << BLUE_TXT << "nickname valid" << RESET_TXT << std::endl;
-			if (this->_step_registration < 4) // si entre dds cette condition : first authentification
-			{
-				this->_step_registration += 1;
-				std::cout << RED_TXT << "rentre ds la premiere auth de nick" << RESET_TXT << std::endl;
-			}
-			else // si entre dans cette condition il s'agit d'un changement de nickname
-			{
-				std::cout << RED_TXT << "rentre ds change nick" << RESET_TXT << std::endl;
-				changeNick(old_nick);
-			}
+			this->_step_registration += 1;
+			std::cout << RED_TXT << "rentre ds la premiere auth de nick" << RESET_TXT << std::endl;
 		}
-		else if (this->_step_registration < 4) // si invalid mais pdt l'étape d'authent
+		else // si entre dans cette condition il s'agit d'un changement de nickname
 		{
-			_step_registration = 0;
-			_flag_shut_client = true;
-			std::cout << RED_TXT << "dans le else nick invalid et first authent" << RESET_TXT << std::endl;
-			return;
+			std::cout << RED_TXT << "rentre ds change nick" << RESET_TXT << std::endl;
+			changeNick(old_nick);
 		}
-		else
-			return;
 	}
+	else if (this->_step_registration < 4) // si invalid mais pdt l'étape d'authent
+	{
+		_step_registration = 0;
+		_flag_shut_client = true;
+		std::cout << RED_TXT << "dans le else nick invalid et first authent" << RESET_TXT << std::endl;
+		return;
+	}
+	// else
+	// 	return;
 }
 
 void Client::checkUser(std::string const &)
@@ -315,11 +297,11 @@ void Client::checkUser(std::string const &)
 	this->_step_registration += 1;
 	_user = _arg_registration[1];
 	_hostname = _arg_registration[2];
-	
+
 	std::string res;
 	size_t pos = 0;
 
-	for (size_t i = 0; i!= _arg_registration.size(); i++)
+	for (size_t i = 0; i != _arg_registration.size(); i++)
 	{
 		if (_arg_registration[i].find_first_of(':', 0) != std::string::npos)
 			pos = i;
@@ -332,11 +314,10 @@ void Client::checkUser(std::string const &)
 	}
 	this->_realname = res;
 	std::cout << BLUE_TXT << "realname is ->" << _realname << RESET_TXT << std::endl;
-	
+
 	if (_step_registration == 4)
 	{
-		std::string buffer = "001 " + get_nickname() + " :Welcome to the " + _hostname + " Network, " 
-		+ _nickname + "!" + _user + "@" + _hostname + "\r\n";
+		std::string buffer = "001 " + get_nickname() + " :Welcome to the " + _hostname + " Network, " + _nickname + "!" + _user + "@" + _hostname + "\r\n";
 		_message.setBuffer(buffer);
 	}
 }
@@ -347,7 +328,7 @@ void Client::clean_ping_mode(std::string const &)
 	setMessage(msg);
 }
 
-// FIXME à modifier ou à delete 
+// FIXME à modifier ou à delete
 void Client::quit(std::string const &)
 {
 	INFO("HERE QUIT FUNC\n");
@@ -366,10 +347,10 @@ void Client::checkParams(std::string const &password)
 	int nb_func = 6;
 	std::string rpl;
 
-	//TODO initialisation 
+	// TODO initialisation
 	void (Client::*func_list[nb_func])(std::string const &arg) =
-		{&Client::ignoreCap, &Client::checkPassword, &Client::Nick, &Client::checkUser, 
-			&Client::clean_ping_mode, &Client::quit};
+		{&Client::ignoreCap, &Client::checkPassword, &Client::Nick, &Client::checkUser,
+		 &Client::clean_ping_mode, &Client::quit};
 	std::string cmd_to_check[nb_func] = {"CAP", "PASS", "NICK", "USER", "PING", "QUIT"};
 	while (i < nb_func)
 	{
@@ -419,24 +400,23 @@ void Client::getCmdLine(std::string const &password)
 		pos = this->_message_recv.find(eol_marker);
 	}
 }
-	
-	
-	//QUIT
-	
-	// std::string msg = client->get_arg().back();
-	// std::string message = ":" + client->get_nickname()+ "@" + "~" +client->get_hostname()+ " QUIT " +  msg + "\r\n";
 
-//signale a tous les autres client sur les bons channels que machin a quit
-	// std::vector<Channel*>::iterator it_chan;	
-	// for (it_chan = this->_channels.begin(); it_chan != _channels.end(); it_chan++)
-	// {
-	// 	if((*it_chan)->hasClient(client))
-	// 	{
-	// 		std::vector<Client*> vectclients = (*it_chan)->getClients();
-	// 		std::vector<Client*>::iterator it_client;	
-	// 		for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++) 
-	// 			(*it_client)->setMessage(message);
-	// 	}
-	// 	INFO("=>Quit le channel" << std::endl);
-	// 	client->setMessage("");// interdit le client en cours de recevoir son propre message 
-	// }
+// QUIT
+
+// std::string msg = client->get_arg().back();
+// std::string message = ":" + client->get_nickname()+ "@" + "~" +client->get_hostname()+ " QUIT " +  msg + "\r\n";
+
+// signale a tous les autres client sur les bons channels que machin a quit
+//  std::vector<Channel*>::iterator it_chan;
+//  for (it_chan = this->_channels.begin(); it_chan != _channels.end(); it_chan++)
+//  {
+//  	if((*it_chan)->hasClient(client))
+//  	{
+//  		std::vector<Client*> vectclients = (*it_chan)->getClients();
+//  		std::vector<Client*>::iterator it_client;
+//  		for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
+//  			(*it_client)->setMessage(message);
+//  	}
+//  	INFO("=>Quit le channel" << std::endl);
+//  	client->setMessage("");// interdit le client en cours de recevoir son propre message
+//  }
