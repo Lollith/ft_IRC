@@ -274,6 +274,7 @@ bool Server::loop_recept_send()
 				//verif l'authent avant d'appeler ces fonctions
 				//mélanger les deux ptr sur fonction
 				parse_msg_recv(client, client->getMsgRecvSave());
+				check_vectors();
 			}
 			if (FD_ISSET(client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
 				mysend(client);
@@ -288,6 +289,33 @@ bool Server::loop_recept_send()
 			else
 				i++;
 		}
+		for (size_t i = 0; i < _channels.size();)
+		{
+			if (_channels[i]->get_flag_erase_chan() == true)
+			{
+				delete (_channels[i]);
+				_channels.erase(_channels.begin() + i);
+			}
+			else
+				i++;
+		}
+		
+
 	}
 	return true;
+}
+
+void Server::check_vectors()
+{
+	DEBUG("vector _channels: ");
+	std::vector<Channel*>::iterator it;	
+	for (it = _channels.begin(); it != _channels.end(); it++)
+		DEBUG((*it)->getName()<<" ");
+	DEBUG(std::endl);
+	
+	DEBUG("vector _clients: ");
+	std::vector<Client*>::iterator it2;	
+	for (it2 = _client.begin(); it2 != _client.end(); it2++)
+		DEBUG((*it2)->getSocketClient()<<" "); 
+	DEBUG(std::endl);
 }
