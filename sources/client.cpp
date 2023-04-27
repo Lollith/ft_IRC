@@ -120,10 +120,6 @@ std::string Client::get_nickname(void) const
 	return this->_nickname;
 }
 
-// void get_oldNickname()
-// {
-
-// }
 void Client::setVectorClient(std::vector<Client *> *clients)
 {
 	_client = clients;
@@ -233,17 +229,25 @@ bool Client::checkNick()
 		_step_registration = 0;
 		return false;
 	}
-	// TODO errror already in use 433 
+	// TODO errror already in use 433 : get vector from serv ?? flag ?? tout bouger ds server ??
+	// size_t id = 0;
+	// while (id != _client->size()) // broadcast the messag
+	// {
+	
+	// 		std::cout << CYAN_TXT << "what is client array: " << (*_client)[id]->get_nickname() <<  RESET_TXT << std::endl;
+		
+	// 	id++;
+	// }
 
-	size_t i = 0;
+	size_t i = 0;	
 	while ((_client->size() > 1) && (i != _client->size() -1)) // broadcast the messag
 	{
-		std::cout << BLUE_TXT << "differents clients have same nickname" << RESET_TXT << std::endl;
-		std::cout << CYAN_TXT << "nickname is :" << _nickname << RESET_TXT << std::endl;
 		if ((*_client)[i]->get_nickname() == this->_nickname)
 		{
 			(*_client)[i]->setMessage("");
+			std::cout << BLUE_TXT << "differents clients have same nickname" << RESET_TXT << std::endl;
 			setMessage(reply(ERR_NICKNAMEINUSE, this));
+			// return false;
 		}
 		i++;
 	}
@@ -253,18 +257,18 @@ bool Client::checkNick()
 void Client::changeNick(std::string const &old_nick)
 {
 	// broadcast
-	std::cout << RED_TXT << "rentre ds change nick" << RESET_TXT << std::endl;
-
-
 	std::string message = ":" + old_nick + "!" + _user + "@" + _hostname + " NICK " + _nickname + "\r\n";
 	// setMessage(message);
-	size_t i = 0;
-	while (i != _client->size())
-	{
-		std::cout << GREEN_TXT << (*_client)[i]->get_nickname() << RESET_TXT << std::endl;
-		(*_client)[i]->setMessage(message);
-		i++;
-	}
+	// size_t i = 0;
+	// while (i != _client->size())
+	// {
+		// {
+			std::cout << GREEN_TXT << get_nickname() << RESET_TXT << std::endl;
+			setMessage(message);
+		// }
+			// i++;
+
+	// }
 }
 
 void Client::Nick(std::string const &) //FIXME nickname
@@ -278,12 +282,10 @@ void Client::Nick(std::string const &) //FIXME nickname
 	}
 	else
 	{
-		// anonymous first time old nick
-		std::string old_nick = _nickname; 
-		_old_nickname = old_nick;
-		std::cout << CYAN_TXT << _old_nickname << " == " << old_nick << RESET_TXT << std::endl;
-		this->_nickname = _arg_registration.back(); // new nick
-		std::cout << "new nick: " << _nickname << std::endl;
+		std::string old_nick = _nickname;
+		std::cout << old_nick << std::endl;
+		this->_nickname = _arg_registration.back();
+		std::cout << _nickname << std::endl;
 		if (checkNick())
 		{
 			std::cout << BLUE_TXT << "nickname valid" << RESET_TXT << std::endl;
@@ -294,6 +296,7 @@ void Client::Nick(std::string const &) //FIXME nickname
 			}
 			else // si entre dans cette condition il s'agit d'un changement de nickname
 			{
+				std::cout << RED_TXT << "rentre ds change nick" << RESET_TXT << std::endl;
 				changeNick(old_nick);
 			}
 		}

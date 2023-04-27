@@ -47,11 +47,11 @@ void Server::join( Client *client)
 
 void Server::welcome_new_chan(Client *client, Channel *channel)
 {
-// FIXME: adeline
+// FIXME:adeline
 	// erreur ici : reinitialise si 2 meme nom???? a tester avec 2 pseudo differents
-	std::string join_msg2 = ":" + client->get_nickname() + "@" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
-	for (size_t i = 0; i!= channel->getClients().size(); i++) //broadcast the message :nouveau client joigned aux autres du chan
-		channel->getClients()[i]->setMessage(join_msg2);
+	// std::string join_msg2 = ":" + client->get_nickname() + "@" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
+	// for (size_t i = 0; i!= channel->getClients().size(); i++) //broadcast the message :nouveau client joigned aux autres du chan
+	// 	channel->getClients()[i]->setMessage(join_msg2);
 	
 	std::string join_msg = ":" + client->get_nickname() + "@" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
 	
