@@ -3,13 +3,13 @@
 //__________________________________________________canonic form
 
 Client::Client(void) : _step_registration(0), _flag_password_ok(false), _flag_password_provided(false),
-					   _flag_shut_client(false), _user(""), _nickname("anonymous"), _hostname("")
+					   _flag_shut_client(false), _user(""), _nickname(""), _hostname("")
 {
 }
 
 Client::Client(int sock_client) : _socket_client(sock_client), _step_registration(0), _flag_password_ok(false),
 								  _flag_password_provided(false), _flag_shut_client(false),
-								  _user(""), _nickname("anonymous"), _hostname("")
+								  _user(""), _nickname(""), _hostname("")
 
 {
 	// 	std::cout << "create client" << std::endl;
@@ -241,7 +241,7 @@ bool Client::checkNick()
 
 void Client::changeNick(std::string const &old_nick) // FIXME //ONGOING
 {
-	std::string message = ":" + old_nick + " NICK :" + _nickname + "\r\n";
+	std::string message = ":" + old_nick + "!" + get_user() + "@" + get_hostname() + " NICK :" + _nickname + "\r\n";
 	setMessage(message);
 }
 
@@ -325,14 +325,15 @@ void Client::checkUser(std::string const &)
 
 	if (_step_registration == 4)
 	{
-		std::string buffer = "001 " + get_nickname() + " :Welcome to the " + _hostname + " Network, " + _nickname + "!" + _user + "@" + _hostname + "\r\n";
+		std::string buffer = ": NICK :" + get_nickname() + "\r\n";
+		buffer += ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " 001 " + get_nickname() + " :Welcome to the " + _hostname + " Network " + _nickname + "!" + _user + "@" + _hostname + "\r\n";
 		_message.setBuffer(buffer);
 	}
 }
 
 void Client::clean_ping_mode(std::string const &)
 {
-	std::string msg = "PONG " + this->_arg_registration.back();
+	std::string msg = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " PONG " + this->_arg_registration.back() + "\r\n";
 	setMessage(msg);
 }
 
