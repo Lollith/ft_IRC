@@ -42,12 +42,13 @@ public:
 	//__________________________________________________members functions
 
 	void 				crash_protector();
-
 	bool				startServer();
 	void				mySelect(fd_set &rd, fd_set &wr);
 	void  				myrecv(Client *client);
 	void 				mysend(Client *client);
 	bool				loop_recept_send();
+
+	void				check_vectors();
 
 
 	//-----fct _channels------------------------------------------------------------
