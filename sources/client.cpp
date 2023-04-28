@@ -239,13 +239,13 @@ bool Client::checkNick()
 	return true;
 }
 
-void Client::changeNick(std::string const &old_nick) // FIXME //ONGOING
+void Client::changeNick(std::string const &old_nick)
 {
 	std::string message = ":" + old_nick + "!" + get_user() + "@" + get_hostname() + " NICK :" + _nickname + "\r\n";
 	setMessage(message);
 }
 
-void Client::Nick(std::string const &) // FIXME nickname
+void Client::Nick(std::string const &)
 {
 	std::cout << GREEN_TXT << "here is NICK func" << RESET_TXT << std::endl;
 	if (_arg_registration.empty())
