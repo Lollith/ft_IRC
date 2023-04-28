@@ -49,6 +49,7 @@ void Server::welcome_new_chan(Client *client, Channel *channel)
 {
 //broadcast the message :nouveau client joigned aux autres du chan
 	std::string join_msg = ":" + client->get_nickname() + "@" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
+	std::cout << CYAN_TXT << "which nickname is saved in WELCOME NEW CHAN =>"<< client->get_nickname() << RESET_TXT << std::endl;
 	for (size_t i = 0; i!= channel->getClients().size(); i++) 
 		channel->getClients()[i]->setMessage(join_msg);
 	

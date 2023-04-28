@@ -26,7 +26,6 @@ void Channel::set_flag_erase_chan( bool mybool ){
 void Channel::addClient(Client *client){
 	INFO("client"<< client->getSocketClient()<<" rejoint" << std::endl);
 	this->_clients.push_back(client);
-	// std::cout << "vector client"<< _clients.back()->getSocketClient()<< std::endl;
 }
 
 

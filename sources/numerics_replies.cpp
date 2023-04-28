@@ -63,10 +63,10 @@ std::string reply (int reply, Client *client)
 			msg = "433 " + client->get_nickname() + " " + client->get_nickname() +  " :Nickname is already in use\r\n";
 			break;
 		case ERR_NONICKNAMEGIVEN :
-			msg = "431 " + client->get_nickname() + " " + client->get_nickname() +  " :Nickname non given\r\n";
+			msg = "431 " + client->get_nickname() +  " :Nickname non given\r\n";
 			break;
 		case ERR_NICKCOLLISION  :
-			msg = "436 " + client->get_nickname() + " " + client->get_nickname() +  " :Nickname collision\r\n";
+			msg = "436 " + client->get_nickname() +  " :Nickname collision\r\n";
 			break;
 		case ERR_NOTREGISTERED:
 			msg = "451 " + client->get_nickname() + " :You have not registered\r\n";
