@@ -1,6 +1,6 @@
 NAME = ircserv
-# CXX = c++
-CXX = g++ #pour pouvoir utiliser lldb à enlever !! 
+CXX = c++
+# CXX = g++ #pour pouvoir utiliser lldb à enlever !! 
 
 SRC_PATHS = ./sources/
 
@@ -17,12 +17,12 @@ OBJ		=	$(SRC:./sources/%.cpp=./build/%.o)
 DEP		=	$(SRC:./sources/%.cpp=./build/%.d)
 INC		=	-I ./includes/
 
-CXXFLAGS = -MMD -g3 -Wall -Wextra -Werror -std=c++98 
+CXXFLAGS = -MMD -g3 -Wall -Wextra -Werror -std=c++98 $(INC)
 # CXXFLAGS += -fsanitize=address
 
 build/%.o:	./sources/%.cpp
 			mkdir -p build
-			$(CXX) $(CXXFLAGS) -c $< -o $@ $(INC)
+			$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(NAME): $(OBJ)
 		$(CXX) $(CXXFLAG) $(OBJ) -o $(NAME)

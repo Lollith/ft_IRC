@@ -22,7 +22,7 @@ int main(int ac, char **av)
 	{
 		int sock_serv = atoi(av[1]);
 		Server serv(sock_serv, av[2]);
-
+		//FIXME ctrl c
 		struct sigaction act;
 		act.sa_handler = sigHandler;
 		sigemptyset(&act.sa_mask);

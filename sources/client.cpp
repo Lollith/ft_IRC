@@ -125,6 +125,11 @@ void Client::setVectorClient(std::vector<Client *> *clients)
 	_client = clients;
 }
 
+void Client::setVectorChan(std::vector<Channel*> *ptr_chan)
+{
+	_channels = ptr_chan;
+}
+
 //__________________________________________________MEMBERS FUNCTIONS
 
 void Client::tokenization_cmd(std::string &cmd)
@@ -231,7 +236,7 @@ bool Client::checkNick()
 		if ((*_client)[i]->get_nickname() == this->_nickname)
 		{
 			std::cout << BLUE_TXT << "differents clients have same nickname" << RESET_TXT << std::endl;
-			// (*_client)[i]->setMessage("");
+			(*_client)[i]->setMessage("");
 			setMessage(reply(ERR_NICKNAMEINUSE, this));
 		}
 		i++;
@@ -242,7 +247,7 @@ bool Client::checkNick()
 void Client::changeNick(std::string const &old_nick)
 {
 	std::string message = ":" + old_nick + "!" + get_user() + "@" + get_hostname() + " NICK :" + _nickname + "\r\n";
-	setMessage(message);
+	broadcaster(message);
 }
 
 void Client::Nick(std::string const &)
@@ -287,7 +292,7 @@ void Client::Nick(std::string const &)
 		}
 		else
 		{
-			std::cout << CYAN_TXT << "ZEBI" << RESET_TXT << std::endl;
+			std::cout << CYAN_TXT << "last else" << RESET_TXT << std::endl;
 		}
 	}
 }
@@ -337,16 +342,31 @@ void Client::clean_ping_mode(std::string const &)
 	setMessage(msg);
 }
 
-// FIXME à modifier ou à delete
 void Client::quit(std::string const &)
 {
 	INFO("HERE QUIT FUNC\n");
+	std::string res;
+	std::string quit_reason;
+	std::string broadcast_rpl;
 
-	// envoyer le message à tous les clients (loop etc)
-	std::string rpl = "ERROR: Server closing a client connection\r\n";
-	rpl += ":" + _nickname + " QUIT :Bye, see you!\r\n";
-	setMessage(rpl);
-	// faut il quit le server aussi ??
+	size_t pos = 0;
+
+	for (size_t i = 0; i != _arg_registration.size(); i++)
+	{
+		if (_arg_registration[i].find_first_of(':', 0) != std::string::npos)
+			pos = i;
+	}
+	res = _arg_registration[pos];
+	pos++;
+	for (; pos != _arg_registration.size(); pos++)
+	{
+		res += " " + _arg_registration[pos];
+	}
+	quit_reason = res;
+
+	setMessage("ERROR: Server closing a client connection\r\n");
+	broadcast_rpl = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "QUIT" + quit_reason + "\r\n";
+	broadcaster(broadcast_rpl);
 	this->_flag_shut_client = true;
 }
 
@@ -356,7 +376,6 @@ void Client::checkParams(std::string const &password)
 	int nb_func = 6;
 	std::string rpl;
 
-	// TODO initialisation
 	void (Client::*func_list[nb_func])(std::string const &arg) =
 		{&Client::ignoreCap, &Client::checkPassword, &Client::Nick, &Client::checkUser,
 		 &Client::clean_ping_mode, &Client::quit};
@@ -410,22 +429,21 @@ void Client::getCmdLine(std::string const &password)
 	}
 }
 
-// QUIT
-
-// std::string msg = client->get_arg().back();
-// std::string message = ":" + client->get_nickname()+ "@" + "~" +client->get_hostname()+ " QUIT " +  msg + "\r\n";
-
-// signale a tous les autres client sur les bons channels que machin a quit
-//  std::vector<Channel*>::iterator it_chan;
-//  for (it_chan = this->_channels.begin(); it_chan != _channels.end(); it_chan++)
-//  {
-//  	if((*it_chan)->hasClient(client))
-//  	{
-//  		std::vector<Client*> vectclients = (*it_chan)->getClients();
-//  		std::vector<Client*>::iterator it_client;
-//  		for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
-//  			(*it_client)->setMessage(message);
-//  	}
-//  	INFO("=>Quit le channel" << std::endl);
-//  	client->setMessage("");// interdit le client en cours de recevoir son propre message
-//  }
+void Client::broadcaster(std::string const &reply)
+{
+	 std::vector<Channel*>::iterator it_chan;
+	 for (it_chan = this->_channels->begin(); it_chan != _channels->end(); it_chan++)
+	 {
+	 	if((*it_chan)->hasClient(this))
+	 	{
+	 		std::vector<Client*> vectclients = (*it_chan)->getClients();
+	 		std::vector<Client*>::iterator it_client;
+	 		for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
+			{
+				if (*it_client != this) // do not send the message channels times to this
+		 			(*it_client)->setMessage(reply);
+			}
+	 	}
+	 }
+	setMessage(reply);
+}

@@ -65,10 +65,10 @@ public:
 	void 						clean_ping_mode(std::string const &arg);
 	void 						Clean_arg( void );
 	void						quit(std::string const &);
-
-	//define typedef ici pour struct sockaddr_in??
+	void						broadcaster(std::string const& reply);
 
 	void						setVectorClient(std::vector<Client*> *_ptr_client);
+	void						setVectorChan(std::vector<Channel*> *_ptr_chan);
 
 private:
 	// useless constructor
@@ -95,6 +95,7 @@ private:
 	
 	std::vector<std::string>	_arg_registration;
 	std::vector<Client*>		*_client;
+	std::vector<Channel*>		*_channels;
 
 };
 
