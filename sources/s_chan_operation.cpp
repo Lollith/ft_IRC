@@ -49,7 +49,6 @@ void Server::welcome_new_chan(Client *client, Channel *channel)
 {
 //broadcast the message :nouveau client joigned aux autres du chan
 	std::string join_msg = ":" + client->get_nickname() + "@" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
-	std::cout << CYAN_TXT << "which nickname is saved in WELCOME NEW CHAN =>"<< client->get_nickname() << RESET_TXT << std::endl;
 	for (size_t i = 0; i!= channel->getClients().size(); i++) 
 		channel->getClients()[i]->setMessage(join_msg);
 	
@@ -97,8 +96,6 @@ void Server::part(Client *client)
 }
 
 
-
-
 // The PRIVMSG command is used to send private messages between users, as well 
 // as to send messages to channels. <target> is the nickname of a client or the name of a channel.(#)
 
@@ -106,45 +103,57 @@ void Server::privmsg( Client *client){
 	int size = client->get_arg().size() - 2;
 	std::string target = client->get_arg()[size];
 	std::string msg = client->get_arg().back();
-	// INFO("je recois les messages prives depuis le client " + client->get_user()+ "\n");
 	// check si commence par un # => chan
 	if (target[0] == '#')
-	{
-	//recherche parmi mon vector de channels , le bon channel , puis envoyer le message aux bons client = clients enregistres dans le channel
-		std::vector<Channel*>::iterator it_chan;	
-		for (it_chan = _channels.begin(); it_chan != _channels.end(); it_chan++)
-		{
-			if ((*it_chan)->getName() == target)
-			{
-				std::string message = ":" + client->get_nickname() + " PRIVMSG " + target + " " + msg + "\r\n";
-				size_t i = 0;
-				while (i!= (*it_chan)->getClients().size()) //broadcast the messag
-				{
-					if ((*it_chan)->getClients()[i] != client) // remplace le set chaine vide 
-						(*it_chan)->getClients()[i]->setMessage(message);
-					i++;
-				}
-				// client->setMessage("");// interdit le client en cours de recevoir son propre message 
-			}
-			else
-				client->setMessage(reply(ERR_NOSUCHCHANNEL, client, target));
-		}
-	}
+		privmsg_to_chan(client, target, msg);
 	else
+		privmg_to_client(client, target, msg);
+}
+
+//recherche parmi mon vector de channels , le bon channel , puis envoyer le 
+//message aux bons client = clients enregistres dans le channel
+void Server::privmsg_to_chan(Client *client, std::string &target, std::string &msg)
+{
+	std::vector<Channel*>::iterator it_chan;	
+	for (it_chan = _channels.begin(); it_chan != _channels.end(); it_chan++)
 	{
-	// na pas trouver le bon channel : check les pseudo pour envoyer a un nickname
-		std::vector<Client*>::iterator it_client;	
-		for (it_client = _client.begin(); it_client != _client.end(); it_client++)
+		if ((*it_chan)->getName() == target)
 		{
-			if ((*it_client)->get_nickname() == target)
+			std::string message = ":" + client->get_nickname() + " PRIVMSG " + target + " " + msg + "\r\n";
+			size_t i = 0;
+			while (i!= (*it_chan)->getClients().size()) //broadcast the messag
 			{
-				std::string message = ":" + client->get_user() + " PRIVMSG " + (*it_client)->get_nickname() + " " + msg + "\r\n";
-				(*it_client)->setMessage(message);
+				if ((*it_chan)->getClients()[i] != client) // remplace le set chaine vide 
+					(*it_chan)->getClients()[i]->setMessage(message);
+				i++;
 			}
-			else
-				client->setMessage(reply(ERR_NOSUCHNICK, client, target));
+			// client->setMessage("");// interdit le client en cours de recevoir son propre message 
+			return;
+		}
+		else
+		{
+			client->setMessage(reply(ERR_NOSUCHCHANNEL, client, target));
+			return;
 		}
 	}
+}
+
+
+// na pas trouver le bon channel : check les pseudo pour envoyer a un nickname
+void Server::privmg_to_client(Client *client, std::string &target,std::string &msg)
+{
+	std::vector<Client*>::iterator it_client;	
+	for (it_client = _client.begin(); it_client != _client.end(); it_client++)
+	{
+		if ((*it_client)->get_nickname() == target)
+		{
+			std::string message = ":" + client->get_nickname() + " PRIVMSG " + (*it_client)->get_nickname() + " " + msg + "\r\n";
+			(*it_client)->setMessage(message);
+			return;
+		}
+	}
+	client->setMessage(reply(ERR_NOSUCHNICK, client, target));
+	return;
 }
 
 void Server::names(Client *client){ // a faire ????
