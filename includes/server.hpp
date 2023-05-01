@@ -56,13 +56,14 @@ public:
 	void 				join( Client *client);
 	void 				part( Client *client);
 	void				privmsg( Client *client);
+	void 				notice( Client *client);
 	void				changeNick( Client *client);
 
 	void 				stop();
 	void 				welcome_new_chan( Client *client, Channel *channel );
-	void 				privmsg_to_chan(Client *client, std::string &targe, std::string &msgt);
-	void 				privmg_to_client(Client *client, std::string &target,std::string &msg );
-	void 				names( Client *client );
+	void 				privmsg_to_chan(Client *client, std::string &priv, std::string &targe, std::string &msgt);
+	void 				privmg_to_client(Client *client,std::string &priv, std::string &target,std::string &msg );
+	// void 				names( Client *client );
 
 private:
 	// useless constructor
@@ -77,6 +78,7 @@ private:
 	socklen_t				_sin_size;
 	std::string 			_password;
 	bool					_flag_keep_loop;
+	bool					_flag_notice;
 	
 	std::vector<Client*>	_client;
 	std::vector<Channel*>	_channels;
