@@ -88,6 +88,7 @@ void Server::welcome_new_chan(Client *client, Channel *channel)
 void Server::part(Client *client)
 {	
 	std::string msg = "";
+	//TODO part tous les chans de la list
 	std::string chan_arg = client->get_arg().at(0);
 	
 	if (client->get_arg().size() == 2)
@@ -105,6 +106,8 @@ void Server::part(Client *client)
 			for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
 					(*it_client)->setMessage(message);
 			chan->deleteClientFromChan(client);
+			client->_chan_ope = false;
+			//TODO chercher le client n 0 de la liste => le passer en operator
 			if(chan->getClients().size() < 1)
 				chan->set_flag_erase_chan(true);
 			return;
@@ -125,6 +128,11 @@ void Server::part(Client *client)
 //si operator ://TODO
 void Server::topic(Client *client)
 {
+	if(client->_chan_ope == false)
+	{
+		// ERR_CHANOPRIVSNEEDED (482) //TODO
+		return;
+	}
 	Channel *chan = has_chan(client);
 	std::string msg;
 //TODO : parcourir la liste de chan donner comme pour join
