@@ -83,6 +83,7 @@ void Server::part(Client *client)
 				(*it_chan)->deleteClientFromChan(client);
 				if((*it_chan)->getClients().size() < 1)
 					(*it_chan)->set_flag_erase_chan(true);
+				return;
 			}
 			else
 			{
@@ -90,9 +91,9 @@ void Server::part(Client *client)
 				return;
 			}
 		}
-		else 
-			client->setMessage(reply(ERR_NOSUCHCHANNEL, client, chan));
-	}
+	} 
+	client->setMessage(reply(ERR_NOSUCHCHANNEL, client, chan));
+	return;
 }
 
 
