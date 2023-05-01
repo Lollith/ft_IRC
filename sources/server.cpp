@@ -3,7 +3,7 @@
 //__________________________________________________canonic form
 
 Server::Server(const int port, const std::string password)
-	: _port(port), _password(password), _flag_keep_loop(true)
+	: _port(port), _password(password), _flag_keep_loop(true), _flag_notice(false)
 {
 	if (!setSocketServer())
 	{
