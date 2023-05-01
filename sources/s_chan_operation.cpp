@@ -3,9 +3,9 @@
 void Server::parse_msg_recv(Client *client, std::string msg_recv)
 {
 	int nb_fct = 4;
-	std::string funct_names[] = {"JOIN", "PART", "PRIVMSG", "NAMES"};
+	std::string funct_names[] = {"JOIN", "PART", "PRIVMSG", "NOTICE"};
 
-	void (Server::*fct_member[])(Client *client) = { &Server::join, &Server::part, &Server::privmsg, &Server::names};
+	void (Server::*fct_member[])(Client *client) = { &Server::join, &Server::part, &Server::privmsg, &Server::notice};
 
 	for (int i = 0; i < nb_fct; i++)
 	{
@@ -36,7 +36,6 @@ void Server::join( Client *client)
 	INFO("creation Channel " + channel + "\n");
 	_channels.back()->addClient(client);
 	welcome_new_chan(client, _channels.back());	
-
 }
 
 //A JOIN message with the client as the message <source> and the channel they 
@@ -103,23 +102,35 @@ void Server::privmsg( Client *client){
 	int size = client->get_arg().size() - 2;
 	std::string target = client->get_arg()[size];
 	std::string msg = client->get_arg().back();
-	// check si commence par un # => chan
+	std::string priv_notice = " PRIVMSG ";
+
+	if(_flag_notice == true)
+		priv_notice = " NOTICE ";
+
 	if (target[0] == '#')
-		privmsg_to_chan(client, target, msg);
+		privmsg_to_chan(client, priv_notice, target, msg);
 	else
-		privmg_to_client(client, target, msg);
+		privmg_to_client(client, priv_notice, target, msg);
+}
+
+// The difference between NOTICE and PRIVMSG is that automatic replies must never
+//be sent in response to a NOTICE message.
+void Server::notice( Client *client)
+{
+	_flag_notice = true;
+	privmsg(client);
 }
 
 //recherche parmi mon vector de channels , le bon channel , puis envoyer le 
 //message aux bons client = clients enregistres dans le channel
-void Server::privmsg_to_chan(Client *client, std::string &target, std::string &msg)
+void Server::privmsg_to_chan(Client *client, std::string &priv_notice, std::string &target, std::string &msg)
 {
 	std::vector<Channel*>::iterator it_chan;	
 	for (it_chan = _channels.begin(); it_chan != _channels.end(); it_chan++)
 	{
 		if ((*it_chan)->getName() == target)
 		{
-			std::string message = ":" + client->get_nickname() + " PRIVMSG " + target + " " + msg + "\r\n";
+			std::string message = ":" + client->get_nickname() + priv_notice + target + " " + msg + "\r\n";
 			size_t i = 0;
 			while (i!= (*it_chan)->getClients().size()) //broadcast the messag
 			{
@@ -127,12 +138,14 @@ void Server::privmsg_to_chan(Client *client, std::string &target, std::string &m
 					(*it_chan)->getClients()[i]->setMessage(message);
 				i++;
 			}
-			// client->setMessage("");// interdit le client en cours de recevoir son propre message 
+			_flag_notice = false;
 			return;
 		}
 		else
 		{
-			client->setMessage(reply(ERR_NOSUCHCHANNEL, client, target));
+			if(_flag_notice == false)
+				client->setMessage(reply(ERR_NOSUCHCHANNEL, client, target));
+			_flag_notice = false;
 			return;
 		}
 	}
@@ -140,26 +153,30 @@ void Server::privmsg_to_chan(Client *client, std::string &target, std::string &m
 
 
 // na pas trouver le bon channel : check les pseudo pour envoyer a un nickname
-void Server::privmg_to_client(Client *client, std::string &target,std::string &msg)
+void Server::privmg_to_client(Client *client, std::string &priv_notice, std::string &target,std::string &msg)
 {
+	std::cout << priv_notice << std::endl;
 	std::vector<Client*>::iterator it_client;	
 	for (it_client = _client.begin(); it_client != _client.end(); it_client++)
 	{
 		if ((*it_client)->get_nickname() == target)
 		{
-			std::string message = ":" + client->get_nickname() + " PRIVMSG " + (*it_client)->get_nickname() + " " + msg + "\r\n";
+			std::string message = ":" + client->get_nickname() + priv_notice + (*it_client)->get_nickname() + " " + msg + "\r\n";
 			(*it_client)->setMessage(message);
+			_flag_notice = false;
 			return;
 		}
 	}
-	client->setMessage(reply(ERR_NOSUCHNICK, client, target));
+	if(_flag_notice == false)
+		client->setMessage(reply(ERR_NOSUCHNICK, client, target));
+	_flag_notice = false;
 	return;
 }
 
-void Server::names(Client *client){ // a faire ????
-(void) client;
-	// INFO("execute la fct names\n");
-}
+// void Server::names(Client *client){ // a faire ????
+// (void) client;
+// 	// INFO("execute la fct names\n");
+// }
 
 //______________________________TEST CTRLC
 void Server::stop()
