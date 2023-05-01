@@ -306,6 +306,11 @@ void Client::checkUser(std::string const &)
 		setMessage(reply(ERR_ALREADYREGISTERED, this));
 		return;
 	}
+	if (_arg_registration.size() < 4)
+	{
+		setMessage(reply(ERR_NEEDMOREPARAMS, this));
+		return;
+	}
 
 	this->_step_registration += 1;
 	_user = _arg_registration[1];
@@ -365,7 +370,7 @@ void Client::quit(std::string const &)
 	quit_reason = res;
 
 	setMessage("ERROR: Server closing a client connection\r\n");
-	broadcast_rpl = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "QUIT" + quit_reason + "\r\n";
+	broadcast_rpl = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "QUIT " + quit_reason + "\r\n";
 	broadcaster(broadcast_rpl);
 	this->_flag_shut_client = true;
 }
