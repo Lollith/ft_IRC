@@ -270,9 +270,9 @@ bool Server::loop_recept_send()
 			{
 				myrecv(client);
 				client->setVectorClient(&_client);
+				client->setVectorChan(&_channels);
 				client->getCmdLine(_password);
-				//verif l'authent avant d'appeler ces fonctions
-				//mélanger les deux ptr sur fonction
+		
 				parse_msg_recv(client, client->getMsgRecvSave());
 				check_vectors();
 			}
@@ -298,7 +298,7 @@ bool Server::loop_recept_send()
 			}
 			else
 				i++;
-		}//TODO: a faire aussi lorsaue l on /quit ds un chan
+		}//TODO a faire aussi lorsaue l on /quit ds un chan
 	}
 	return true;
 }

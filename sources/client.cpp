@@ -125,6 +125,11 @@ void Client::setVectorClient(std::vector<Client *> *clients)
 	_client = clients;
 }
 
+void Client::setVectorChan(std::vector<Channel*> *ptr_chan)
+{
+	_channels = ptr_chan;
+}
+
 //__________________________________________________MEMBERS FUNCTIONS
 
 void Client::tokenization_cmd(std::string &cmd)
@@ -231,7 +236,7 @@ bool Client::checkNick()
 		if ((*_client)[i]->get_nickname() == this->_nickname)
 		{
 			std::cout << BLUE_TXT << "differents clients have same nickname" << RESET_TXT << std::endl;
-			// (*_client)[i]->setMessage("");
+			(*_client)[i]->setMessage("");
 			setMessage(reply(ERR_NICKNAMEINUSE, this));
 		}
 		i++;
@@ -239,10 +244,11 @@ bool Client::checkNick()
 	return true;
 }
 
+// ONGOING broadcast à tous les clients lors du changement de nick
 void Client::changeNick(std::string const &old_nick)
 {
 	std::string message = ":" + old_nick + "!" + get_user() + "@" + get_hostname() + " NICK :" + _nickname + "\r\n";
-	setMessage(message);
+	broadcaster(message);
 }
 
 void Client::Nick(std::string const &)
@@ -287,7 +293,7 @@ void Client::Nick(std::string const &)
 		}
 		else
 		{
-			std::cout << CYAN_TXT << "ZEBI" << RESET_TXT << std::endl;
+			std::cout << CYAN_TXT << "last else" << RESET_TXT << std::endl;
 		}
 	}
 }
@@ -337,7 +343,7 @@ void Client::clean_ping_mode(std::string const &)
 	setMessage(msg);
 }
 
-// FIXME à modifier ou à delete
+// FIXME : quit: à modifier
 void Client::quit(std::string const &)
 {
 	INFO("HERE QUIT FUNC\n");
@@ -356,7 +362,6 @@ void Client::checkParams(std::string const &password)
 	int nb_func = 6;
 	std::string rpl;
 
-	// TODO initialisation
 	void (Client::*func_list[nb_func])(std::string const &arg) =
 		{&Client::ignoreCap, &Client::checkPassword, &Client::Nick, &Client::checkUser,
 		 &Client::clean_ping_mode, &Client::quit};
@@ -410,8 +415,26 @@ void Client::getCmdLine(std::string const &password)
 	}
 }
 
-// QUIT
+void Client::broadcaster(std::string const &reply)
+{
+	 std::vector<Channel*>::iterator it_chan;
+	 for (it_chan = this->_channels->begin(); it_chan != _channels->end(); it_chan++)
+	 {
+	 	if((*it_chan)->hasClient(this))
+	 	{
+	 		std::vector<Client*> vectclients = (*it_chan)->getClients();
+	 		std::vector<Client*>::iterator it_client;
+	 		for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
+			{
+				if (*it_client != this) // do not send the message channels times to this
+		 			(*it_client)->setMessage(reply);
+			}
+	 	}
+	 }
+	setMessage(reply);
+}
 
+//QUIT broadcast by Adeline
 // std::string msg = client->get_arg().back();
 // std::string message = ":" + client->get_nickname()+ "@" + "~" +client->get_hostname()+ " QUIT " +  msg + "\r\n";
 
@@ -429,3 +452,5 @@ void Client::getCmdLine(std::string const &password)
 //  	INFO("=>Quit le channel" << std::endl);
 //  	client->setMessage("");// interdit le client en cours de recevoir son propre message
 //  }
+
+// TODO get prefix ?
