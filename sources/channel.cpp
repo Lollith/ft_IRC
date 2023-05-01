@@ -2,13 +2,20 @@
 
 Channel::Channel ( std::string name ): _name(name){
 	_flag_erase_chan = false;
-	_topic = " :welcome";
+	_topic = "welcome";
 	// std::cout << "constructeur channel par default"<< std::endl;
 }
 
 std::string Channel::getName( void ) const{
 	return this->_name;
+}
 
+std::string Channel::getTopic( void ) const{
+	return this->_topic;
+}
+
+void	Channel::setTopic( std::string newtopic ){
+	_topic = newtopic;
 }
 
 std::vector<Client *> Channel::getClients( void ) const {

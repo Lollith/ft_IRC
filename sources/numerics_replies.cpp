@@ -8,7 +8,7 @@ std::string reply (int reply, Client *client, Channel *channel)
 	switch(reply)
 	{
 		case RPL_TOPIC:
-			msg = "332 " + client->get_nickname() + " " + channel->getName() +channel->_topic +"\r\n";
+			msg = "332 " + client->get_nickname() + " " + channel->getName() + " " + channel->getTopic() +"\r\n";
 			break;
 		
 		case RPL_NAMREPLY:

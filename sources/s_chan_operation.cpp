@@ -26,7 +26,11 @@ void Server::parse_msg_recv(Client *client, std::string msg_recv)
 void Server::join( Client *client)
 {
 	//TODO : tabl de channel pour recup la liste des arg => plusieurs channels
-	std::string channel = client->get_arg().back();	
+	// Channel *channel = 
+	
+	std::string channel = client->get_arg().back();
+
+
 	std::vector<Channel*>::iterator it;	
 	for (it = _channels.begin(); it != _channels.end(); it++) // 1er n existe pas , ne rentre pas
 	{
@@ -60,7 +64,7 @@ void Server::welcome_new_chan(Client *client, Channel *channel)
 	for (size_t i = 0; i!= channel->getClients().size(); i++)
 		channel->getClients()[i]->setMessage(join_msg);
 		// std::cout << channel->getClients()[i]->get_nickname()<<std::endl;
-	if(channel->_topic == "")
+	if(channel->getTopic() == "")
 		join_msg += reply(RPL_NOTOPIC, client, channel->getName());
 	else
 		join_msg += reply(RPL_TOPIC, client, channel);
@@ -126,12 +130,12 @@ void Server::topic(Client *client)
 //TODO : parcourir la liste de chan donner comme pour join
 	if (chan)
 	{
-		chan->_topic = "";
+		chan->setTopic( "" );
 		msg = reply(RPL_NOTOPIC, client, chan->getName());
 
 		if (client->get_arg().size() == 2)
 		{
-			chan->_topic = client->get_arg().at(1);
+			chan->setTopic(client->get_arg().at(1));
 			msg = reply(RPL_TOPIC, client, chan);
 		}
 		client->setMessage((msg));
