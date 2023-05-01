@@ -342,7 +342,6 @@ void Client::clean_ping_mode(std::string const &)
 	setMessage(msg);
 }
 
-// ONGOING //FIXME : quit: à modifier
 void Client::quit(std::string const &)
 {
 	INFO("HERE QUIT FUNC\n");
