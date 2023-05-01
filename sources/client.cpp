@@ -13,6 +13,7 @@ Client::Client(int sock_client) : _socket_client(sock_client), _step_registratio
 
 {
 	// 	std::cout << "create client" << std::endl;
+	_chan_ope = false;
 	//
 }
 

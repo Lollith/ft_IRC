@@ -18,6 +18,7 @@ class Channel{
 		void 					addClient(Client *client);
 		void 					deleteClientFromChan(Client *client);
 
+		std::string				_topic;//TODO
 	private:
 		std::vector<Client *>	_clients;
 		std::string				_name;

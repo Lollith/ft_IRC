@@ -7,6 +7,7 @@ SRC_PATHS = ./sources/
 SRC = $(addprefix $(SRC_PATHS),\
 	server.cpp\
 	s_chan_operation.cpp\
+	s_messages.cpp\
 	client.cpp\
 	message.cpp\
 	channel.cpp\

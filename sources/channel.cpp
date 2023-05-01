@@ -2,6 +2,7 @@
 
 Channel::Channel ( std::string name ): _name(name){
 	_flag_erase_chan = false;
+	_topic = " :welcome";
 	// std::cout << "constructeur channel par default"<< std::endl;
 }
 

@@ -70,6 +70,13 @@ public:
 
 	void						setVectorClient(std::vector<Client*> *_ptr_client);
 
+	
+	bool						_chan_ope;//TODO a passer en private +setter
+
+
+
+
+
 private:
 	// useless constructor
 	Client(void);

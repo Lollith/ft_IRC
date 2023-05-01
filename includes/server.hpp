@@ -55,15 +55,18 @@ public:
 	void 				parse_msg_recv( Client *client, std::string msg_recv ); // msg_recv et arg useless => a suprimer
 	void 				join( Client *client);
 	void 				part( Client *client);
+	void 				topic(Client *client);
+
 	void				privmsg( Client *client);
 	void 				notice( Client *client);
-	void				changeNick( Client *client);
+	// void				changeNick( Client *client);
 
 	void 				stop();
 	void 				welcome_new_chan( Client *client, Channel *channel );
 	void 				privmsg_to_chan(Client *client, std::string &priv, std::string &targe, std::string &msgt);
 	void 				privmg_to_client(Client *client,std::string &priv, std::string &target,std::string &msg );
 	// void 				names( Client *client );
+ 	Channel *			has_chan(Client* client);
 
 private:
 	// useless constructor
