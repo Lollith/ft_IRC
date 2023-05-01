@@ -244,7 +244,6 @@ bool Client::checkNick()
 	return true;
 }
 
-// ONGOING broadcast à tous les clients lors du changement de nick
 void Client::changeNick(std::string const &old_nick)
 {
 	std::string message = ":" + old_nick + "!" + get_user() + "@" + get_hostname() + " NICK :" + _nickname + "\r\n";
@@ -343,16 +342,32 @@ void Client::clean_ping_mode(std::string const &)
 	setMessage(msg);
 }
 
-// FIXME : quit: à modifier
+// ONGOING //FIXME : quit: à modifier
 void Client::quit(std::string const &)
 {
 	INFO("HERE QUIT FUNC\n");
+	std::string res;
+	std::string quit_reason;
+	std::string broadcast_rpl;
 
-	// envoyer le message à tous les clients (loop etc)
-	std::string rpl = "ERROR: Server closing a client connection\r\n";
-	rpl += ":" + _nickname + " QUIT :Bye, see you!\r\n";
-	setMessage(rpl);
-	// faut il quit le server aussi ??
+	size_t pos = 0;
+
+	for (size_t i = 0; i != _arg_registration.size(); i++)
+	{
+		if (_arg_registration[i].find_first_of(':', 0) != std::string::npos)
+			pos = i;
+	}
+	res = _arg_registration[pos];
+	pos++;
+	for (; pos != _arg_registration.size(); pos++)
+	{
+		res += " " + _arg_registration[pos];
+	}
+	quit_reason = res;
+
+	setMessage("ERROR: Server closing a client connection\r\n");
+	broadcast_rpl = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "QUIT" + quit_reason + "\r\n";
+	broadcaster(broadcast_rpl);
 	this->_flag_shut_client = true;
 }
 
@@ -433,24 +448,3 @@ void Client::broadcaster(std::string const &reply)
 	 }
 	setMessage(reply);
 }
-
-//QUIT broadcast by Adeline
-// std::string msg = client->get_arg().back();
-// std::string message = ":" + client->get_nickname()+ "@" + "~" +client->get_hostname()+ " QUIT " +  msg + "\r\n";
-
-// signale a tous les autres client sur les bons channels que machin a quit
-//  std::vector<Channel*>::iterator it_chan;
-//  for (it_chan = this->_channels.begin(); it_chan != _channels.end(); it_chan++)
-//  {
-//  	if((*it_chan)->hasClient(client))
-//  	{
-//  		std::vector<Client*> vectclients = (*it_chan)->getClients();
-//  		std::vector<Client*>::iterator it_client;
-//  		for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
-//  			(*it_client)->setMessage(message);
-//  	}
-//  	INFO("=>Quit le channel" << std::endl);
-//  	client->setMessage("");// interdit le client en cours de recevoir son propre message
-//  }
-
-// TODO get prefix ?
