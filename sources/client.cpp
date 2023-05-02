@@ -381,10 +381,10 @@ void Client::checkParams(std::string const &password)
 	int nb_func = 6;
 	std::string rpl;
 
-	void (Client::*func_list[nb_func])(std::string const &arg) =
+	void (Client::*func_list[])(std::string const &arg) =
 		{&Client::ignoreCap, &Client::checkPassword, &Client::Nick, &Client::checkUser,
 		 &Client::clean_ping_mode, &Client::quit};
-	std::string cmd_to_check[nb_func] = {"CAP", "PASS", "NICK", "USER", "PING", "QUIT"};
+	std::string cmd_to_check[] = {"CAP", "PASS", "NICK", "USER", "PING", "QUIT"};
 	while (i < nb_func)
 	{
 		if (_cmd_registration == cmd_to_check[i])
