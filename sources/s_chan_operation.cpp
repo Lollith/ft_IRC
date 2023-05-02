@@ -36,47 +36,36 @@ void Server::broadcast(Client *client, Channel *chan)
 
 }
 
+Channel *Server::searchChan(std::string name)
+{
+	for (size_t i = 0; i < _channels.size(); i++)
+	{
+		if (_channels[i]->getName() == name)
+			return _channels[i];
+	}
+	return (NULL);
+}
+
 void Server::join( Client *client)
 {
-	//TODO : tabl de channel pour recup la liste des arg => plusieurs channels
-	std::vector<std::string > list_channel;
 	size_t i = 0;
+
 	while(i < client->get_arg().size())
 	{
-		// std::cout << client->get_arg()[i]<< std::endl;
-		list_channel.push_back(client->get_arg()[i]);
-		i++;
-	} 
-	
-
-	std::vector<Channel*>::iterator it;	
-	for (it = _channels.begin(); it != _channels.end(); it++) // 1er n existe pas , ne rentre pas
-	{
-		i = 0;
-		while(i < list_channel.size())
+		Channel * chan = searchChan(client->get_arg()[i]);
+		if (!chan)
 		{
-			if ((*it)->getName() == list_channel[i]) // si  channel existe
-			{
-				INFO("=>Join le channel\n");
-				(*it)->addClient(client);
-				welcome_new_chan(client, *it);
-			}
-			i++;
+			chan = new Channel( client->get_arg()[i]);
+			_channels.push_back(chan); // si chan n existe pas => le creer
+			INFO("creation Channel " + client->get_arg()[i] + "\n");
+			client->_chan_ope = true;
 		}
-		//TODO return ici => separer la fct
-	}
-	// for(size_t i = 0; i != 10; i++)
-	i = 0;
-	while(i < list_channel.size())
-	{
-		_channels.push_back(new Channel( list_channel[i])); // si chan n existe pas => le creer
-		INFO("creation Channel " + list_channel[i] + "\n");
-		_channels.back()->addClient(client);
-		client->_chan_ope = true;
-		welcome_new_chan(client, _channels.back());
+
+			INFO("=>Join le channel\n");
+			(chan)->addClient(client);
+			welcome_new_chan(client, chan);
 		i++;
 	}
-		return;
 }
 
 //A JOIN message with the client as the message <source> and the channel they 

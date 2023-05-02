@@ -62,6 +62,7 @@ public:
 	// void				changeNick( Client *client);
 
 	void 				stop();
+	Channel *			searchChan(std::string name);
 	void 				welcome_new_chan( Client *client, Channel *channel );
 	void 				broadcast(Client *client, Channel *chan);
 	void 				privmsg_to_chan(Client *client, std::string &priv, std::string &targe, std::string &msgt);
