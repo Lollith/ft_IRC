@@ -125,7 +125,7 @@ void Client::setVectorClient(std::vector<Client *> *clients)
 	_client = clients;
 }
 
-void Client::setVectorChan(std::vector<Channel*> *ptr_chan)
+void Client::setVectorChan(std::vector<Channel *> *ptr_chan)
 {
 	_channels = ptr_chan;
 }
@@ -347,6 +347,7 @@ void Client::clean_ping_mode(std::string const &)
 	setMessage(msg);
 }
 
+// ONGOING //TODO fix leaks
 void Client::quit(std::string const &)
 {
 	INFO("HERE QUIT FUNC\n");
@@ -354,8 +355,8 @@ void Client::quit(std::string const &)
 	std::string quit_reason;
 	std::string broadcast_rpl;
 
+	// récupere le parametre apres les : (reason param)
 	size_t pos = 0;
-
 	for (size_t i = 0; i != _arg_registration.size(); i++)
 	{
 		if (_arg_registration[i].find_first_of(':', 0) != std::string::npos)
@@ -369,6 +370,7 @@ void Client::quit(std::string const &)
 	}
 	quit_reason = res;
 
+	// send messages
 	setMessage("ERROR: Server closing a client connection\r\n");
 	broadcast_rpl = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "QUIT " + quit_reason + "\r\n";
 	broadcaster(broadcast_rpl);
@@ -436,19 +438,28 @@ void Client::getCmdLine(std::string const &password)
 
 void Client::broadcaster(std::string const &reply)
 {
-	 std::vector<Channel*>::iterator it_chan;
-	 for (it_chan = this->_channels->begin(); it_chan != _channels->end(); it_chan++)
-	 {
-	 	if((*it_chan)->hasClient(this))
-	 	{
-	 		std::vector<Client*> vectclients = (*it_chan)->getClients();
-	 		std::vector<Client*>::iterator it_client;
-	 		for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
+	std::vector<Channel *>::iterator it_chan;
+	for (it_chan = this->_channels->begin(); it_chan != _channels->end(); it_chan++)
+	{
+		if ((*it_chan)->hasClient(this))
+		{
+			std::vector<Client *> vectclients = (*it_chan)->getClients();
+			std::vector<Client *>::iterator it_client;
+			for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
 			{
 				if (*it_client != this) // do not send the message channels times to this
-		 			(*it_client)->setMessage(reply);
+					(*it_client)->setMessage(reply);
 			}
-	 	}
-	 }
+			((*it_chan)->deleteClientFromChan(this));
+			if ((*it_chan)->getClients().size() < 1)
+				(*it_chan)->set_flag_erase_chan(true);
+			return;
+		}
+		// else
+		// {
+		// 	setMessage(reply(ERR_NOTONCHANNEL, this, *it_chan));
+		// 	return;
+		// }
+	}
 	setMessage(reply);
 }
