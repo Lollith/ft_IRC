@@ -239,12 +239,12 @@ bool Client::checkSameNick()
 	size_t i = 0;
 	while ((_client->size() > 1) && (i != _client->size() - 1)) // broadcast the messag
 	{
-		if ((*_client)[i]->get_nickname() == this->_nickname)
+		if ((*_client)[i] != this && (*_client)[i]->get_nickname() == this->_nickname)
 		{
 			std::cout << BLUE_TXT << "differents clients have same nickname" << RESET_TXT << std::endl;
-			if ((*_client)[i] != this)
-				setMessage(reply(ERR_NICKNAMEINUSE, this));
+			// if ((*_client)[i] != this)
 			setMessage(reply(ERR_NICKNAMEINUSE, this));
+			// setMessage(reply(ERR_NICKNAMEINUSE, this));
 			return true;
 		}
 		i++;
@@ -294,203 +294,203 @@ void Client::Nick(std::string const &)
 		changeNick(old_nick);
 	}
 }
-		// if (checkNick() == true && checkSameNick(old_nick) == false)
-		// {
-		// 	std::cout << BLUE_TXT << "nickname valid" << RESET_TXT << std::endl;
-		// 	if (this->_step_registration < 4) // si entre dds cette condition : first authentification
-		// 	{
-		// 		std::cout << RED_TXT << "rentre ds la premiere auth de nick" << RESET_TXT << std::endl;
-		// 		this->_step_registration += 1;
-		// 	}
-		// 	else // si entre dans cette condition il s'agit d'un changement de nickname
-		// 	{
-		// 		std::cout << RED_TXT << "rentre ds change nick" << RESET_TXT << std::endl;
-		// 		changeNick(old_nick);
-		// 	}
-		// }
-		// else
-		// {
-		// 	std::cout << CYAN_TXT << " step registration in NICK parse= " << _step_registration << RESET_TXT << std::endl;
+// if (checkNick() == true && checkSameNick(old_nick) == false)
+// {
+// 	std::cout << BLUE_TXT << "nickname valid" << RESET_TXT << std::endl;
+// 	if (this->_step_registration < 4) // si entre dds cette condition : first authentification
+// 	{
+// 		std::cout << RED_TXT << "rentre ds la premiere auth de nick" << RESET_TXT << std::endl;
+// 		this->_step_registration += 1;
+// 	}
+// 	else // si entre dans cette condition il s'agit d'un changement de nickname
+// 	{
+// 		std::cout << RED_TXT << "rentre ds change nick" << RESET_TXT << std::endl;
+// 		changeNick(old_nick);
+// 	}
+// }
+// else
+// {
+// 	std::cout << CYAN_TXT << " step registration in NICK parse= " << _step_registration << RESET_TXT << std::endl;
 
-		// 	if (this->_step_registration < 4) // si invalid mais pdt l'étape d'authent
-		// 	{
-		// 		_step_registration = 0;
-		// 		_flag_shut_client = true;
-		// 		std::cout << RED_TXT << "dans le else nick invalid et first authent" << RESET_TXT << std::endl;
-		// 		return;
-		// 	}
-		// 	else
-		// 	{
-		// 		std::cout << CYAN_TXT << "last else" << RESET_TXT << std::endl;
-		// 	}
-		// }
+// 	if (this->_step_registration < 4) // si invalid mais pdt l'étape d'authent
+// 	{
+// 		_step_registration = 0;
+// 		_flag_shut_client = true;
+// 		std::cout << RED_TXT << "dans le else nick invalid et first authent" << RESET_TXT << std::endl;
+// 		return;
+// 	}
+// 	else
+// 	{
+// 		std::cout << CYAN_TXT << "last else" << RESET_TXT << std::endl;
+// 	}
+// }
 
-	void Client::checkUser(std::string const &)
+void Client::checkUser(std::string const &)
+{
+	std::cout << GREEN_TXT << "here is USER check func" << RESET_TXT << std::endl;
+
+	if (_step_registration == 4)
 	{
-		std::cout << GREEN_TXT << "here is USER check func" << RESET_TXT << std::endl;
-
-		if (_step_registration == 4)
-		{
-			setMessage(reply(ERR_ALREADYREGISTERED, this));
-			return;
-		}
-		if (_arg_registration.size() < 4)
-		{
-			setMessage(reply(ERR_NEEDMOREPARAMS, this));
-			return;
-		}
-
-		this->_step_registration += 1;
-		_user = _arg_registration[1];
-		_hostname = _arg_registration[2];
-
-		std::string res;
-		size_t pos = 0;
-
-		for (size_t i = 0; i != _arg_registration.size(); i++)
-		{
-			if (_arg_registration[i].find_first_of(':', 0) != std::string::npos)
-				pos = i;
-		}
-		res = _arg_registration[pos];
-		pos++;
-		for (; pos != _arg_registration.size(); pos++)
-		{
-			res += " " + _arg_registration[pos];
-		}
-		this->_realname = res;
-		std::cout << BLUE_TXT << "realname is ->" << _realname << RESET_TXT << std::endl;
-
-		if (_step_registration == 4)
-		{
-			std::string buffer = ": NICK :" + get_nickname() + "\r\n";
-			buffer += ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " 001 " + get_nickname() + " :Welcome to the " + _hostname + " Network " + _nickname + "!" + _user + "@" + _hostname + "\r\n";
-			_message.setBuffer(buffer);
-		}
+		setMessage(reply(ERR_ALREADYREGISTERED, this));
+		return;
+	}
+	if (_arg_registration.size() < 4)
+	{
+		setMessage(reply(ERR_NEEDMOREPARAMS, this));
+		return;
 	}
 
-	void Client::clean_ping_mode(std::string const &)
+	this->_step_registration += 1;
+	_user = _arg_registration[1];
+	_hostname = _arg_registration[2];
+
+	std::string res;
+	size_t pos = 0;
+
+	for (size_t i = 0; i != _arg_registration.size(); i++)
 	{
-		std::string msg = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " PONG " + this->_arg_registration.back() + "\r\n";
-		setMessage(msg);
+		if (_arg_registration[i].find_first_of(':', 0) != std::string::npos)
+			pos = i;
 	}
-
-	void Client::quit(std::string const &)
+	res = _arg_registration[pos];
+	pos++;
+	for (; pos != _arg_registration.size(); pos++)
 	{
-		INFO("HERE QUIT FUNC\n");
-		std::string res;
-		std::string quit_reason;
-		std::string broadcast_rpl;
-
-		// récupere le parametre apres les : (reason param)
-		size_t pos = 0;
-		for (size_t i = 0; i != _arg_registration.size(); i++)
-		{
-			if (_arg_registration[i].find_first_of(':', 0) != std::string::npos)
-				pos = i;
-		}
-		res = _arg_registration[pos];
-		pos++;
-		for (; pos != _arg_registration.size(); pos++)
-		{
-			res += " " + _arg_registration[pos];
-		}
-		quit_reason = res;
-
-		// send messages
-
-		setMessage("ERROR: Server closing a client connection\r\n");
-		broadcast_rpl = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "QUIT " + quit_reason + "\r\n";
-		broadcaster(broadcast_rpl);
-		// TODO
-		// for (it_chan = this->_channels->begin(); it_chan != _channels->end(); it_chan++)
-		// {
-		// 	if ((*it_chan)->hasClient(this))
-		// 	{
-		// 		std::vector<Client *> vectclients = (*it_chan)->getClients();
-		// 		std::vector<Client *>::iterator it_client;
-		//  ((*it_chan)->deleteClientFromChan(this));
-		//  if ((*it_chan)->getClients().size() < 1)
-		//  	(*it_chan)->set_flag_erase_chan(true);
-		this->_flag_shut_client = true;
+		res += " " + _arg_registration[pos];
 	}
+	this->_realname = res;
+	std::cout << BLUE_TXT << "realname is ->" << _realname << RESET_TXT << std::endl;
 
-	void Client::checkParams(std::string const &password)
+	if (_step_registration == 4)
 	{
-		int i = 0;
-		int nb_func = 6;
-		std::string rpl;
+		std::string buffer = ": NICK :" + get_nickname() + "\r\n";
+		buffer += ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " 001 " + get_nickname() + " :Welcome to the " + _hostname + " Network " + _nickname + "!" + _user + "@" + _hostname + "\r\n";
+		_message.setBuffer(buffer);
+	}
+}
 
-		void (Client::*func_list[])(std::string const &arg) =
-			{&Client::ignoreCap, &Client::checkPassword, &Client::Nick, &Client::checkUser,
-			 &Client::clean_ping_mode, &Client::quit};
-		std::string cmd_to_check[] = {"CAP", "PASS", "NICK", "USER", "PING", "QUIT"};
-		while (i < nb_func)
+void Client::clean_ping_mode(std::string const &)
+{
+	std::string msg = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " PONG " + this->_arg_registration.back() + "\r\n";
+	setMessage(msg);
+}
+
+void Client::quit(std::string const &)
+{
+	INFO("HERE QUIT FUNC\n");
+	std::string res;
+	std::string quit_reason;
+	std::string broadcast_rpl;
+
+	// récupere le parametre apres les : (reason param)
+	size_t pos = 0;
+	for (size_t i = 0; i != _arg_registration.size(); i++)
+	{
+		if (_arg_registration[i].find_first_of(':', 0) != std::string::npos)
+			pos = i;
+	}
+	res = _arg_registration[pos];
+	pos++;
+	for (; pos != _arg_registration.size(); pos++)
+	{
+		res += " " + _arg_registration[pos];
+	}
+	quit_reason = res;
+
+	// send messages
+
+	setMessage("ERROR: Server closing a client connection\r\n");
+	broadcast_rpl = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "QUIT " + quit_reason + "\r\n";
+	broadcaster(broadcast_rpl);
+	// TODO
+	// for (it_chan = this->_channels->begin(); it_chan != _channels->end(); it_chan++)
+	// {
+	// 	if ((*it_chan)->hasClient(this))
+	// 	{
+	// 		std::vector<Client *> vectclients = (*it_chan)->getClients();
+	// 		std::vector<Client *>::iterator it_client;
+	//  ((*it_chan)->deleteClientFromChan(this));
+	//  if ((*it_chan)->getClients().size() < 1)
+	//  	(*it_chan)->set_flag_erase_chan(true);
+	this->_flag_shut_client = true;
+}
+
+void Client::checkParams(std::string const &password)
+{
+	int i = 0;
+	int nb_func = 6;
+	std::string rpl;
+
+	void (Client::*func_list[])(std::string const &arg) =
+		{&Client::ignoreCap, &Client::checkPassword, &Client::Nick, &Client::checkUser,
+		 &Client::clean_ping_mode, &Client::quit};
+	std::string cmd_to_check[] = {"CAP", "PASS", "NICK", "USER", "PING", "QUIT"};
+	while (i < nb_func)
+	{
+		if (_cmd_registration == cmd_to_check[i])
 		{
-			if (_cmd_registration == cmd_to_check[i])
+			if (i > 1 && _flag_password_provided == false)
 			{
-				if (i > 1 && _flag_password_provided == false)
-				{
-					rpl = reply(ERR_NOTREGISTERED, this);
-					rpl += "ERROR: Server closing a client connection because need registration.\r\n";
-					setMessage(rpl);
-					_flag_shut_client = true;
-					_step_registration = 0;
-					return;
-				}
-				else
-				{
-					(this->*(func_list[i]))(password);
-					break;
-				}
+				rpl = reply(ERR_NOTREGISTERED, this);
+				rpl += "ERROR: Server closing a client connection because need registration.\r\n";
+				setMessage(rpl);
+				_flag_shut_client = true;
+				_step_registration = 0;
+				return;
 			}
-			i++;
+			else
+			{
+				(this->*(func_list[i]))(password);
+				break;
+			}
 		}
+		i++;
 	}
+}
 
-	void Client::Clean_arg()
+void Client::Clean_arg()
+{
+	std::vector<std::string>::iterator it = _arg_registration.begin();
+	while (it != _arg_registration.end())
+		_arg_registration.erase(it);
+}
+
+void Client::getCmdLine(std::string const &password)
+{
+	const std::string eol_marker = "\r\n"; // à mettre ds un define?
+
+	size_t pos;
+	std::string cmd_line;
+
+	pos = this->_message_recv.find(eol_marker);
+	while (pos != std::string::npos)
 	{
-		std::vector<std::string>::iterator it = _arg_registration.begin();
-		while (it != _arg_registration.end())
-			_arg_registration.erase(it);
-	}
-
-	void Client::getCmdLine(std::string const &password)
-	{
-		const std::string eol_marker = "\r\n"; // à mettre ds un define?
-
-		size_t pos;
-		std::string cmd_line;
-
+		cmd_line = _message_recv.substr(0, pos);
+		set_arg();
+		tokenization_cmd(cmd_line);
+		checkParams(password);
+		_message_recv.erase(_message_recv.begin(), (_message_recv.begin() + pos + eol_marker.length()));
 		pos = this->_message_recv.find(eol_marker);
-		while (pos != std::string::npos)
-		{
-			cmd_line = _message_recv.substr(0, pos);
-			set_arg();
-			tokenization_cmd(cmd_line);
-			checkParams(password);
-			_message_recv.erase(_message_recv.begin(), (_message_recv.begin() + pos + eol_marker.length()));
-			pos = this->_message_recv.find(eol_marker);
-		}
 	}
+}
 
-	// TODO fix broadcast for quit and nick
-	//  voir fonction PART d'Adeline
-	void Client::broadcaster(std::string const &reply)
+// TODO fix broadcast for quit and nick
+//  voir fonction PART d'Adeline
+void Client::broadcaster(std::string const &reply)
+{
+	std::vector<Channel *>::iterator it_chan;
+	for (it_chan = this->_channels->begin(); it_chan != _channels->end(); it_chan++)
 	{
-		std::vector<Channel *>::iterator it_chan;
-		for (it_chan = this->_channels->begin(); it_chan != _channels->end(); it_chan++)
+		if ((*it_chan)->hasClient(this))
 		{
-			if ((*it_chan)->hasClient(this))
+			std::vector<Client *> vectclients = (*it_chan)->getClients();
+			std::vector<Client *>::iterator it_client;
+			for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
 			{
-				std::vector<Client *> vectclients = (*it_chan)->getClients();
-				std::vector<Client *>::iterator it_client;
-				for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
-				{
-					if (*it_client != this) // do not send the message channels times to this
-						(*it_client)->setMessage(reply);
-				}
+				if (*it_client != this) // do not send the message channels times to this
+					(*it_client)->setMessage(reply);
 			}
 		}
-		setMessage(reply);
 	}
+	setMessage(reply);
+}
