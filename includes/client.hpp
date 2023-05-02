@@ -68,6 +68,7 @@ public:
 	void 						Clean_arg( void );
 	void						quit(std::string const &);
 	void						broadcaster(std::string const& reply);
+	void 						authenticationValid();
 
 	void						setVectorClient(std::vector<Client*> *_ptr_client);
 	void						setVectorChan(std::vector<Channel*> *_ptr_chan);

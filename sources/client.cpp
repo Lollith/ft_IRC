@@ -157,7 +157,7 @@ void Client::ignoreCap(std::string const &)
 {
 	std::cout << GREEN_TXT << "here is CAP check func" << RESET_TXT << std::endl;
 
-	this->_step_registration += 1;
+	this->_step_registration |= 1;
 }
 
 // FERMER LE SOCKET CLIENT SI PASSWD FAUX + GARDER LE SERVEUR ALIVE
@@ -171,7 +171,7 @@ void Client::checkPassword(std::string const &psswd)
 
 	if (_arg_registration.back() == psswd)
 	{
-		this->_step_registration += 1;
+		this->_step_registration |= 2;
 		this->_flag_password_ok = true;
 		std::cout << GREEN_TXT << "PASSWORD OK : " << _flag_password_ok << RESET_TXT << std::endl;
 	}
@@ -254,7 +254,10 @@ bool Client::checkSameNick()
 
 void Client::changeNick(std::string const &old_nick)
 {
-	std::string message = ":" + old_nick + "!" + get_user() + "@" + get_hostname() + " NICK :" + _nickname + "\r\n";
+	std::string message = ":";
+	if (old_nick.size() && get_user().size() && get_hostname().size())
+		message += old_nick + "!" + get_user() + "@" + get_hostname();
+	message += " NICK :" + _nickname + "\r\n";
 	broadcaster(message);
 }
 
@@ -282,17 +285,20 @@ void Client::Nick(std::string const &)
 		return;
 	}
 	// if (checkSameNick(old_nick) == true)
+	std::cout << CYAN_TXT << "changing nick ? Step Registration = " << _step_registration << std::endl;
+	//if (_step_registration < 4)
+	//	_step_registration += 1;
+	//else
 	if (checkSameNick() == true)
-		changeNick(old_nick);
-	if (_step_registration < 4)
 	{
-		_step_registration += 1;
-		_nick_first_init = true;
+		std::cout << CYAN_TXT << "here, same nicks == true" << RESET_TXT << std::endl;
+		if (_step_registration == 15)
+			_nickname = old_nick; // revenir en  arrière en cas de nick already use
+		return;
 	}
-	else
-	{
-		changeNick(old_nick);
-	}
+	if ((_step_registration & 4) == 0)
+		_step_registration |= 4;
+	changeNick(old_nick);
 }
 // if (checkNick() == true && checkSameNick(old_nick) == false)
 // {
@@ -319,7 +325,7 @@ void Client::Nick(std::string const &)
 // 		std::cout << RED_TXT << "dans le else nick invalid et first authent" << RESET_TXT << std::endl;
 // 		return;
 // 	}
-// 	else
+// 	elseget_nickname
 // 	{
 // 		std::cout << CYAN_TXT << "last else" << RESET_TXT << std::endl;
 // 	}
@@ -340,7 +346,7 @@ void Client::checkUser(std::string const &)
 		return;
 	}
 
-	this->_step_registration += 1;
+	this->_step_registration |= 8;
 	_user = _arg_registration[1];
 	_hostname = _arg_registration[2];
 
@@ -360,13 +366,6 @@ void Client::checkUser(std::string const &)
 	}
 	this->_realname = res;
 	std::cout << BLUE_TXT << "realname is ->" << _realname << RESET_TXT << std::endl;
-
-	if (_step_registration == 4)
-	{
-		std::string buffer = ": NICK :" + get_nickname() + "\r\n";
-		buffer += ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " 001 " + get_nickname() + " :Welcome to the " + _hostname + " Network " + _nickname + "!" + _user + "@" + _hostname + "\r\n";
-		_message.setBuffer(buffer);
-	}
 }
 
 void Client::clean_ping_mode(std::string const &)
@@ -440,7 +439,10 @@ void Client::checkParams(std::string const &password)
 			}
 			else
 			{
+				int before_step = this->_step_registration;
 				(this->*(func_list[i]))(password);
+				if (before_step != this->_step_registration)
+					this->authenticationValid();
 				break;
 			}
 		}
@@ -493,4 +495,14 @@ void Client::broadcaster(std::string const &reply)
 		}
 	}
 	setMessage(reply);
+}
+
+void Client::authenticationValid()
+{
+	if (_step_registration == 15)
+	{
+		// std::string buffer = ": NICK :" + get_nickname() + "\r\n";
+		std::string buffer = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " 001 " + get_nickname() + " :Welcome to the " + _hostname + " Network " + _nickname + "!" + _user + "@" + _hostname + "\r\n";
+		_message.setBuffer(buffer);
+	}
 }
