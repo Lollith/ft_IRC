@@ -63,6 +63,7 @@ public:
 
 	void 				stop();
 	void 				welcome_new_chan( Client *client, Channel *channel );
+	void 				broadcast(Client *client, Channel *chan);
 	void 				privmsg_to_chan(Client *client, std::string &priv, std::string &targe, std::string &msgt);
 	void 				privmg_to_client(Client *client,std::string &priv, std::string &target,std::string &msg );
 	// void 				names( Client *client );

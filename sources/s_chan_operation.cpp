@@ -18,35 +18,65 @@ void Server::parse_msg_recv(Client *client, std::string msg_recv)
 		{
 			(this->*fct_member[i])(client);
 			client->set_arg();
-			client->setMsgRecvSave(""); // reinitialise le message recu sinon boucle sur /quit
+			// client->setMsgRecvSave(""); // reinitialise le message recu sinon boucle sur /quit
 		}
 	}
+}
+
+void Server::broadcast(Client *client, Channel *chan)
+{
+	std::string nickname = client->get_nickname();
+	std::string join_msg_all = ":"+ nickname + "@" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
+	for (size_t i = 0; i!= chan->getClients().size(); i++)
+	{
+		// if (chan->getClients()[i] != client)
+			chan->getClients()[i]->setMessage(join_msg_all);
+	}
+	return;
+
 }
 
 void Server::join( Client *client)
 {
 	//TODO : tabl de channel pour recup la liste des arg => plusieurs channels
-	// Channel *channel = 
+	std::vector<std::string > list_channel;
+	size_t i = 0;
+	while(i < client->get_arg().size())
+	{
+		// std::cout << client->get_arg()[i]<< std::endl;
+		list_channel.push_back(client->get_arg()[i]);
+		i++;
+	} 
 	
-	std::string channel = client->get_arg().back();
-
 
 	std::vector<Channel*>::iterator it;	
 	for (it = _channels.begin(); it != _channels.end(); it++) // 1er n existe pas , ne rentre pas
 	{
-		if ((*it)->getName() == channel) // si  channel existe
+		i = 0;
+		while(i < list_channel.size())
 		{
-			INFO("=>Join le channel\n");
-			(*it)->addClient(client);
-			welcome_new_chan(client, *it);
-			return;
+			if ((*it)->getName() == list_channel[i]) // si  channel existe
+			{
+				INFO("=>Join le channel\n");
+				(*it)->addClient(client);
+				welcome_new_chan(client, *it);
+			}
+			i++;
 		}
+		//TODO return ici => separer la fct
 	}
-	_channels.push_back(new Channel( channel)); // si chan n existe pas => le creer
-	INFO("creation Channel " + channel + "\n");
-	_channels.back()->addClient(client);
-	 client->_chan_ope = true;
-	welcome_new_chan(client, _channels.back());	
+	// for(size_t i = 0; i != 10; i++)
+	i = 0;
+	while(i < list_channel.size())
+	{
+		_channels.push_back(new Channel( list_channel[i])); // si chan n existe pas => le creer
+		INFO("creation Channel " + list_channel[i] + "\n");
+		_channels.back()->addClient(client);
+		client->_chan_ope = true;
+		welcome_new_chan(client, _channels.back());
+		i++;
+	}
+		return;
 }
 
 //A JOIN message with the client as the message <source> and the channel they 
@@ -59,11 +89,9 @@ void Server::welcome_new_chan(Client *client, Channel *channel)
 {
 //broadcast the message :nouveau client joigned aux autres du chan
 	std::string nickname = client->get_nickname();
-		
-	std::string join_msg = ":"+ nickname + "@" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
-	for (size_t i = 0; i!= channel->getClients().size(); i++)
-		channel->getClients()[i]->setMessage(join_msg);
-		// std::cout << channel->getClients()[i]->get_nickname()<<std::endl;
+	broadcast(client, channel);
+	
+	std::string join_msg;
 	if(channel->getTopic() == "")
 		join_msg += reply(RPL_NOTOPIC, client, channel->getName());
 	else
