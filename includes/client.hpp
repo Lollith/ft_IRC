@@ -60,6 +60,8 @@ public:
 	bool						NicknameIsValid();
 	void						Nick(std::string const&);
 	bool						checkNick();
+	// bool						checkSameNick(std::string const &old_nick);
+	bool						checkSameNick();
 	void						changeNick(std::string const& old_nick);
 	void						checkUser( std::string const& );
 	void 						clean_ping_mode(std::string const &arg);
@@ -85,6 +87,7 @@ private:
 	bool						_flag_password_ok;
 	bool						_flag_password_provided;
 	bool						_flag_shut_client;
+	bool						_nick_first_init;
 	std::string					_message_recv; // modifiee apres getcmdline
 	std::string					_message_recv_save; //non modifiee apres getcmdline
 	std::string 				_cmd_registration;
