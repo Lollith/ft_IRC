@@ -1,5 +1,5 @@
-#ifndef IRC_H
-# define IRC_H
+#ifndef IRC_HPP
+# define IRC_HPP
 
 #include <stdio.h>
 #include <cstring>
@@ -18,6 +18,8 @@
 #include "channel.hpp"
 #include "server.hpp"
 // #include <utility> //pair
+class Channel;
+class Client;
 
 #define RESET_TXT "\e[0m"
 

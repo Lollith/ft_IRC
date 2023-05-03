@@ -1,7 +1,7 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include "irc.h"
+#include "irc.hpp"
 
 class Channel;
 class Client
@@ -41,7 +41,11 @@ public:
 
 	void 						set_arg( void );
 	std::vector<std::string>  	get_arg( void ) const;
+	
+	void 						add_chan_ope( Channel *chan );
+	std::vector<Channel*>	  	get_chan_ope( void ) const;
 
+	
 	std::string					get_user( void ) const;
 	std::string					get_hostname( void ) const;
 
@@ -69,9 +73,9 @@ public:
 	//define typedef ici pour struct sockaddr_in??
 
 	void						setVectorClient(std::vector<Client*> *_ptr_client);
-
+	void 						deleteOperator(Channel *chan);
+	bool 						is_operator(Channel *chan);
 	
-	bool						_chan_ope;//TODO a passer en private +setter
 
 
 
@@ -102,7 +106,7 @@ private:
 	
 	std::vector<std::string>	_arg_registration;
 	std::vector<Client*>		*_client;
-
+	std::vector <Channel *>		_chan_ope;//TODO a passer en private +setter
 };
 
 #include "channel.hpp"

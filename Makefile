@@ -9,6 +9,7 @@ SRC = $(addprefix $(SRC_PATHS),\
 	s_chan_operation.cpp\
 	s_messages.cpp\
 	client.cpp\
+	c_operator.cpp\
 	message.cpp\
 	channel.cpp\
 	numerics_replies.cpp\

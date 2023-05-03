@@ -1,4 +1,4 @@
-#include "irc.h"
+#include "irc.hpp"
 
 // The PRIVMSG command is used to send private messages between users, as well 
 // as to send messages to channels. <target> is the nickname of a client or the name of a channel.(#)

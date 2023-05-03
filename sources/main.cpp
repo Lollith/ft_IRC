@@ -1,4 +1,4 @@
-#include "irc.h"
+#include "irc.hpp"
 
 //__________________________________________________________
 // en globale: définition dun ptr sur objet Server dans le but

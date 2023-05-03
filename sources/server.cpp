@@ -1,4 +1,4 @@
-#include "irc.h"
+#include "irc.hpp"
 
 //__________________________________________________canonic form
 

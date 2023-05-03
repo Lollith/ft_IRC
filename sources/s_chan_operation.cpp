@@ -1,4 +1,4 @@
-#include "irc.h"
+#include "irc.hpp"
 //-----fct _channels------------------------------------------------------------
 void Server::parse_msg_recv(Client *client, std::string msg_recv)
 {
@@ -52,19 +52,18 @@ void Server::join( Client *client)
 
 	while(i < client->get_arg().size())
 	{
-		Channel * chan = searchChan(client->get_arg()[i]);
+		Channel *chan = searchChan(client->get_arg()[i]);
 		if (!chan)
 		{
 			chan = new Channel( client->get_arg()[i]);
 			_channels.push_back(chan); // si chan n existe pas => le creer
 			INFO("creation Channel " + client->get_arg()[i] + "\n");
-			client->_chan_ope = true;
+			client->add_chan_ope(chan);
 		}
-
 			INFO("=>Join le channel\n");
 			(chan)->addClient(client);
 			welcome_new_chan(client, chan);
-			chan->check_vctor();
+			chan->check_vctor(client);
 		i++;
 	}
 }
@@ -112,11 +111,11 @@ void Server::part(Client *client)
 	if (client->get_arg().size() == 2)
 		msg = client->get_arg().back();
 	
-	Channel *chan = has_chan(client);
+	Channel *chan = has_chan(client); // check si chan existe
 	if(chan!= NULL)
 	{
 		INFO("=>leave le channel" << std::endl);
-		if(chan->hasClient(client))
+		if(chan->has_clients(client))
 		{
 			std::string message =  ":" + client->get_nickname()+ "@" + client->get_hostname() + " PART " + chan_arg + " " + msg + "\r\n";
 			std::vector<Client*> vectclients = chan->getClients();
@@ -124,11 +123,12 @@ void Server::part(Client *client)
 			for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
 					(*it_client)->setMessage(message);
 			chan->deleteClientFromChan(client);
-			client->_chan_ope = false;
+			client->deleteOperator(chan);
 			if(chan->getClients().size() < 1)
 				chan->set_flag_erase_chan(true);
-			chan->search_new_ope();
-			chan->check_vctor();
+			else
+				chan->search_new_ope(client);
+			chan->check_vctor(client);
 			return;
 		}
 		else
@@ -144,20 +144,26 @@ void Server::part(Client *client)
 	}
 }
 
-//TODO chan_op = depend pas du chan => a corriger=> pair? // ou refaire en plus un vector ds channel
-//faire un pointeur sur le client operator ds chan
 void Server::topic(Client *client)
 {
+
 	Channel *chan = has_chan(client);
 	std::string msg;
+	std::string chan_arg = client->get_arg().at(0);
 //TODO : parcourir la liste de chan donner comme pour join
-	if (chan)
+	if (chan) // arg[0]
 	{
-		if(client->_chan_ope == false)
+		if(!chan->has_clients(client))
 		{
-			msg = reply(ERR_CHANOPRIVSNEEDED, client, chan->getName());
+			client->setMessage(reply(ERR_NOTONCHANNEL, client, chan_arg));
 			return;
 		}
+		if(!client->is_operator(chan))
+		{
+			client->setMessage(reply(ERR_CHANOPRIVSNEEDED, client, chan->getName()));
+			return;
+		}
+		
 		chan->setTopic( "" );
 		msg = reply(RPL_NOTOPIC, client, chan->getName());
 
@@ -169,9 +175,13 @@ void Server::topic(Client *client)
 		std::cout << msg << std::endl;
 		client->setMessage(msg);
 	}
-}//TODO
-// ERR_NOSUCHCHANNEL (403)
-// ERR_NOTONCHANNEL (442)
+	else 
+	{
+		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, chan_arg));
+		return;
+	}
+}
+//TODO
 // RPL_TOPICWHOTIME (333)
 //envoyer a tous les clients le new topic memem vide
 

@@ -1,7 +1,7 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include "irc.h"
+#include "irc.hpp"
 
 #define BACKLOG 10
 
@@ -89,5 +89,5 @@ private:
 	std::vector<Channel*>	_channels;
 };
 
-#include "irc.h"
+#include "irc.hpp"
 #endif

@@ -1,4 +1,4 @@
-#include "irc.h"
+#include "irc.hpp"
 
 std::string reply (int reply, Client *client, Channel *channel)
 {

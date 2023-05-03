@@ -1,8 +1,8 @@
 #ifndef CHANNEL_HPP
 #define CHANNEL_HPP
 
-#include "irc.h"
-
+#include "irc.hpp"
+class Client;
 class Channel{
 	public:
 		Channel( std::string name );
@@ -17,11 +17,13 @@ class Channel{
 		bool					get_flag_erase_chan( void ) const;
 		void					set_flag_erase_chan( bool );
 
-		bool 					hasClient(Client *client);
+		bool 					has_clients(Client *client);
+
 		void 					addClient(Client *client);
 		void 					deleteClientFromChan(Client *client);
-		void 					search_new_ope();
-		void 					check_vctor();
+
+		void 					search_new_ope(Client *client);
+		void 					check_vctor(Client *);
 
 		
 	private:
