@@ -354,7 +354,7 @@ void Client::quit(std::string const &)
 	std::vector<Channel *>::iterator it_chan;
 	for (it_chan = this->_channels->begin(); it_chan != _channels->end(); it_chan++)
 	{
-		if ((*it_chan)->hasClient(this))
+		if ((*it_chan)->has_clients(this))
 		{
 			broadcast_rpl = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "QUIT " + quit_reason + "\r\n";
 			std::vector<Client *> vectclients = (*it_chan)->getClients();
@@ -444,7 +444,7 @@ void Client::broadcaster(std::string const &reply)
 	std::vector<Channel *>::iterator it_chan;
 	for (it_chan = this->_channels->begin(); it_chan != _channels->end(); it_chan++)
 	{
-		if ((*it_chan)->hasClient(this))
+		if ((*it_chan)->has_clients(this))
 		{
 			std::vector<Client *> vectclients = (*it_chan)->getClients();
 			std::vector<Client *>::iterator it_client;
