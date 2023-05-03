@@ -60,12 +60,17 @@ public:
 	bool						NicknameIsValid();
 	void						Nick(std::string const&);
 	bool						checkNick();
+	// bool						checkSameNick(std::string const &old_nick);
+	bool						checkSameNick();
 	void						changeNick(std::string const& old_nick);
 	void						checkUser( std::string const& );
 	void 						clean_ping_mode(std::string const &arg);
 	void 						Clean_arg( void );
 	void						quit(std::string const &);
 	void						broadcaster(std::string const& reply);
+	void 						authenticationValid();
+	bool						isAuthenticate();
+
 
 	void						setVectorClient(std::vector<Client*> *_ptr_client);
 	void						setVectorChan(std::vector<Channel*> *_ptr_chan);
@@ -85,6 +90,10 @@ private:
 	bool						_flag_password_ok;
 	bool						_flag_password_provided;
 	bool						_flag_shut_client;
+	bool						_cap_ok;
+	bool						_pass_ok;
+	bool						_nick_ok;
+	bool						_user_ok;
 	std::string					_message_recv; // modifiee apres getcmdline
 	std::string					_message_recv_save; //non modifiee apres getcmdline
 	std::string 				_cmd_registration;

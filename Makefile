@@ -1,6 +1,6 @@
 NAME = ircserv
-CXX = c++
-# CXX = g++ #pour pouvoir utiliser lldb à enlever !! 
+# CXX = c++
+CXX = g++ #pour pouvoir utiliser lldb à enlever !! 
 
 SRC_PATHS = ./sources/
 

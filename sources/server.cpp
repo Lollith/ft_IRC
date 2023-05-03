@@ -308,7 +308,14 @@ void Server::check_vectors()
 	DEBUG("vector _channels: ");
 	std::vector<Channel*>::iterator it;	
 	for (it = _channels.begin(); it != _channels.end(); it++)
+	{
 		DEBUG((*it)->getName()<<" ");
+		std::vector<Client*> clients = (*it)->getClients();
+		for (std::vector<Client*>::iterator cit =  clients.begin(); cit != clients.end(); cit++)
+		{
+			DEBUG("  << " + (*cit)->get_nickname());
+		}
+	}
 	DEBUG(std::endl);
 	
 	DEBUG("vector _clients: ");
