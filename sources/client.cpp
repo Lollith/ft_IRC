@@ -10,7 +10,7 @@ Client::Client(void) : _step_registration(0), _flag_password_ok(false), _flag_pa
 
 Client::Client(int sock_client) : _socket_client(sock_client), _step_registration(0), _flag_password_ok(false),
 								  _flag_password_provided(false), _flag_shut_client(false),
-								  _cap_ok(false), _pass_ok(false), _nick_ok(false), _user_ok(false), 
+								  _cap_ok(false), _pass_ok(false), _nick_ok(false), _user_ok(false),
 								  _user(""), _nickname(""), _hostname("")
 
 {
@@ -275,7 +275,7 @@ void Client::Nick(std::string const &)
 	if (_nick_ok == false)
 	{
 		this->_nick_ok = true;
-		this->_step_registration +=1;
+		this->_step_registration += 1;
 	}
 	changeNick(old_nick);
 }
@@ -331,7 +331,7 @@ void Client::quit(std::string const &)
 	std::string quit_reason;
 	std::string broadcast_rpl;
 
-	// récupere le parametre apres les : (reason param)
+	// récupere le parametre apres les ´:´ (reason param)
 	size_t pos = 0;
 	for (size_t i = 0; i != _arg_registration.size(); i++)
 	{
@@ -347,21 +347,34 @@ void Client::quit(std::string const &)
 	quit_reason = res;
 
 	// send messages
+	// TODO //ONGOING
 
 	setMessage("ERROR: Server closing a client connection\r\n");
-	broadcast_rpl = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "QUIT " + quit_reason + "\r\n";
-	broadcaster(broadcast_rpl);
-	// TODO
-	// for (it_chan = this->_channels->begin(); it_chan != _channels->end(); it_chan++)
-	// {
-	// 	if ((*it_chan)->hasClient(this))
-	// 	{
-	// 		std::vector<Client *> vectclients = (*it_chan)->getClients();
-	// 		std::vector<Client *>::iterator it_client;
-	//  ((*it_chan)->deleteClientFromChan(this));
-	//  if ((*it_chan)->getClients().size() < 1)
-	//  	(*it_chan)->set_flag_erase_chan(true);
-	this->_flag_shut_client = true;
+	std::vector<Channel *>::iterator it_chan;
+	for (it_chan = this->_channels->begin(); it_chan != _channels->end(); it_chan++)
+	{
+		if ((*it_chan)->hasClient(this))
+		{
+			broadcast_rpl = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "QUIT " + quit_reason + "\r\n";
+			std::vector<Client *> vectclients = (*it_chan)->getClients();
+			std::vector<Client *>::iterator it_client;
+			for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
+			{
+				if (*it_client != this) // do not send the message channels times to this
+					(*it_client)->setMessage(broadcast_rpl);
+			}
+			((*it_chan)->deleteClientFromChan(this));
+			if ((*it_chan)->getClients().size() < 1)
+				(*it_chan)->set_flag_erase_chan(true);
+			this->_flag_shut_client = true;
+			return;
+		}
+		else
+		{
+			setMessage(reply(ERR_NOTONCHANNEL, this, (*it_chan)));
+			return;
+		}
+	}
 }
 
 void Client::checkParams(std::string const &password)
@@ -425,8 +438,6 @@ void Client::getCmdLine(std::string const &password)
 	}
 }
 
-// TODO fix broadcast for quit and nick
-//  voir fonction PART d'Adeline
 void Client::broadcaster(std::string const &reply)
 {
 	std::vector<Channel *>::iterator it_chan;
