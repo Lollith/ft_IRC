@@ -62,6 +62,26 @@ void Channel::deleteClientFromChan(Client *client)
 		else
 			it++;
 	}
-
 }
 
+void Channel::search_new_ope()
+{
+	if (_clients.size() > 0 )
+		_clients.at(0)->_chan_ope = true;
+}
+
+void Channel::check_vctor()
+{
+	DEBUG("vector _client in chan: ");
+	std::vector<Client*>::iterator it_client;
+	for (it_client = _clients.begin(); it_client != _clients.end(); it_client++)// ici si remplace _clients par getClients())
+		DEBUG((*it_client)->get_nickname() << " ");
+	
+	std::cout <<std::endl;
+	std::vector<Client*>::iterator it2_client;
+	for (it2_client = _clients.begin(); it2_client != _clients.end(); it2_client++)// ici si remplace _clients par getClients())
+	{
+		if ((*it2_client)->_chan_ope == true)
+			DEBUG ((*it2_client)->get_nickname()<< " is operator of chan "<<(*this).getName()<< std::endl);
+	}
+}

@@ -64,6 +64,7 @@ void Server::join( Client *client)
 			INFO("=>Join le channel\n");
 			(chan)->addClient(client);
 			welcome_new_chan(client, chan);
+			chan->check_vctor();
 		i++;
 	}
 }
@@ -105,7 +106,7 @@ void Server::welcome_new_chan(Client *client, Channel *channel)
 void Server::part(Client *client)
 {	
 	std::string msg = "";
-	//TODO part tous les chans de la list
+	//TODO part tous les chans de la list ?
 	std::string chan_arg = client->get_arg().at(0);
 	
 	if (client->get_arg().size() == 2)
@@ -124,9 +125,10 @@ void Server::part(Client *client)
 					(*it_client)->setMessage(message);
 			chan->deleteClientFromChan(client);
 			client->_chan_ope = false;
-			//TODO chercher le client n 0 de la liste => le passer en operator
 			if(chan->getClients().size() < 1)
 				chan->set_flag_erase_chan(true);
+			chan->search_new_ope();
+			chan->check_vctor();
 			return;
 		}
 		else
@@ -142,19 +144,20 @@ void Server::part(Client *client)
 	}
 }
 
-//si operator ://TODO
+//TODO chan_op = depend pas du chan => a corriger=> pair? // ou refaire en plus un vector ds channel
+//faire un pointeur sur le client operator ds chan
 void Server::topic(Client *client)
 {
-	if(client->_chan_ope == false)
-	{
-		// ERR_CHANOPRIVSNEEDED (482) //TODO
-		return;
-	}
 	Channel *chan = has_chan(client);
 	std::string msg;
 //TODO : parcourir la liste de chan donner comme pour join
 	if (chan)
 	{
+		if(client->_chan_ope == false)
+		{
+			msg = reply(ERR_CHANOPRIVSNEEDED, client, chan->getName());
+			return;
+		}
 		chan->setTopic( "" );
 		msg = reply(RPL_NOTOPIC, client, chan->getName());
 
@@ -163,7 +166,8 @@ void Server::topic(Client *client)
 			chan->setTopic(client->get_arg().at(1));
 			msg = reply(RPL_TOPIC, client, chan);
 		}
-		client->setMessage((msg));
+		std::cout << msg << std::endl;
+		client->setMessage(msg);
 	}
 }//TODO
 // ERR_NOSUCHCHANNEL (403)

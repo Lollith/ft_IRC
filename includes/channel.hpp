@@ -20,6 +20,8 @@ class Channel{
 		bool 					hasClient(Client *client);
 		void 					addClient(Client *client);
 		void 					deleteClientFromChan(Client *client);
+		void 					search_new_ope();
+		void 					check_vctor();
 
 		
 	private:

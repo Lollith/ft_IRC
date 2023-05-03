@@ -30,7 +30,7 @@ std::string reply (int reply, Client *client, std::string target)
 	{
 		
 		case RPL_NOTOPIC:
-			msg = "331 " + client->get_nickname() + " " + target +" :No topic is set\r\n";
+			msg = "331 " + client->get_nickname() + " " + target + " :No topic is set\r\n";
 			break;
 		
 		case RPL_ENDOFNAMES:
@@ -47,6 +47,10 @@ std::string reply (int reply, Client *client, std::string target)
 		
 		case ERR_NOTONCHANNEL:
 			msg = "442 " + client->get_nickname() + " " + target + " :You're not on that channel\r\n";
+			break;
+
+		case ERR_CHANOPRIVSNEEDED:
+			msg = "482 " + client->get_nickname() + " " + target + " :You're not channel operator\r\n";
 			break;
 
 		default:
