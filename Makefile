@@ -19,12 +19,12 @@ OBJ		=	$(SRC:./sources/%.cpp=./build/%.o)
 DEP		=	$(SRC:./sources/%.cpp=./build/%.d)
 INC		=	-I ./includes/
 
-CXXFLAGS = -MMD -g3 -Wall -Wextra -Werror -std=c++98 
+CXXFLAGS = -MMD -g3 -Wall -Wextra -Werror -std=c++98 $(INC)
 # CXXFLAGS += -fsanitize=address
 
 build/%.o:	./sources/%.cpp
 			mkdir -p build
-			$(CXX) $(CXXFLAGS) -c $< -o $@ $(INC)
+			$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(NAME): $(OBJ)
 		$(CXX) $(CXXFLAG) $(OBJ) -o $(NAME)
@@ -42,7 +42,7 @@ re: fclean
 	make -C .
 
 grind: $(NAME)
-	valgrind --track-origins=yes --track-fds=yes --leak-check=full --show-leak-kinds=all ./ircserv 6667 coucou
+	valgrind -s --track-origins=yes --track-fds=yes --leak-check=full --show-leak-kinds=all ./ircserv 6667 coucou
 
 .PHONY: all re clean fclean grind
 

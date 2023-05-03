@@ -270,9 +270,9 @@ bool Server::loop_recept_send()
 			{
 				myrecv(client);
 				client->setVectorClient(&_client);
+				client->setVectorChan(&_channels);
 				client->getCmdLine(_password);
-				//verif l'authent avant d'appeler ces fonctions
-				//mélanger les deux ptr sur fonction
+		
 				parse_msg_recv(client, client->getMsgRecvSave());
 				check_vectors();
 			}
@@ -298,7 +298,7 @@ bool Server::loop_recept_send()
 			}
 			else
 				i++;
-		}//TODO: a faire aussi lorsaue l on /quit ds un chan
+		}//TODO a faire aussi lorsaue l on /quit ds un chan
 	}
 	return true;
 }
@@ -308,7 +308,14 @@ void Server::check_vectors()
 	DEBUG("vector _channels: ");
 	std::vector<Channel*>::iterator it;	
 	for (it = _channels.begin(); it != _channels.end(); it++)
+	{
 		DEBUG((*it)->getName()<<" ");
+		std::vector<Client*> clients = (*it)->getClients();
+		for (std::vector<Client*>::iterator cit =  clients.begin(); cit != clients.end(); cit++)
+		{
+			DEBUG("  << " + (*cit)->get_nickname());
+		}
+	}
 	DEBUG(std::endl);
 	
 	DEBUG("vector _clients: ");

@@ -8,7 +8,6 @@ class Client
 {
 public:
 
-	std::string _old_nickname;
 	//__________________________________________________canonic form
 
 	Client(int sock_client);
@@ -64,22 +63,25 @@ public:
 	bool						NicknameIsValid();
 	void						Nick(std::string const&);
 	bool						checkNick();
+	// bool						checkSameNick(std::string const &old_nick);
+	bool						checkSameNick();
 	void						changeNick(std::string const& old_nick);
 	void						checkUser( std::string const& );
 	void 						clean_ping_mode(std::string const &arg);
 	void 						Clean_arg( void );
 	void						quit(std::string const &);
+	void						broadcaster(std::string const& reply);
+	void 						authenticationValid();
+	bool						isAuthenticate();
 
-	//define typedef ici pour struct sockaddr_in??
 
 	void						setVectorClient(std::vector<Client*> *_ptr_client);
+
+	void						setVectorChan(std::vector<Channel*> *_ptr_chan);
+
 	void 						deleteOperator(Channel *chan);
 	bool 						is_operator(Channel *chan);
 	
-
-
-
-
 
 private:
 	// useless constructor
@@ -96,6 +98,10 @@ private:
 	bool						_flag_password_ok;
 	bool						_flag_password_provided;
 	bool						_flag_shut_client;
+	bool						_cap_ok;
+	bool						_pass_ok;
+	bool						_nick_ok;
+	bool						_user_ok;
 	std::string					_message_recv; // modifiee apres getcmdline
 	std::string					_message_recv_save; //non modifiee apres getcmdline
 	std::string 				_cmd_registration;
@@ -106,7 +112,9 @@ private:
 	
 	std::vector<std::string>	_arg_registration;
 	std::vector<Client*>		*_client;
-	std::vector <Channel *>		_chan_ope;//TODO a passer en private +setter
+	std::vector<Channel*>		*_channels;
+	std::vector <Channel *>		_chan_ope;
+
 };
 
 #include "channel.hpp"
