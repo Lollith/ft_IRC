@@ -10,7 +10,8 @@ Client::Client(void) : _step_registration(0), _flag_password_ok(false), _flag_pa
 
 Client::Client(int sock_client) : _socket_client(sock_client), _step_registration(0), _flag_password_ok(false),
 								  _flag_password_provided(false), _flag_shut_client(false),
-								  _cap_ok(false), _pass_ok(false), _nick_ok(false), _user(""), _nickname(""), _hostname("")
+								  _cap_ok(false), _pass_ok(false), _nick_ok(false), _user_ok(false), 
+								  _user(""), _nickname(""), _hostname("")
 
 {
 	// 	std::cout << "create client" << std::endl;
@@ -243,7 +244,6 @@ void Client::changeNick(std::string const &old_nick)
 	broadcaster(message);
 }
 
-// FIXME // ONGOING
 void Client::Nick(std::string const &)
 {
 	std::cout << GREEN_TXT << "here is NICK func" << RESET_TXT << std::endl;
@@ -446,20 +446,19 @@ void Client::broadcaster(std::string const &reply)
 	setMessage(reply);
 }
 
-void Client::authenticationValid()
-{
-	if (isAuthenticate())
-	{
-		// std::string buffer = ": NICK :" + get_nickname() + "\r\n";
-		std::string buffer = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " 001 " + get_nickname() + " :Welcome to the " + _hostname + " Network " + _nickname + "!" + _user + "@" + _hostname + "\r\n";
-		_message.setBuffer(buffer);
-	}
-}
-
 bool Client::isAuthenticate()
 {
 	if (_cap_ok == true && _pass_ok == true && _nick_ok == true && _user_ok == true)
 		return true;
 	else
 		return false;
+}
+
+void Client::authenticationValid()
+{
+	if (isAuthenticate())
+	{
+		std::string buffer = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " 001 " + get_nickname() + " :Welcome to the " + _hostname + " Network " + _nickname + "!" + _user + "@" + _hostname + "\r\n";
+		_message.setBuffer(buffer);
+	}
 }
