@@ -1,4 +1,4 @@
-#include "irc.h"
+#include "irc.hpp"
 
 std::string reply (int reply, Client *client, Channel *channel)
 {
@@ -7,10 +7,14 @@ std::string reply (int reply, Client *client, Channel *channel)
 	
 	switch(reply)
 	{
+		case RPL_TOPIC:
+			msg = "332 " + client->get_nickname() + " " + channel->getName() + " " + channel->getTopic() +"\r\n";
+			break;
+		
 		case RPL_NAMREPLY:
 			for (size_t  j = 0; j < channel->getClients().size(); j++)
 				name += channel->getClients()[j]->get_nickname()+ " ";
-			msg = "353 " + client->get_nickname() + " = " + channel->getName() + " :" + name + "\r\n";
+			msg = "353 " + client->get_nickname() + " = " + channel->getName() + " :@" + name + "\r\n";
 			break;
 		default:
 			msg = "erreur";   // a redefinir
@@ -24,8 +28,9 @@ std::string reply (int reply, Client *client, std::string target)
 
 	switch(reply)
 	{
-		case RPL_TOPIC:
-			msg = "332 " + client->get_nickname() + " " + target + " :welcome\r\n";
+		
+		case RPL_NOTOPIC:
+			msg = "331 " + client->get_nickname() + " " + target + " :No topic is set\r\n";
 			break;
 		
 		case RPL_ENDOFNAMES:
@@ -42,6 +47,10 @@ std::string reply (int reply, Client *client, std::string target)
 		
 		case ERR_NOTONCHANNEL:
 			msg = "442 " + client->get_nickname() + " " + target + " :You're not on that channel\r\n";
+			break;
+
+		case ERR_CHANOPRIVSNEEDED:
+			msg = "482 " + client->get_nickname() + " " + target + " :You're not channel operator\r\n";
 			break;
 
 		default:

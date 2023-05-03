@@ -1,7 +1,7 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include "irc.h"
+#include "irc.hpp"
 
 #define BACKLOG 10
 
@@ -55,15 +55,20 @@ public:
 	void 				parse_msg_recv( Client *client, std::string msg_recv ); // msg_recv et arg useless => a suprimer
 	void 				join( Client *client);
 	void 				part( Client *client);
+	void 				topic(Client *client);
+
 	void				privmsg( Client *client);
 	void 				notice( Client *client);
-	void				changeNick( Client *client);
+	// void				changeNick( Client *client);
 
 	void 				stop();
+	Channel *			searchChan(std::string name);
 	void 				welcome_new_chan( Client *client, Channel *channel );
+	void 				broadcast(Client *client, Channel *chan);
 	void 				privmsg_to_chan(Client *client, std::string &priv, std::string &targe, std::string &msgt);
 	void 				privmg_to_client(Client *client,std::string &priv, std::string &target,std::string &msg );
 	// void 				names( Client *client );
+ 	Channel *			has_chan(Client* client);
 
 private:
 	// useless constructor
@@ -84,5 +89,5 @@ private:
 	std::vector<Channel*>	_channels;
 };
 
-#include "irc.h"
+#include "irc.hpp"
 #endif

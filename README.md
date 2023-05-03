@@ -34,6 +34,10 @@
 <!-- - channels = group d un ou +ieurs clients, receive all message; creee lorsque le 1er client joins et rm when last leave, name rules -->
 <!-- - JOIN message -->
 <!-- - PART message -->
+- topic message
+- names message
+- list message
+- invite message
 
 
 <!-- - JOIN = create ou se connecter  -->
@@ -41,7 +45,7 @@
 <!-- RPL_TOPIC, NAMREPLY, ENDOFNAMES -->
 
 
-	<!-- 1 user => join serveral channel ( 1 limite) -->
+<!-- 1 user => join serveral channel ( 1 limite) -->
 
 4. messages prives
 <!-- -	privmsg -->

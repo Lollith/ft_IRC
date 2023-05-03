@@ -1,7 +1,7 @@
 #ifndef MESSAGE_HPP
 #define MESSAGE_HPP
 
-#include "irc.h"
+#include "irc.hpp"
 
 // message appartiennent a la classe client
 // a faire une fonction par commande

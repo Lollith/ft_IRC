@@ -1,4 +1,4 @@
-#include "irc.h"
+#include "irc.hpp"
 
 //__________________________________________________canonic form
 Message::Message( void ){
@@ -31,7 +31,7 @@ std::string Message::getBuffer( void )const{
 }
 
 void 	Message::setBuffer( std::string buffer ){
-	this->_buffer += buffer;
+	this->_buffer += buffer; //permet de recup tous les messages sans en oublier
 }
 
 void 	Message::resetBuffer(){

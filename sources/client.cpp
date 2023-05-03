@@ -1,4 +1,4 @@
-#include "irc.h"
+#include "irc.hpp"
 
 //__________________________________________________canonic form
 
@@ -15,6 +15,7 @@ Client::Client(int sock_client) : _socket_client(sock_client), _step_registratio
 
 {
 	// 	std::cout << "create client" << std::endl;
+	// _chan_ope = false;
 	//
 }
 
@@ -95,16 +96,16 @@ std::vector<std::string> Client::get_arg(void) const
 	return this->_arg_registration;
 }
 
-bool Client::getFlagMustShutClient()
-{
-	return this->_flag_shut_client;
-}
-
 void Client::set_arg(void)
 {
 	std::vector<std::string>::iterator it = _arg_registration.begin();
 	while (it != _arg_registration.end())
 		_arg_registration.erase(it);
+}
+
+bool Client::getFlagMustShutClient()
+{
+	return this->_flag_shut_client;
 }
 
 std::string Client::get_user(void) const
@@ -473,3 +474,4 @@ void Client::authenticationValid()
 		_message.setBuffer(buffer);
 	}
 }
+

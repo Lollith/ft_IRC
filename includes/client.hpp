@@ -1,7 +1,7 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include "irc.h"
+#include "irc.hpp"
 
 class Channel;
 class Client
@@ -40,7 +40,11 @@ public:
 
 	void 						set_arg( void );
 	std::vector<std::string>  	get_arg( void ) const;
+	
+	void 						add_chan_ope( Channel *chan );
+	std::vector<Channel*>	  	get_chan_ope( void ) const;
 
+	
 	std::string					get_user( void ) const;
 	std::string					get_hostname( void ) const;
 
@@ -72,7 +76,12 @@ public:
 
 
 	void						setVectorClient(std::vector<Client*> *_ptr_client);
+
 	void						setVectorChan(std::vector<Channel*> *_ptr_chan);
+
+	void 						deleteOperator(Channel *chan);
+	bool 						is_operator(Channel *chan);
+	
 
 private:
 	// useless constructor
@@ -104,6 +113,7 @@ private:
 	std::vector<std::string>	_arg_registration;
 	std::vector<Client*>		*_client;
 	std::vector<Channel*>		*_channels;
+	std::vector <Channel *>		_chan_ope;
 
 };
 

@@ -1,11 +1,16 @@
-#include "irc.h"
+#include "irc.hpp"
 //-----fct _channels------------------------------------------------------------
 void Server::parse_msg_recv(Client *client, std::string msg_recv)
 {
 	int nb_fct = 4;
-	std::string funct_names[] = {"JOIN", "PART", "PRIVMSG", "NOTICE"};
+	std::string funct_names[] = {"JOIN", "PART", "TOPIC", "PRIVMSG", "NOTICE"};
 
-	void (Server::*fct_member[])(Client *client) = { &Server::join, &Server::part, &Server::privmsg, &Server::notice};
+	void (Server::*fct_member[])(Client *client) = { 
+		&Server::join, 
+		&Server::part,
+		&Server::topic,
+		&Server::privmsg, 
+		&Server::notice};
 
 	for (int i = 0; i < nb_fct; i++)
 	{
@@ -13,29 +18,54 @@ void Server::parse_msg_recv(Client *client, std::string msg_recv)
 		{
 			(this->*fct_member[i])(client);
 			client->set_arg();
-			client->setMsgRecvSave(""); // reinitialise le message recu sinon boucle sur /quit
+			// client->setMsgRecvSave(""); // reinitialise le message recu sinon boucle sur /quit
 		}
 	}
 }
 
+void Server::broadcast(Client *client, Channel *chan)
+{
+	std::string nickname = client->get_nickname();
+	std::string join_msg_all = ":"+ nickname + "@" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
+	for (size_t i = 0; i!= chan->getClients().size(); i++)
+	{
+		// if (chan->getClients()[i] != client)
+			chan->getClients()[i]->setMessage(join_msg_all);
+	}
+	return;
+
+}
+
+Channel *Server::searchChan(std::string name)
+{
+	for (size_t i = 0; i < _channels.size(); i++)
+	{
+		if (_channels[i]->getName() == name)
+			return _channels[i];
+	}
+	return (NULL);
+}
+
 void Server::join( Client *client)
 {
-	std::string channel = client->get_arg().back();	
-	std::vector<Channel*>::iterator it;	
-	for (it = _channels.begin(); it != _channels.end(); it++) // 1er n existe pas , ne rentre pas
+	size_t i = 0;
+
+	while(i < client->get_arg().size())
 	{
-		if ((*it)->getName() == channel) // si  channel existe
+		Channel *chan = searchChan(client->get_arg()[i]);
+		if (!chan)
 		{
-			INFO("=>Join le channel\n");
-			(*it)->addClient(client);
-			welcome_new_chan(client, *it);
-			return;
+			chan = new Channel( client->get_arg()[i]);
+			_channels.push_back(chan); // si chan n existe pas => le creer
+			INFO("creation Channel " + client->get_arg()[i] + "\n");
+			client->add_chan_ope(chan);
 		}
+			INFO("=>Join le channel\n");
+			(chan)->addClient(client);
+			welcome_new_chan(client, chan);
+			chan->check_vctor(client);
+		i++;
 	}
-	_channels.push_back(new Channel( channel)); // si chan n existe pas => le creer
-	INFO("creation Channel " + channel + "\n");
-	_channels.back()->addClient(client);
-	welcome_new_chan(client, _channels.back());	
 }
 
 //A JOIN message with the client as the message <source> and the channel they 
@@ -47,142 +77,131 @@ void Server::join( Client *client)
 void Server::welcome_new_chan(Client *client, Channel *channel)
 {
 //broadcast the message :nouveau client joigned aux autres du chan
-	std::string join_msg = ":" + client->get_nickname() + "@" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
-	for (size_t i = 0; i!= channel->getClients().size(); i++) 
-		channel->getClients()[i]->setMessage(join_msg);
+	std::string nickname = client->get_nickname();
+	broadcast(client, channel);
 	
-	join_msg += reply(RPL_TOPIC, client, channel->getName());
+	std::string join_msg;
+	if(channel->getTopic() == "")
+		join_msg += reply(RPL_NOTOPIC, client, channel->getName());
+	else
+		join_msg += reply(RPL_TOPIC, client, channel);
 	join_msg += reply(RPL_NAMREPLY, client, channel);
 	join_msg += reply(RPL_ENDOFNAMES, client, channel->getName());
 	client->setMessage(join_msg);
 }
 
+ Channel *Server::has_chan(Client * client)
+{
+	std::string chan = client->get_arg().at(0);
+	std::vector<Channel*>::iterator it_chan;	
+	for (it_chan = this->_channels.begin(); it_chan != _channels.end(); it_chan++)
+	{
+		if ((*it_chan)->getName() == chan)
+			return (*it_chan);
+	}
+	return (NULL);
+}
+
 void Server::part(Client *client)
 {	
 	std::string msg = "";
-	std::string chan = client->get_arg().at(0);
-	std::vector<Channel*>::iterator it_chan;	
+	//TODO part tous les chans de la list ?
+	std::string chan_arg = client->get_arg().at(0);
 	
 	if (client->get_arg().size() == 2)
 		msg = client->get_arg().back();
 	
-	for (it_chan = this->_channels.begin(); it_chan != _channels.end(); it_chan++)
+	Channel *chan = has_chan(client); // check si chan existe
+	if(chan!= NULL)
 	{
-		if ((*it_chan)->getName() == chan)
+		INFO("=>leave le channel" << std::endl);
+		if(chan->has_clients(client))
 		{
-			INFO("=>leave le channel" << std::endl);
-			if((*it_chan)->hasClient(client))
-			{
-				std::string message =  ":" + client->get_nickname()+ "@" + client->get_hostname() + " PART " + chan + " " + msg + "\r\n";
-				std::vector<Client*> vectclients = (*it_chan)->getClients();
-				std::vector<Client*>::iterator it_client;	
-				for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
+			std::string message =  ":" + client->get_nickname()+ "@" + client->get_hostname() + " PART " + chan_arg + " " + msg + "\r\n";
+			std::vector<Client*> vectclients = chan->getClients();
+			std::vector<Client*>::iterator it_client;				
+			for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
 					(*it_client)->setMessage(message);
-				(*it_chan)->deleteClientFromChan(client);
-				if((*it_chan)->getClients().size() < 1)
-					(*it_chan)->set_flag_erase_chan(true);
-				return;
-			}
+			chan->deleteClientFromChan(client);
+			client->deleteOperator(chan);
+			if(chan->getClients().size() < 1)
+				chan->set_flag_erase_chan(true);
 			else
-			{
-				client->setMessage(reply(ERR_NOTONCHANNEL, client, chan));
-				return;
-			}
-		}
-	} 
-	client->setMessage(reply(ERR_NOSUCHCHANNEL, client, chan));
-	return;
-}
-
-
-// The PRIVMSG command is used to send private messages between users, as well 
-// as to send messages to channels. <target> is the nickname of a client or the name of a channel.(#)
-
-void Server::privmsg( Client *client){
-	int size = client->get_arg().size() - 2;
-	std::string target = client->get_arg()[size];
-	std::string msg = client->get_arg().back();
-	std::string priv_notice = " PRIVMSG ";
-
-	if(_flag_notice == true)
-		priv_notice = " NOTICE ";
-
-	if (target[0] == '#')
-		privmsg_to_chan(client, priv_notice, target, msg);
-	else
-		privmg_to_client(client, priv_notice, target, msg);
-}
-
-// The difference between NOTICE and PRIVMSG is that automatic replies must never
-//be sent in response to a NOTICE message.
-void Server::notice( Client *client)
-{
-	_flag_notice = true;
-	privmsg(client);
-}
-
-//recherche parmi mon vector de channels , le bon channel , puis envoyer le 
-//message aux bons client = clients enregistres dans le channel
-void Server::privmsg_to_chan(Client *client, std::string &priv_notice, std::string &target, std::string &msg)
-{
-	std::vector<Channel*>::iterator it_chan;	
-	for (it_chan = _channels.begin(); it_chan != _channels.end(); it_chan++)
-	{
-		if ((*it_chan)->getName() == target)
-		{
-			std::string message = ":" + client->get_nickname() + priv_notice + target + " " + msg + "\r\n";
-			size_t i = 0;
-			while (i!= (*it_chan)->getClients().size()) //broadcast the messag
-			{
-				if ((*it_chan)->getClients()[i] != client) // remplace le set chaine vide 
-					(*it_chan)->getClients()[i]->setMessage(message);
-				i++;
-			}
-			_flag_notice = false;
+				chan->search_new_ope(client);
+			chan->check_vctor(client);
 			return;
 		}
 		else
 		{
-			if(_flag_notice == false)
-				client->setMessage(reply(ERR_NOSUCHCHANNEL, client, target));
-			_flag_notice = false;
+			client->setMessage(reply(ERR_NOTONCHANNEL, client, chan_arg));
 			return;
 		}
 	}
-}
-
-
-// na pas trouver le bon channel : check les pseudo pour envoyer a un nickname
-void Server::privmg_to_client(Client *client, std::string &priv_notice, std::string &target,std::string &msg)
-{
-	std::cout << priv_notice << std::endl;
-	std::vector<Client*>::iterator it_client;	
-	for (it_client = _client.begin(); it_client != _client.end(); it_client++)
+	else 
 	{
-		if ((*it_client)->get_nickname() == target)
-		{
-			std::string message = ":" + client->get_nickname() + priv_notice + (*it_client)->get_nickname() + " " + msg + "\r\n";
-			(*it_client)->setMessage(message);
-			_flag_notice = false;
-			return;
-		}
+		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, chan_arg));
+		return;
 	}
-	if(_flag_notice == false)
-		client->setMessage(reply(ERR_NOSUCHNICK, client, target));
-	_flag_notice = false;
-	return;
 }
 
-// void Server::names(Client *client){ // a faire ????
+void Server::topic(Client *client)
+{
+
+	Channel *chan = has_chan(client);
+	std::string msg;
+	std::string chan_arg = client->get_arg().at(0);
+//TODO : parcourir la liste de chan donner comme pour join
+	if (chan) // arg[0]
+	{
+		if(!chan->has_clients(client))
+		{
+			client->setMessage(reply(ERR_NOTONCHANNEL, client, chan_arg));
+			return;
+		}
+		if(!client->is_operator(chan))
+		{
+			client->setMessage(reply(ERR_CHANOPRIVSNEEDED, client, chan->getName()));
+			return;
+		}
+		
+		chan->setTopic( "" );
+		msg = reply(RPL_NOTOPIC, client, chan->getName());
+
+		if (client->get_arg().size() == 2)
+		{
+			chan->setTopic(client->get_arg().at(1));
+			msg = reply(RPL_TOPIC, client, chan);
+		}
+		std::cout << msg << std::endl;
+		client->setMessage(msg);
+	}
+	else 
+	{
+		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, chan_arg));
+		return;
+	}
+}
+//TODO
+// RPL_TOPICWHOTIME (333)
+//envoyer a tous les clients le new topic memem vide
+
+
+// void Server::names(Client *client){ // TODO
 // (void) client;
 // 	// INFO("execute la fct names\n");
 // }
+
+//TODO
+// list message
+//invite message: operator
+//kick : operator
 
 //______________________________TEST CTRLC
 void Server::stop()
 {
 	this->_flag_keep_loop = false;
 }
+
 
 
 //TODO
