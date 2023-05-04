@@ -11,11 +11,17 @@ std::string reply (int reply, Client *client, Channel *channel)
 			msg = "332 " + client->get_nickname() + " " + channel->getName() + " " + channel->getTopic() +"\r\n";
 			break;
 		
+		case RPL_TOPICWHOTIME:
+			msg = "333 " + client->get_nickname() + " " + channel->getName() + " " + client->get_nickname() + " " +ft_itoa(channel->get_topic_time()) + "\r\n";
+			break;
+		
+
 		case RPL_NAMREPLY:
 			for (size_t  j = 0; j < channel->getClients().size(); j++)
 				name += channel->getClients()[j]->get_nickname()+ " ";
 			msg = "353 " + client->get_nickname() + " = " + channel->getName() + " :@" + name + "\r\n";
 			break;
+		
 		default:
 			msg = "erreur";   // a redefinir
 	}
@@ -48,6 +54,10 @@ std::string reply (int reply, Client *client, std::string target)
 		case ERR_NOTONCHANNEL:
 			msg = "442 " + client->get_nickname() + " " + target + " :You're not on that channel\r\n";
 			break;
+
+		// case ERR_NEEDMOREPARAMS:
+		// 	msg = "461 " + client->get_nickname() + " " + client->get_cmd() + " :Not enough parameters\r\n";
+		// 	break;
 
 		case ERR_CHANOPRIVSNEEDED:
 			msg = "482 " + client->get_nickname() + " " + target + " :You're not channel operator\r\n";
@@ -93,4 +103,14 @@ std::string reply (int reply, Client *client)
 			msg = "erreur";   // a redefinir
 	}
 	return (msg);
+}
+
+std::string ft_itoa(int n)
+{
+	std::string result;
+	std::stringstream _out;
+	
+	_out << n;
+	result = _out.str();
+	return result;
 }

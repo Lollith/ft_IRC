@@ -17,6 +17,9 @@ class Channel{
 		bool					get_flag_erase_chan( void ) const;
 		void					set_flag_erase_chan( bool );
 
+		time_t					get_topic_time( void ) const;
+		void					set_topic_time( time_t timestamp );
+		
 		bool 					has_clients(Client *client);
 
 		void 					addClient(Client *client);
@@ -31,6 +34,7 @@ class Channel{
 		std::string				_name;
 		bool					_flag_erase_chan;
 		std::string				_topic;
+		time_t					_topic_time;
 		
 		
 		Channel( void );
