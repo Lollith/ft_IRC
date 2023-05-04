@@ -84,5 +84,6 @@ std::string reply (int reply, Client *client);
 std::string reply (int reply, Client *client, std::string target);
 std::string reply (int reply, Client *client, Channel *channel);
 std::string ft_itoa(int n);
+std::vector<std::string> split(const std::string &str, const char *set_delim);
 
 #endif

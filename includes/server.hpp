@@ -68,7 +68,7 @@ public:
 	void 				broadcast_all(Client *client, Channel *chan, std::string msg);
 	void 				privmsg_to_chan(Client *client, std::string &priv, std::string &targe, std::string &msgt);
 	void 				privmg_to_client(Client *client,std::string &priv, std::string &target,std::string &msg );
-	// void 				names( Client *client );
+	void 				names( Client *client );
  	Channel *			has_chan(Client* client);
 
 private:
