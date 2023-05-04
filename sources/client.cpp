@@ -103,6 +103,11 @@ void Client::set_arg(void)
 		_arg_registration.erase(it);
 }
 
+std::string	Client::get_cmd( void ) const
+{
+	return (this->_cmd_registration);
+}
+
 bool Client::getFlagMustShutClient()
 {
 	return this->_flag_shut_client;

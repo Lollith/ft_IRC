@@ -246,6 +246,30 @@ void Server::mysend(Client *client)
 	}
 }
 
+void Server::update()
+{
+	for (size_t i = 0; i < _client.size();)
+	{
+		if (_client[i]->getFlagMustShutClient() == true)
+		{
+			delete _client[i];
+			_client.erase(_client.begin() + i);
+		}
+		else
+			i++;
+	}
+	for (size_t i = 0; i < _channels.size();)
+	{
+		if (_channels[i]->get_flag_erase_chan() == true)
+		{
+			delete (_channels[i]);
+			_channels.erase(_channels.begin() + i);
+		}
+		else
+			i++;
+	}//TODO a faire aussi lorsaue l on /quit ds un chan
+}
+
 bool Server::loop_recept_send()
 {
 	fd_set rd, wr;
@@ -274,31 +298,14 @@ bool Server::loop_recept_send()
 				client->getCmdLine(_password);
 		
 				parse_msg_recv(client, client->getMsgRecvSave());
-				check_vectors();
+				check_vectors(); //DEBUG si /part puis quit
 			}
 			if (FD_ISSET(client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
 				mysend(client);
 		}
-		for (size_t i = 0; i < _client.size();)
-		{
-			if (_client[i]->getFlagMustShutClient() == true)
-			{
-				delete _client[i];
-				_client.erase(_client.begin() + i);
-			}
-			else
-				i++;
-		}
-		for (size_t i = 0; i < _channels.size();)
-		{
-			if (_channels[i]->get_flag_erase_chan() == true)
-			{
-				delete (_channels[i]);
-				_channels.erase(_channels.begin() + i);
-			}
-			else
-				i++;
-		}//TODO a faire aussi lorsaue l on /quit ds un chan
+		
+		update();
+
 	}
 	return true;
 }

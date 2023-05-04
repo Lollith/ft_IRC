@@ -41,6 +41,8 @@ public:
 	void 						set_arg( void );
 	std::vector<std::string>  	get_arg( void ) const;
 	
+	std::string					get_cmd( void ) const;
+	
 	void 						add_chan_ope( Channel *chan );
 	std::vector<Channel*>	  	get_chan_ope( void ) const;
 

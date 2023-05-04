@@ -13,6 +13,8 @@
 #include <arpa/inet.h> //htons +define the in_addr cf <netinet/in.h>
 #include <set>
 #include <vector>
+#include <ctime>
+#include <sstream>
 #include "message.hpp"
 #include "client.hpp"
 #include "channel.hpp"
@@ -81,5 +83,6 @@ enum reply_code
 std::string reply (int reply, Client *client);
 std::string reply (int reply, Client *client, std::string target);
 std::string reply (int reply, Client *client, Channel *channel);
+std::string ft_itoa(int n);
 
 #endif

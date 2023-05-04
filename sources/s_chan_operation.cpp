@@ -23,14 +23,13 @@ void Server::parse_msg_recv(Client *client, std::string msg_recv)
 	}
 }
 
-void Server::broadcast(Client *client, Channel *chan)
+void Server::broadcast_all(Client *client, Channel *chan, std:: string msg)
 {
 	std::string nickname = client->get_nickname();
-	std::string join_msg_all = ":"+ nickname + "@" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
 	for (size_t i = 0; i!= chan->getClients().size(); i++)
 	{
 		// if (chan->getClients()[i] != client)
-			chan->getClients()[i]->setMessage(join_msg_all);
+			chan->getClients()[i]->setMessage(msg);
 	}
 	return;
 
@@ -76,9 +75,9 @@ void Server::join( Client *client)
 
 void Server::welcome_new_chan(Client *client, Channel *channel)
 {
-//broadcast the message :nouveau client joigned aux autres du chan
 	std::string nickname = client->get_nickname();
-	broadcast(client, channel);
+	std::string join_msg_all = ":"+ nickname + "@" + client->get_hostname() + " JOIN " + _channels.back()->getName() + "\r\n";
+	broadcast_all(client, channel, join_msg_all);
 	
 	std::string join_msg;
 	if(channel->getTopic() == "")
@@ -118,10 +117,7 @@ void Server::part(Client *client)
 		if(chan->has_clients(client))
 		{
 			std::string message =  ":" + client->get_nickname()+ "@" + client->get_hostname() + " PART " + chan_arg + " " + msg + "\r\n";
-			std::vector<Client*> vectclients = chan->getClients();
-			std::vector<Client*>::iterator it_client;				
-			for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
-					(*it_client)->setMessage(message);
+			broadcast_all(client, chan, message);
 			chan->deleteClientFromChan(client);
 			client->deleteOperator(chan);
 			if(chan->getClients().size() < 1)
@@ -146,10 +142,10 @@ void Server::part(Client *client)
 
 void Server::topic(Client *client)
 {
-
-	Channel *chan = has_chan(client);
 	std::string msg;
+	Channel *chan = has_chan(client);
 	std::string chan_arg = client->get_arg().at(0);
+
 //TODO : parcourir la liste de chan donner comme pour join
 	if (chan) // arg[0]
 	{
@@ -163,17 +159,27 @@ void Server::topic(Client *client)
 			client->setMessage(reply(ERR_CHANOPRIVSNEEDED, client, chan->getName()));
 			return;
 		}
-		
-		chan->setTopic( "" );
-		msg = reply(RPL_NOTOPIC, client, chan->getName());
-
+	// TODO ?	
+		// if (client->get_arg().size() < 1)
+		// {
+		// 	std::cout << "here " << std::endl;
+		// 	client->setMessage(reply(ERR_NEEDMOREPARAMS, client, chan->getName()));
+		// 	return;  
+		// }
 		if (client->get_arg().size() == 2)
 		{
 			chan->setTopic(client->get_arg().at(1));
 			msg = reply(RPL_TOPIC, client, chan);
 		}
+		else if (client->get_arg().size() == 1)	
+		{
+				chan->setTopic( "" );
+				msg = reply(RPL_NOTOPIC, client, chan->getName());
+		}
+		chan->set_topic_time(std::time(NULL));
+		msg += reply(RPL_TOPICWHOTIME, client, chan);
 		std::cout << msg << std::endl;
-		client->setMessage(msg);
+		broadcast_all(client, chan, msg);
 	}
 	else 
 	{
@@ -181,9 +187,6 @@ void Server::topic(Client *client)
 		return;
 	}
 }
-//TODO
-// RPL_TOPICWHOTIME (333)
-//envoyer a tous les clients le new topic memem vide
 
 
 // void Server::names(Client *client){ // TODO
