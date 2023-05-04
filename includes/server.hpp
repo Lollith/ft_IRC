@@ -41,14 +41,15 @@ public:
 
 	//__________________________________________________members functions
 
-	void 				crash_protector();
-	bool				startServer();
+	void 				crash_protector( void );
+	bool				startServer( void);
 	void				mySelect(fd_set &rd, fd_set &wr);
 	void  				myrecv(Client *client);
 	void 				mysend(Client *client);
-	bool				loop_recept_send();
+	bool				loop_recept_send( void );
+	void 				update( void );
 
-	void				check_vectors();
+	void				check_vectors( void );
 
 
 	//-----fct _channels------------------------------------------------------------
@@ -64,7 +65,7 @@ public:
 	void 				stop();
 	Channel *			searchChan(std::string name);
 	void 				welcome_new_chan( Client *client, Channel *channel );
-	void 				broadcast(Client *client, Channel *chan);
+	void 				broadcast_all(Client *client, Channel *chan, std::string msg);
 	void 				privmsg_to_chan(Client *client, std::string &priv, std::string &targe, std::string &msgt);
 	void 				privmg_to_client(Client *client,std::string &priv, std::string &target,std::string &msg );
 	// void 				names( Client *client );

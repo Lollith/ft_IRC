@@ -18,6 +18,15 @@ void	Channel::setTopic( std::string newtopic ){
 _topic = newtopic;
 }
 
+time_t Channel::get_topic_time( void ) const{
+	return this->_topic_time;
+}
+
+void Channel::set_topic_time( time_t timestamp )
+{
+	_topic_time = timestamp;
+}
+
 std::vector<Client *> Channel::getClients( void ) const {
 return(this->_clients);
 }
