@@ -75,6 +75,8 @@ public:
 	void						broadcaster(std::string const& reply);
 	void 						authenticationValid();
 	bool						isAuthenticate();
+	void						mode(std::string const &);
+
 
 
 	void						setVectorClient(std::vector<Client*> *_ptr_client);
