@@ -4,14 +4,14 @@
 
 Client::Client(void) : _step_registration(0), _flag_password_ok(false), _flag_password_provided(false),
 					   _flag_shut_client(false), _cap_ok(false), _pass_ok(false), _nick_ok(false), _user_ok(false),
-					   _user(""), _nickname(""), _hostname("")
+					   _flag_not_registered(false), _already_auth(false), _user(""), _nickname(""), _hostname("")
 {
 }
 
 Client::Client(int sock_client) : _socket_client(sock_client), _step_registration(0), _flag_password_ok(false),
 								  _flag_password_provided(false), _flag_shut_client(false),
 								  _cap_ok(false), _pass_ok(false), _nick_ok(false), _user_ok(false),
-								  _user(""), _nickname(""), _hostname("")
+								  _flag_not_registered(false), _already_auth(false), _user(""), _nickname(""), _hostname("")
 
 {
 	// 	std::cout << "create client" << std::endl;
@@ -103,7 +103,7 @@ void Client::set_arg(void)
 		_arg_registration.erase(it);
 }
 
-std::string	Client::get_cmd( void ) const
+std::string Client::get_cmd(void) const
 {
 	return (this->_cmd_registration);
 }
@@ -185,7 +185,7 @@ void Client::checkPassword(std::string const &psswd)
 		this->_flag_password_ok = true;
 		std::cout << GREEN_TXT << "PASSWORD OK : " << _flag_password_ok << RESET_TXT << std::endl;
 	}
-	else if (_flag_password_ok == true)
+	else if (isAuthenticate())
 	{
 		setMessage(reply(ERR_ALREADYREGISTERED, this));
 		return;
@@ -243,11 +243,16 @@ bool Client::checkSameNick()
 
 void Client::changeNick(std::string const &old_nick)
 {
-	std::string message = ":";
-	if (old_nick.size() && get_user().size() && get_hostname().size())
-		message += old_nick + "!" + get_user() + "@" + get_hostname();
-	message += " NICK :" + _nickname + "\r\n";
-	broadcaster(message);
+	if (this->_pass_ok == true)
+	{
+		std::string message = ":";
+		if (old_nick.size() && get_user().size() && get_hostname().size())
+			message += old_nick + "!" + get_user() + "@" + get_hostname();
+		message += " NICK :" + _nickname + "\r\n";
+		broadcaster(message);
+	}
+	else
+		return;
 }
 
 void Client::Nick(std::string const &)
@@ -290,7 +295,7 @@ void Client::checkUser(std::string const &)
 {
 	std::cout << GREEN_TXT << "here is USER check func" << RESET_TXT << std::endl;
 
-	if (isAuthenticate())
+	if (this->_already_auth == true && this->_flag_password_provided == true)
 	{
 		setMessage(reply(ERR_ALREADYREGISTERED, this));
 		return;
@@ -394,13 +399,14 @@ void Client::checkParams(std::string const &password)
 	{
 		if (_cmd_registration == cmd_to_check[i])
 		{
-			if (i > 1 && _flag_password_provided == false)
+			if (i > 1 && _flag_password_provided == false && _flag_not_registered == false)
 			{
 				rpl = reply(ERR_NOTREGISTERED, this);
 				rpl += "ERROR: Server closing a client connection because need registration.\r\n";
 				setMessage(rpl);
 				_flag_shut_client = true;
-				return;
+				_flag_not_registered = true;
+				break;
 			}
 			else
 			{
@@ -470,10 +476,10 @@ bool Client::isAuthenticate()
 
 void Client::authenticationValid()
 {
-	if (isAuthenticate())
+	if (isAuthenticate() && _already_auth == false)
 	{
 		std::string buffer = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " 001 " + get_nickname() + " :Welcome to the " + _hostname + " Network " + _nickname + "!" + _user + "@" + _hostname + "\r\n";
 		_message.setBuffer(buffer);
+		_already_auth = true;
 	}
 }
-

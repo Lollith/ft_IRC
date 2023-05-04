@@ -296,7 +296,6 @@ bool Server::loop_recept_send()
 				client->setVectorClient(&_client);
 				client->setVectorChan(&_channels);
 				client->getCmdLine(_password);
-		
 				parse_msg_recv(client, client->getMsgRecvSave());
 				check_vectors(); //DEBUG si /part puis quit
 			}
