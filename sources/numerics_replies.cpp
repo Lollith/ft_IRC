@@ -7,6 +7,10 @@ std::string reply (int reply, Client *client, Channel *channel)
 	
 	switch(reply)
 	{
+		case RPL_LIST:
+			// msg = "322 " + client->get_nickname() + " " + channel->getName() + " " + channel->getTopic() +"\r\n";
+			break;
+
 		case RPL_TOPIC:
 			msg = "332 " + client->get_nickname() + " " + channel->getName() + " " + channel->getTopic() +"\r\n";
 			break;
@@ -34,6 +38,9 @@ std::string reply (int reply, Client *client, std::string target)
 
 	switch(reply)
 	{
+		case RPL_LISTSTART:
+			msg = "321 " + client->get_nickname() + " Channel :Users Name \r\n";
+			break;
 		
 		case RPL_NOTOPIC:
 			msg = "331 " + client->get_nickname() + " " + target + " :No topic is set\r\n";
