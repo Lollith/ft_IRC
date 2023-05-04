@@ -34,7 +34,7 @@
 <!-- - channels = group d un ou +ieurs clients, receive all message; creee lorsque le 1er client joins et rm when last leave, name rules -->
 <!-- - JOIN message -->
 <!-- - PART message -->
-- topic message
+<!-- - topic message -->
 - names message
 - list message
 - invite message
@@ -72,7 +72,7 @@ allowed to perform maintenance:
 	- KICK: Eject a client from the channel,
 	- MODE: Change the channel’s modes,
 	- INVITE: Invite a client to an invite-only channel (mode +i),
-	- TOPIC: Change the channel topic in a mode +t channel,  
+	<!-- - TOPIC: Change the channel topic in a mode +t channel,   -->
 	
 
 	

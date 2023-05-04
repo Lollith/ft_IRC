@@ -205,8 +205,3 @@ void Server::stop()
 	this->_flag_keep_loop = false;
 }
 
-
-
-//TODO
-// operator chan? avec ~
-	//std::string message =  ":" + client->get_nickname() + "@" + "~" + client->get_hostname() +  " PART " + chan + " " + msg + "\r\n";
