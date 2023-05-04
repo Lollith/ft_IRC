@@ -3,14 +3,15 @@
 void Server::parse_msg_recv(Client *client, std::string msg_recv)
 {
 	int nb_fct = 4;
-	std::string funct_names[] = {"JOIN", "PART", "TOPIC", "PRIVMSG", "NOTICE"};
+	std::string funct_names[] = {"JOIN", "PART", "TOPIC", "PRIVMSG", "NOTICE", "NAMES"};
 
 	void (Server::*fct_member[])(Client *client) = { 
 		&Server::join, 
 		&Server::part,
 		&Server::topic,
 		&Server::privmsg, 
-		&Server::notice};
+		&Server::notice,
+		&Server::names};
 
 	for (int i = 0; i < nb_fct; i++)
 	{
@@ -189,11 +190,28 @@ void Server::topic(Client *client)
 }
 
 
-// void Server::names(Client *client){ // TODO
-// (void) client;
-// 	// INFO("execute la fct names\n");
-// }
+	//TODO name tous les chans de la list 
+	// The NAMES command is used to view the nicknames joined to a channel and their 
+	// channel membership prefixes. The param of this command is a list of channel names, 
+	// delimited by a comma (",", 0x2C) character . pb tokenisation]
+void Server::names(Client *client){ // TODO
+	
+	Channel *chan_arg = has_chan(client);
+	// std::vector<std::string> chan_list = split(has_chan(client)->getName(),",");
+	std::string msg;
 
+	// for(size_t i = 0; i < chan_list.size(); i++)
+	// {
+	// 	std::cout << chan_list[i]<< " "<< std::endl;
+	// }
+	if(chan_arg)
+		msg += reply(RPL_NAMREPLY, client, chan_arg);
+	msg += reply(RPL_ENDOFNAMES, client, chan_arg->getName());
+	client->setMessage(msg);
+
+	return;
+
+}
 //TODO
 // list message
 //invite message: operator
