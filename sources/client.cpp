@@ -347,9 +347,6 @@ void Client::quit(std::string const &)
 	}
 	quit_reason = res;
 
-	// send messages
-	// TODO //ONGOING
-
 	setMessage("ERROR: Server closing a client connection\r\n");
 	std::vector<Channel *>::iterator it_chan;
 	for (it_chan = this->_channels->begin(); it_chan != _channels->end(); it_chan++)
