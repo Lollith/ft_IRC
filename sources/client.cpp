@@ -178,12 +178,15 @@ void Client::checkPassword(std::string const &psswd)
 
 	this->_flag_password_provided = true;
 
-	if (_arg_registration.back() == psswd)
+	if (!_arg_registration.empty())
 	{
-		this->_pass_ok = true;
-		this->_step_registration += 1;
-		this->_flag_password_ok = true;
-		std::cout << GREEN_TXT << "PASSWORD OK : " << _flag_password_ok << RESET_TXT << std::endl;
+		if (_arg_registration.back() == psswd)
+		{
+			this->_pass_ok = true;
+			this->_step_registration += 1;
+			this->_flag_password_ok = true;
+			std::cout << GREEN_TXT << "PASSWORD OK : " << _flag_password_ok << RESET_TXT << std::endl;
+		}
 	}
 	else if (isAuthenticate())
 	{
