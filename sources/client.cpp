@@ -331,6 +331,8 @@ void Client::clean_ping_mode(std::string const &)
 }
 
 // ONGOING
+
+// FIXME : un quit hors chan quand les auutres clients sont ds un chan
 void Client::quit(std::string const &)
 {
 	INFO("HERE QUIT FUNC\n");
@@ -371,11 +373,6 @@ void Client::quit(std::string const &)
 			if ((*it_chan)->getClients().size() < 1)
 				(*it_chan)->set_flag_erase_chan(true);
 			this->_flag_shut_client = true;
-			return;
-		}
-		else
-		{
-			setMessage(reply(ERR_NOTONCHANNEL, this, (*it_chan)));
 			return;
 		}
 	}
@@ -481,3 +478,6 @@ void Client::authenticationValid()
 		_already_auth = true;
 	}
 }
+
+// TODO
+//  tester et corriger broadcast pour nick et quit quand plusieurs clients sont co sur plusieurs channels
