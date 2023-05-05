@@ -61,6 +61,7 @@ public:
 	void 				mode(Client *client);
 	void 				list(Client *client);
 	void 				invite(Client *client);
+	void 				kick(Client *client);
 
 	void				privmsg( Client *client);
 	void 				notice( Client *client);

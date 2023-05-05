@@ -2,7 +2,7 @@
 //-----fct _channels------------------------------------------------------------
 void Server::parse_msg_recv(Client *client, std::string msg_recv)
 {
-	int nb_fct = 9;
+	int nb_fct = 10;
 	std::string funct_names[] = {
 		"JOIN", 
 		"PART", 
@@ -12,7 +12,8 @@ void Server::parse_msg_recv(Client *client, std::string msg_recv)
 		"NAMES", 
 		"MODE", 
 		"LIST", 
-		"INVITE"};
+		"INVITE",
+		"KICK"};
 
 	void (Server::*fct_member[])(Client *client) = { 
 		&Server::join, 
@@ -23,7 +24,8 @@ void Server::parse_msg_recv(Client *client, std::string msg_recv)
 		&Server::names,
 		&Server::mode,
 		&Server::list,
-		&Server::invite};
+		&Server::invite,
+		&Server::kick};
 
 	for (int i = 0; i < nb_fct; i++)
 	{
@@ -317,7 +319,6 @@ void Server::invite(Client *client)
 		return;
 	}
 	Channel *chan = searchChan(client->get_arg()[1]); // check si chan existe
-
 	if(chan!= NULL)
 	{
 		if(chan->has_clients(client))
@@ -339,7 +340,10 @@ void Server::invite(Client *client)
 				return;
 			}
 
-			client->setMessage(reply( RPL_INVITING, client, chan->getName()));
+			std::string msg = reply( RPL_INVITING, client, chan->getName());
+			client->setMessage(msg);
+			std::string invite_msg = ":"+ new_target->get_nickname() + "@" + new_target->get_hostname() + " INVITE " + new_target->get_nickname()+ " " +chan->getName() + "\r\n";
+			new_target->setMessage(invite_msg);
 			return;
 		}
 		else
@@ -358,6 +362,10 @@ void Server::invite(Client *client)
 
 //TODO
 //kick : operator
+void Server::kick(Client *)
+{
+	
+}
 
 //______________________________TEST CTRLC
 void Server::stop()
