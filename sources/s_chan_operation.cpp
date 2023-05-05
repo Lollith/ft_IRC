@@ -195,13 +195,18 @@ void Server::topic(Client *client)
 
 
 void Server::mode(Client *client)
-{		
-	std::string msg = "+i";
+{	
+	std::string message;
+	std::string target = client->get_arg()[0];
+	std::string msg = "-i";
+
 	if (client->get_arg().size() == 2)
 		msg = client->get_arg()[1];
-	std::string chan_arg = client->get_arg().at(0);
-	std::string message =  ":" + client->get_nickname()+ "@" + client->get_hostname() + " MODE " + chan_arg + " " + msg + "\r\n";
-	// message +=  ":" + client->get_nickname()+ "@" + client->get_hostname() + " MODE " + client->get_nickname() + " " + "-i" + "\r\n";
+
+	if (target[0] == '#')
+		message += ":" + client->get_nickname()+ "@" + client->get_hostname() + " MODE " + target + " " + msg + "\r\n";
+	else
+		message +=  ":" + client->get_nickname()+ "@" + client->get_hostname() + " MODE " + target + " " + msg + "\r\n";
 	client->setMessage(message);
 }
 
