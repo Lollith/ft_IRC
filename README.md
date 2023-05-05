@@ -36,8 +36,8 @@
 <!-- - PART message -->
 <!-- - topic message -->
 - names message
-- list message
-- invite message
+<!-- - list message -->
+<!-- - invite message -->
 
 
 <!-- - JOIN = create ou se connecter  -->
@@ -69,9 +69,9 @@ allowed to perform maintenance:
 
 - Channel moderators are identified by the channel member prefix ('@' for standard channel operators
 1er connecte sur le chan
-	- KICK: Eject a client from the channel,
+	<!-- - KICK: Eject a client from the channel, -->
 	- MODE: Change the channel’s modes,
-	- INVITE: Invite a client to an invite-only channel (mode +i),
+	<!-- - INVITE: Invite a client to an invite-only channel (mode +i), -->
 	<!-- - TOPIC: Change the channel topic in a mode +t channel,   -->
 	
 
