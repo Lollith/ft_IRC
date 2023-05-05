@@ -85,11 +85,18 @@ Client*Server::searchClient(std::string name)
 
 void Server::join( Client *client)
 {
-	size_t i = 0;
 
-	while(i < client->get_arg().size())
+	if (client->get_arg().size() < 1)
 	{
-		Channel *chan = searchChan(client->get_arg()[i]);
+		client->setMessage(reply(ERR_NEEDMOREPARAMS, client, ""));
+		return;
+	}
+
+	std::vector<std::string> chan_list; 
+	chan_list = split(client->get_arg()[0], ",");
+	for (size_t i = 0; i < chan_list.size(); i++)
+	{
+		Channel *chan = searchChan(chan_list[i]);
 		if (!chan)
 		{
 			chan = new Channel( client->get_arg()[i]);
@@ -139,33 +146,28 @@ void Server::part(Client *client)
 		msg = client->get_arg().back();
 	
 	Channel *chan = has_chan(client); // check si chan existe
-	if(chan!= NULL)
-	{
-		INFO("=>leave le channel" << std::endl);
-		if(chan->has_clients(client))
-		{
-			std::string message =  ":" + client->get_nickname()+ "@" + client->get_hostname() + " PART " + chan_arg + " " + msg + "\r\n";
-			broadcast_all(client, chan, message);
-			chan->deleteClientFromChan(client);
-			client->deleteOperator(chan);
-			if(chan->getClients().size() < 1)
-				chan->set_flag_erase_chan(true);
-			else
-				chan->search_new_ope(client);
-			chan->check_vctor(client);
-			return;
-		}
-		else
-		{
-			client->setMessage(reply(ERR_NOTONCHANNEL, client, chan_arg));
-			return;
-		}
-	}
-	else 
+	if(!chan)
 	{
 		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, chan_arg));
 		return;
 	}
+	INFO("=>leave le channel" << std::endl);
+	if(!chan->has_clients(client))
+	{
+		client->setMessage(reply(ERR_NOTONCHANNEL, client, chan_arg));
+		return;
+	}
+	std::string message =  ":" + client->get_nickname()+ "@" + 
+	client->get_hostname() + " PART " + chan_arg + " " + msg + "\r\n";
+	broadcast_all(client, chan, message);
+	chan->deleteClientFromChan(client);
+	client->deleteOperator(chan);
+	if(chan->getClients().size() < 1)
+		chan->set_flag_erase_chan(true);
+	else
+		chan->search_new_ope(client);
+	chan->check_vctor(client);
+	return;
 }
 
 
@@ -228,9 +230,11 @@ void Server::mode(Client *client)
 		msg = client->get_arg()[1];
 
 	if (target[0] == '#')
-		message += ":" + client->get_nickname()+ "@" + client->get_hostname() + " MODE " + target + " " + msg + "\r\n";
+		message += ":" + client->get_nickname()+ "@" + client->get_hostname() + 
+			" MODE " + target + " " + msg + "\r\n";
 	else
-		message +=  ":" + client->get_nickname()+ "@" + client->get_hostname() + " MODE " + target + " " + msg + "\r\n";
+		message +=  ":" + client->get_nickname()+ "@" + client->get_hostname() + 
+			" MODE " + target + " " + msg + "\r\n";
 	client->setMessage(message);
 }
 
@@ -288,9 +292,7 @@ void Server::list(Client *client)
 	{
 		msg += reply(RPL_LISTSTART, client, "");
 		for (size_t i = 0; i < _channels.size(); i++)
-		{
 			msg += reply(RPL_LIST, client, _channels[i]);
-		}
 		msg += reply(RPL_LISTEND, client, "");
 	}
 	else
@@ -309,7 +311,6 @@ void Server::list(Client *client)
 		client->setMessage(msg);
 	return;
 }
-//invite message: operator
 
 void Server::invite(Client *client)
 {
@@ -319,10 +320,17 @@ void Server::invite(Client *client)
 		return;
 	}
 	Channel *chan = searchChan(client->get_arg()[1]); // check si chan existe
-	if(chan!= NULL)
+	if(!chan)
 	{
-		if(chan->has_clients(client))
-		{
+		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, client->get_arg()[1]));
+		return;
+	}
+	if(!chan->has_clients(client))
+	{
+		client->setMessage(reply(ERR_NOTONCHANNEL, client, chan->getName()));
+		return;
+	}
+
 			if (!client->is_operator(chan))
 			{
 				client->setMessage(reply(ERR_CHANOPRIVSNEEDED , client, chan->getName()));
@@ -342,22 +350,11 @@ void Server::invite(Client *client)
 
 			std::string msg = reply( RPL_INVITING, client, chan->getName());
 			client->setMessage(msg);
-			std::string invite_msg = ":"+ new_target->get_nickname() + "@" + new_target->get_hostname() + " INVITE " + new_target->get_nickname()+ " " +chan->getName() + "\r\n";
+			std::string invite_msg = ":"+ new_target->get_nickname() + "@" + 
+				new_target->get_hostname() + " INVITE " + new_target->get_nickname()+ 
+				" " +chan->getName() + "\r\n";
 			new_target->setMessage(invite_msg);
 			return;
-		}
-		else
-		{
-			client->setMessage(reply(ERR_NOTONCHANNEL, client, chan->getName()));
-			return;
-		}
-	}
-	else 
-	{
-		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, client->get_arg()[1]));
-		return;
-	}
-
 }
 
 //Kick <channel> <user>(","<user>)(comment)
@@ -370,48 +367,43 @@ void Server::kick(Client *client)
 	}
 	
 	Channel *chan = searchChan(client->get_arg()[0]); // check si chan existe
-	if(chan)
-	{
-		if(chan->has_clients(client))
-		{
-			if (!client->is_operator(chan))
-			{
-				client->setMessage(reply(ERR_CHANOPRIVSNEEDED , client, chan->getName()));
-				return;
-			}
-
-			std::vector<std::string> client_list; 
-			client_list = split(client->get_arg()[1], ",");
-			for (size_t i = 0; i < client_list.size(); i++)
-			{
-				Client *new_target = searchClient(client_list[i]);
-
-
-				if (!new_target)
-				{
-					client->setMessage(reply(ERR_USERNOTINCHANNEL, client, chan->getName(), client->get_arg()[1] ));
-					return;
-				}
-
-				std::string comment = "kicked\r\n";
-				if (client->get_arg().size() == 3)
-					comment = client->get_arg().back();
-				std::string kick_msg = ":"+ client->get_nickname() + "@" + client->get_hostname() + " KICK " + chan->getName() + " " +new_target->get_nickname()+ " :" + comment + "\r\n";
-				new_target->setMessage(kick_msg);
-				chan->deleteClientFromChan(new_target);
-				broadcast_all(client, chan, kick_msg);
-				return;
-			}
-		}
-		else
-		{
-				client->setMessage(reply(ERR_NOTONCHANNEL, client, chan->getName()));
-				return;
-		}
-	}
-	else 
+	if(!chan)
 	{
 		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, client->get_arg()[0]));
+		return;
+	}
+	if(!chan->has_clients(client))
+	{
+		client->setMessage(reply(ERR_NOTONCHANNEL, client, chan->getName()));
+		return;
+	}
+
+	if (!client->is_operator(chan))
+	{
+		client->setMessage(reply(ERR_CHANOPRIVSNEEDED , client, chan->getName()));
+		return;
+	}
+
+	std::vector<std::string> client_list; 
+	client_list = split(client->get_arg()[1], ",");
+	for (size_t i = 0; i < client_list.size(); i++)
+	{
+		Client *new_target = searchClient(client_list[i]);
+
+
+		if (!new_target)
+		{
+			client->setMessage(reply(ERR_USERNOTINCHANNEL, client, chan->getName(), client->get_arg()[1] ));
+			return;
+		}
+
+		std::string comment = "kicked\r\n";
+		if (client->get_arg().size() == 3)
+			comment = client->get_arg().back();
+		std::string kick_msg = ":"+ client->get_nickname() + "@" + client->get_hostname() + " KICK " + chan->getName() + " " +new_target->get_nickname()+ " :" + comment + "\r\n";
+		new_target->setMessage(kick_msg);
+		chan->deleteClientFromChan(new_target);
+		broadcast_all(client, chan, kick_msg);
 		return;
 	}
 }
