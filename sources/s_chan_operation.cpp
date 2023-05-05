@@ -2,8 +2,8 @@
 //-----fct _channels------------------------------------------------------------
 void Server::parse_msg_recv(Client *client, std::string msg_recv)
 {
-	int nb_fct = 7;
-	std::string funct_names[] = {"JOIN", "PART", "TOPIC", "PRIVMSG", "NOTICE", "NAMES", "MODE"/*, "LIST"*/};
+	int nb_fct = 8;
+	std::string funct_names[] = {"JOIN", "PART", "TOPIC", "PRIVMSG", "NOTICE", "NAMES", "MODE", "LIST"};
 
 	void (Server::*fct_member[])(Client *client) = { 
 		&Server::join, 
@@ -12,9 +12,9 @@ void Server::parse_msg_recv(Client *client, std::string msg_recv)
 		&Server::privmsg, 
 		&Server::notice,
 		&Server::names,
-		&Server::mode/*,
+		&Server::mode,
 
-		&Server::list*/};
+		&Server::list};
 
 	for (int i = 0; i < nb_fct; i++)
 	{
@@ -218,7 +218,6 @@ void Server::mode(Client *client)
 	// delimited by a comma (",", 0x2C) character . pb tokenisation]
 	//FIXME pas de tokenisation?
 void Server::names(Client *client){ // TODO
-std::cout << " NAMES fct" << std::endl;
 // (void) client;
 	// si  1 arg
 	Channel *chan_arg = has_chan(client);
@@ -241,7 +240,9 @@ std::cout << " NAMES fct" << std::endl;
 	}
 		msg += reply(RPL_ENDOFNAMES, client, client->get_arg()[0]);
 		client->setMessage(msg);
-	// //liste arg
+
+
+	// // //liste arg
 	// std::vector<std::string> chan_list; 
 	// for(size_t i = 0; i < client->get_arg().size() - 1; i++)
 	// {
@@ -262,16 +263,30 @@ void Server::list(Client *client)
 {
 	std::string msg;
 
-	if (client->get_arg().size() < 1)
+	if (client->get_arg()[0]== "")  //si == 0 ne rentre pas ds la fonction => pareil pour Name => pas de lecture de requette
 	{
 		msg += reply(RPL_LISTSTART, client, "");
-		client->setMessage(msg);
+		for (size_t i = 0; i < _channels.size(); i++)
+		{
+			msg += reply(RPL_LIST, client, _channels[i]);
+		}
+		msg += reply(RPL_LISTEND, client, "");
+	}
+	else
+	{
+		std::vector<std::string> chan_list; 
+		msg += reply(RPL_LISTSTART, client, "");
+		chan_list = split(client->get_arg()[0], ",");
+		for (size_t i = 0; i < chan_list.size(); i++)
+		{
+			Channel *chan = searchChan(chan_list[i]);
+			if (chan)
+				msg += reply(RPL_LIST, client, chan);
+		}
+		msg += reply(RPL_LISTEND, client, "");
 	}
 
-	// Channel *chan_arg = has_chan(client);
-	// if(chan_arg)
-	// 	client->setMessage(reply(RPL_LIST, client, chan_arg));
-	
+		client->setMessage(msg);
 	return;
 
 }

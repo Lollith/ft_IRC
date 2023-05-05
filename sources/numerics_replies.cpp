@@ -8,7 +8,7 @@ std::string reply (int reply, Client *client, Channel *channel)
 	switch(reply)
 	{
 		case RPL_LIST:
-			// msg = "322 " + client->get_nickname() + " " + channel->getName() + " " + channel->getTopic() +"\r\n";
+			msg = "322 " + client->get_nickname() + " " + channel->getName() + " " +ft_itoa(channel->getClients().size()) + " :" + channel->getTopic() +"\r\n";
 			break;
 
 		case RPL_TOPIC:
@@ -40,6 +40,10 @@ std::string reply (int reply, Client *client, std::string target)
 	{
 		case RPL_LISTSTART:
 			msg = "321 " + client->get_nickname() + " Channel :Users Name \r\n";
+			break;
+		
+		case RPL_LISTEND:
+			msg = "323 " +client->get_nickname() + " :End of /LIST\r\n";
 			break;
 		
 		case RPL_NOTOPIC:
