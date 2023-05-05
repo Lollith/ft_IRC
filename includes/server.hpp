@@ -60,6 +60,7 @@ public:
 	void 				names( Client *client );
 	void 				mode(Client *client);
 	void 				list(Client *client);
+	void 				invite(Client *client);
 
 	void				privmsg( Client *client);
 	void 				notice( Client *client);
@@ -67,6 +68,7 @@ public:
 
 	void 				stop();
 	Channel *			searchChan(std::string name);
+	Client*				searchClient(std::string name);
 	void 				welcome_new_chan( Client *client, Channel *channel );
 	void 				broadcast_all(Client *client, Channel *chan, std::string msg);
 	void 				privmsg_to_chan(Client *client, std::string &priv, std::string &targe, std::string &msgt);

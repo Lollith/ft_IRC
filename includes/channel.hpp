@@ -21,6 +21,7 @@ class Channel{
 		void					set_topic_time( time_t timestamp );
 		
 		bool 					has_clients(Client *client);
+		bool 					has_clients(std::string newclient);
 
 		void 					addClient(Client *client);
 		void 					deleteClientFromChan(Client *client);

@@ -2,8 +2,17 @@
 //-----fct _channels------------------------------------------------------------
 void Server::parse_msg_recv(Client *client, std::string msg_recv)
 {
-	int nb_fct = 8;
-	std::string funct_names[] = {"JOIN", "PART", "TOPIC", "PRIVMSG", "NOTICE", "NAMES", "MODE", "LIST"};
+	int nb_fct = 9;
+	std::string funct_names[] = {
+		"JOIN", 
+		"PART", 
+		"TOPIC", 
+		"PRIVMSG", 
+		"NOTICE", 
+		"NAMES", 
+		"MODE", 
+		"LIST", 
+		"INVITE"};
 
 	void (Server::*fct_member[])(Client *client) = { 
 		&Server::join, 
@@ -13,8 +22,8 @@ void Server::parse_msg_recv(Client *client, std::string msg_recv)
 		&Server::notice,
 		&Server::names,
 		&Server::mode,
-
-		&Server::list};
+		&Server::list,
+		&Server::invite};
 
 	for (int i = 0; i < nb_fct; i++)
 	{
@@ -45,6 +54,29 @@ Channel *Server::searchChan(std::string name)
 	{
 		if (_channels[i]->getName() == name)
 			return _channels[i];
+	}
+	return (NULL);
+}
+
+
+Client*Server::searchClient(std::string name)
+{
+	for (size_t i = 0; i < _client.size(); i++)
+	{
+		if (_client[i]->get_nickname() == name)
+			return _client[i];
+	}
+	return (NULL);
+}
+
+ Channel *Server::has_chan(Client * client)
+{
+	std::string chan = client->get_arg().at(0);
+	std::vector<Channel*>::iterator it_chan;	
+	for (it_chan = this->_channels.begin(); it_chan != _channels.end(); it_chan++)
+	{
+		if ((*it_chan)->getName() == chan)
+			return (*it_chan);
 	}
 	return (NULL);
 }
@@ -93,17 +125,7 @@ void Server::welcome_new_chan(Client *client, Channel *channel)
 	client->setMessage(join_msg);
 }
 
- Channel *Server::has_chan(Client * client)
-{
-	std::string chan = client->get_arg().at(0);
-	std::vector<Channel*>::iterator it_chan;	
-	for (it_chan = this->_channels.begin(); it_chan != _channels.end(); it_chan++)
-	{
-		if ((*it_chan)->getName() == chan)
-			return (*it_chan);
-	}
-	return (NULL);
-}
+
 
 void Server::part(Client *client)
 {	
@@ -255,10 +277,7 @@ void Server::names(Client *client){ // TODO
 	return;
 
 }
-//TODO  liste de chan
-// RPL_LISTSTART (321)
-// RPL_LIST (322)
-// RPL_LISTEND (323)
+
 void Server::list(Client *client)
 {
 	std::string msg;
@@ -285,12 +304,59 @@ void Server::list(Client *client)
 		}
 		msg += reply(RPL_LISTEND, client, "");
 	}
-
 		client->setMessage(msg);
 	return;
-
 }
 //invite message: operator
+
+void Server::invite(Client *client)
+{
+	if (client->get_arg().size() < 2)
+	{
+		client->setMessage(reply(ERR_NEEDMOREPARAMS, client, ""));
+		return;
+	}
+	Channel *chan = searchChan(client->get_arg()[1]); // check si chan existe
+
+	if(chan!= NULL)
+	{
+		if(chan->has_clients(client))
+		{
+			if (!client->is_operator(chan))
+			{
+				client->setMessage(reply(ERR_CHANOPRIVSNEEDED , client, chan->getName()));
+				return;
+			}
+			Client *new_target = searchClient(client->get_arg()[0]);
+			if (!new_target)
+			{
+				client->setMessage(reply(ERR_NOSUCHNICK, client, chan->getName() ));
+				return;
+			}
+			if (chan->has_clients(client->get_arg()[0]))
+			{
+				client->setMessage(reply(ERR_USERONCHANNEL, client, chan->getName()));
+				return;
+			}
+
+			client->setMessage(reply( RPL_INVITING, client, chan->getName()));
+			return;
+		}
+		else
+		{
+			client->setMessage(reply(ERR_NOTONCHANNEL, client, chan->getName()));
+			return;
+		}
+	}
+	else 
+	{
+		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, client->get_arg()[1]));
+		return;
+	}
+
+}
+
+//TODO
 //kick : operator
 
 //______________________________TEST CTRLC

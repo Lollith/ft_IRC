@@ -50,6 +50,10 @@ std::string reply (int reply, Client *client, std::string target)
 			msg = "331 " + client->get_nickname() + " " + target + " :No topic is set\r\n";
 			break;
 		
+		case  RPL_INVITING:
+			msg = "341 " + client->get_nickname() + " " + client->get_arg()[0] + " " + target + "\r\n";
+			break;
+		
 		case RPL_ENDOFNAMES:
 			msg = "366 "+ client->get_nickname() + " " + target + " :End of /NAMES list\r\n";
 			break;
@@ -65,10 +69,14 @@ std::string reply (int reply, Client *client, std::string target)
 		case ERR_NOTONCHANNEL:
 			msg = "442 " + client->get_nickname() + " " + target + " :You're not on that channel\r\n";
 			break;
+		
+		case ERR_USERONCHANNEL:
+			msg = "443 " + client->get_nickname() + " " + client->get_arg()[0] + " " + target + " :is already on channel\r\n";
+			break;
 
-		// case ERR_NEEDMOREPARAMS:
-		// 	msg = "461 " + client->get_nickname() + " " + client->get_cmd() + " :Not enough parameters\r\n";
-		// 	break;
+		case ERR_NEEDMOREPARAMS:
+			msg = "461 " + client->get_nickname() + " " + client->get_cmd() + " :Not enough parameters\r\n";
+			break;
 
 		case ERR_CHANOPRIVSNEEDED:
 			msg = "482 " + client->get_nickname() + " " + target + " :You're not channel operator\r\n";
