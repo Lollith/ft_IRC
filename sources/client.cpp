@@ -3,15 +3,15 @@
 //__________________________________________________canonic form
 
 Client::Client(void) : _step_registration(0), _flag_password_ok(false), _flag_password_provided(false),
-					   _flag_shut_client(false), _cap_ok(false), _pass_ok(false), _nick_ok(false), _user_ok(false),
-					   _user(""), _nickname(""), _hostname("")
+					   _flag_shut_client(false), _pass_ok(false), _nick_ok(false), _user_ok(false),
+					   _flag_not_registered(false), _already_auth(false), _user(""), _nickname(""), _hostname("")
 {
 }
 
 Client::Client(int sock_client) : _socket_client(sock_client), _step_registration(0), _flag_password_ok(false),
 								  _flag_password_provided(false), _flag_shut_client(false),
-								  _cap_ok(false), _pass_ok(false), _nick_ok(false), _user_ok(false),
-								  _user(""), _nickname(""), _hostname("")
+								  _pass_ok(false), _nick_ok(false), _user_ok(false),
+								  _flag_not_registered(false), _already_auth(false), _user(""), _nickname(""), _hostname("")
 
 {
 	// 	std::cout << "create client" << std::endl;
@@ -103,7 +103,7 @@ void Client::set_arg(void)
 		_arg_registration.erase(it);
 }
 
-std::string	Client::get_cmd( void ) const
+std::string Client::get_cmd(void) const
 {
 	return (this->_cmd_registration);
 }
@@ -161,14 +161,6 @@ void Client::tokenization_cmd(std::string &cmd)
 		std::cout << "in tokenization: args are : " << (*it) << std::endl;
 }
 
-void Client::ignoreCap(std::string const &)
-{
-	std::cout << GREEN_TXT << "here is CAP check func" << RESET_TXT << std::endl;
-
-	this->_step_registration += 1;
-	this->_cap_ok = true;
-}
-
 // FERMER LE SOCKET CLIENT SI PASSWD FAUX + GARDER LE SERVEUR ALIVE
 void Client::checkPassword(std::string const &psswd)
 {
@@ -178,29 +170,32 @@ void Client::checkPassword(std::string const &psswd)
 
 	this->_flag_password_provided = true;
 
-	if (_arg_registration.back() == psswd)
+	if (!_arg_registration.empty())
 	{
-		this->_pass_ok = true;
-		this->_step_registration += 1;
-		this->_flag_password_ok = true;
-		std::cout << GREEN_TXT << "PASSWORD OK : " << _flag_password_ok << RESET_TXT << std::endl;
-	}
-	else if (_flag_password_ok == true)
-	{
-		setMessage(reply(ERR_ALREADYREGISTERED, this));
-		return;
-	}
-	else if ((_cmd_registration == "PASS") && (_arg_registration.empty()))
-	{
-		rpl = reply(ERR_NEEDMOREPARAMS, this);
-		rpl += "ERROR: Server closing a client connection because need registration.\r\n";
-		setMessage(rpl);
-		_flag_shut_client = true;
-		return;
+		if (_arg_registration.back() == psswd)
+		{
+			this->_pass_ok = true;
+			this->_step_registration += 1;
+			this->_flag_password_ok = true;
+			std::cout << GREEN_TXT << "PASSWORD OK : " << _flag_password_ok << RESET_TXT << std::endl;
+		}
+		else
+		{
+			rpl = reply(ERR_PASSWDMISMATCH, this);
+			rpl += "ERROR: Server closing a client connection because need registration.\r\n";
+			setMessage(rpl);
+			_flag_shut_client = true;
+			return;
+		}
+		if (isAuthenticate())
+		{
+			setMessage(reply(ERR_ALREADYREGISTERED, this));
+			return;
+		}
 	}
 	else
 	{
-		rpl = reply(ERR_PASSWDMISMATCH, this);
+		rpl = reply(ERR_NEEDMOREPARAMS, this);
 		rpl += "ERROR: Server closing a client connection because need registration.\r\n";
 		setMessage(rpl);
 		_flag_shut_client = true;
@@ -243,11 +238,16 @@ bool Client::checkSameNick()
 
 void Client::changeNick(std::string const &old_nick)
 {
-	std::string message = ":";
-	if (old_nick.size() && get_user().size() && get_hostname().size())
-		message += old_nick + "!" + get_user() + "@" + get_hostname();
-	message += " NICK :" + _nickname + "\r\n";
-	broadcaster(message);
+	if (this->_pass_ok == true)
+	{
+		std::string message = ":";
+		if (old_nick.size() && get_user().size() && get_hostname().size())
+			message += old_nick + "!" + get_user() + "@" + get_hostname();
+		message += " NICK :" + _nickname + "\r\n";
+		broadcaster(message);
+	}
+	else
+		return;
 }
 
 void Client::Nick(std::string const &)
@@ -290,7 +290,7 @@ void Client::checkUser(std::string const &)
 {
 	std::cout << GREEN_TXT << "here is USER check func" << RESET_TXT << std::endl;
 
-	if (isAuthenticate())
+	if (this->_already_auth == true && this->_flag_password_provided == true)
 	{
 		setMessage(reply(ERR_ALREADYREGISTERED, this));
 		return;
@@ -352,9 +352,6 @@ void Client::quit(std::string const &)
 	}
 	quit_reason = res;
 
-	// send messages
-	// TODO //ONGOING
-
 	setMessage("ERROR: Server closing a client connection\r\n");
 	std::vector<Channel *>::iterator it_chan;
 	for (it_chan = this->_channels->begin(); it_chan != _channels->end(); it_chan++)
@@ -386,24 +383,25 @@ void Client::quit(std::string const &)
 void Client::checkParams(std::string const &password)
 {
 	int i = 0;
-	int nb_func = 6;
+	int nb_func = 5;
 	std::string rpl;
 
 	void (Client::*func_list[])(std::string const &arg) =
-		{&Client::ignoreCap, &Client::checkPassword, &Client::Nick, &Client::checkUser,
+		{&Client::checkPassword, &Client::Nick, &Client::checkUser,
 		 &Client::clean_ping_mode, &Client::quit};
-	std::string cmd_to_check[] = {"CAP", "PASS", "NICK", "USER", "PING", "QUIT"};
+	std::string cmd_to_check[] = {"PASS", "NICK", "USER", "PING", "QUIT"};
 	while (i < nb_func)
 	{
 		if (_cmd_registration == cmd_to_check[i])
 		{
-			if (i > 1 && _flag_password_provided == false)
+			if (i > 0 && _flag_password_provided == false && _flag_not_registered == false)
 			{
 				rpl = reply(ERR_NOTREGISTERED, this);
 				rpl += "ERROR: Server closing a client connection because need registration.\r\n";
 				setMessage(rpl);
 				_flag_shut_client = true;
-				return;
+				_flag_not_registered = true;
+				break;
 			}
 			else
 			{
@@ -465,7 +463,7 @@ void Client::broadcaster(std::string const &reply)
 
 bool Client::isAuthenticate()
 {
-	if (_cap_ok == true && _pass_ok == true && _nick_ok == true && _user_ok == true)
+	if (_pass_ok == true && _nick_ok == true && _user_ok == true)
 		return true;
 	else
 		return false;
@@ -473,10 +471,10 @@ bool Client::isAuthenticate()
 
 void Client::authenticationValid()
 {
-	if (isAuthenticate())
+	if (isAuthenticate() && _already_auth == false)
 	{
 		std::string buffer = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " 001 " + get_nickname() + " :Welcome to the " + _hostname + " Network " + _nickname + "!" + _user + "@" + _hostname + "\r\n";
 		_message.setBuffer(buffer);
+		_already_auth = true;
 	}
 }
-

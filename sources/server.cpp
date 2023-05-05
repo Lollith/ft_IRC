@@ -296,9 +296,10 @@ bool Server::loop_recept_send()
 				client->setVectorClient(&_client);
 				client->setVectorChan(&_channels);
 				client->getCmdLine(_password);
-		
 				parse_msg_recv(client, client->getMsgRecvSave());
+
 				// check_vectors(); //FIXME si /part puis quit
+
 			}
 			if (FD_ISSET(client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
 				mysend(client);

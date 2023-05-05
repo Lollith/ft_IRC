@@ -75,6 +75,8 @@ public:
 	void						broadcaster(std::string const& reply);
 	void 						authenticationValid();
 	bool						isAuthenticate();
+	void						mode(std::string const &);
+
 
 
 	void						setVectorClient(std::vector<Client*> *_ptr_client);
@@ -100,10 +102,11 @@ private:
 	bool						_flag_password_ok;
 	bool						_flag_password_provided;
 	bool						_flag_shut_client;
-	bool						_cap_ok;
 	bool						_pass_ok;
 	bool						_nick_ok;
 	bool						_user_ok;
+	bool						_flag_not_registered;
+	bool						_already_auth;
 	std::string					_message_recv; // modifiee apres getcmdline
 	std::string					_message_recv_save; //non modifiee apres getcmdline
 	std::string 				_cmd_registration;
