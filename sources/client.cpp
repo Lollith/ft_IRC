@@ -3,14 +3,14 @@
 //__________________________________________________canonic form
 
 Client::Client(void) : _step_registration(0), _flag_password_ok(false), _flag_password_provided(false),
-					   _flag_shut_client(false), _cap_ok(false), _pass_ok(false), _nick_ok(false), _user_ok(false),
+					   _flag_shut_client(false), _pass_ok(false), _nick_ok(false), _user_ok(false),
 					   _flag_not_registered(false), _already_auth(false), _user(""), _nickname(""), _hostname("")
 {
 }
 
 Client::Client(int sock_client) : _socket_client(sock_client), _step_registration(0), _flag_password_ok(false),
 								  _flag_password_provided(false), _flag_shut_client(false),
-								  _cap_ok(false), _pass_ok(false), _nick_ok(false), _user_ok(false),
+								  _pass_ok(false), _nick_ok(false), _user_ok(false),
 								  _flag_not_registered(false), _already_auth(false), _user(""), _nickname(""), _hostname("")
 
 {
@@ -159,14 +159,6 @@ void Client::tokenization_cmd(std::string &cmd)
 	std::vector<std::string>::iterator it;
 	for (it = _arg_registration.begin(); it != _arg_registration.end(); it++) // 1er n hexiste pas , ne rentre pas
 		std::cout << "in tokenization: args are : " << (*it) << std::endl;
-}
-
-void Client::ignoreCap(std::string const &)
-{
-	std::cout << GREEN_TXT << "here is CAP check func" << RESET_TXT << std::endl;
-
-	this->_step_registration += 1;
-	this->_cap_ok = true;
 }
 
 // FERMER LE SOCKET CLIENT SI PASSWD FAUX + GARDER LE SERVEUR ALIVE
@@ -391,18 +383,18 @@ void Client::quit(std::string const &)
 void Client::checkParams(std::string const &password)
 {
 	int i = 0;
-	int nb_func = 6;
+	int nb_func = 5;
 	std::string rpl;
 
 	void (Client::*func_list[])(std::string const &arg) =
-		{&Client::ignoreCap, &Client::checkPassword, &Client::Nick, &Client::checkUser,
+		{&Client::checkPassword, &Client::Nick, &Client::checkUser,
 		 &Client::clean_ping_mode, &Client::quit};
-	std::string cmd_to_check[] = {"CAP", "PASS", "NICK", "USER", "PING", "QUIT"};
+	std::string cmd_to_check[] = {"PASS", "NICK", "USER", "PING", "QUIT"};
 	while (i < nb_func)
 	{
 		if (_cmd_registration == cmd_to_check[i])
 		{
-			if (i > 1 && _flag_password_provided == false && _flag_not_registered == false)
+			if (i > 0 && _flag_password_provided == false && _flag_not_registered == false)
 			{
 				rpl = reply(ERR_NOTREGISTERED, this);
 				rpl += "ERROR: Server closing a client connection because need registration.\r\n";
@@ -471,7 +463,7 @@ void Client::broadcaster(std::string const &reply)
 
 bool Client::isAuthenticate()
 {
-	if (_cap_ok == true && _pass_ok == true && _nick_ok == true && _user_ok == true)
+	if (_pass_ok == true && _nick_ok == true && _user_ok == true)
 		return true;
 	else
 		return false;
