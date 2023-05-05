@@ -330,6 +330,7 @@ void Client::clean_ping_mode(std::string const &)
 	setMessage(msg);
 }
 
+// ONGOING
 void Client::quit(std::string const &)
 {
 	INFO("HERE QUIT FUNC\n");
@@ -354,11 +355,11 @@ void Client::quit(std::string const &)
 
 	setMessage("ERROR: Server closing a client connection\r\n");
 	std::vector<Channel *>::iterator it_chan;
+	broadcast_rpl = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "QUIT " + quit_reason + "\r\n";
 	for (it_chan = this->_channels->begin(); it_chan != _channels->end(); it_chan++)
 	{
 		if ((*it_chan)->has_clients(this))
 		{
-			broadcast_rpl = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "QUIT " + quit_reason + "\r\n";
 			std::vector<Client *> vectclients = (*it_chan)->getClients();
 			std::vector<Client *>::iterator it_client;
 			for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
@@ -378,6 +379,8 @@ void Client::quit(std::string const &)
 			return;
 		}
 	}
+	setMessage(broadcast_rpl);
+	this->_flag_shut_client = true;
 }
 
 void Client::checkParams(std::string const &password)
