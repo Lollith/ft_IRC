@@ -102,7 +102,6 @@ private:
 	bool						_flag_password_ok;
 	bool						_flag_password_provided;
 	bool						_flag_shut_client;
-	bool						_cap_ok;
 	bool						_pass_ok;
 	bool						_nick_ok;
 	bool						_user_ok;
