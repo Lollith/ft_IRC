@@ -88,6 +88,26 @@ std::string reply (int reply, Client *client, std::string target)
 	return (msg);
 }
 
+std::string reply (int reply, Client *client, std::string target, std::string newnick)
+{
+	std::string msg;
+
+	switch(reply)
+	{
+		case ERR_USERNOTINCHANNEL:
+			msg = "441 " + client->get_nickname() + " " + newnick + " " + target + " :They aren't on that channel\r\n";
+			break;
+		
+		// case ERR_USERONCHANNEL: //TODO ici
+			// msg = "443 " + client->get_nickname() + " " + client->get_arg()[0] + " " + target + " :is already on channel\r\n";
+			// break;
+		
+		default:
+			msg = "erreur";   // a redefinir
+	}
+	return (msg);
+}
+
 std::string reply (int reply, Client *client)
 {
 	std::string msg;

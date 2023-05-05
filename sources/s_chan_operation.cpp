@@ -360,11 +360,60 @@ void Server::invite(Client *client)
 
 }
 
-//TODO
-//kick : operator
-void Server::kick(Client *)
+//Kick <channel> <user>(","<user>)(comment)
+void Server::kick(Client *client)
 {
+	if (client->get_arg().size() < 2)
+	{
+		client->setMessage(reply(ERR_NEEDMOREPARAMS, client, ""));
+		return;
+	}
 	
+	Channel *chan = searchChan(client->get_arg()[0]); // check si chan existe
+	if(chan)
+	{
+		if(chan->has_clients(client))
+		{
+			if (!client->is_operator(chan))
+			{
+				client->setMessage(reply(ERR_CHANOPRIVSNEEDED , client, chan->getName()));
+				return;
+			}
+
+			std::vector<std::string> client_list; 
+			client_list = split(client->get_arg()[1], ",");
+			for (size_t i = 0; i < client_list.size(); i++)
+			{
+				Client *new_target = searchClient(client_list[i]);
+
+
+				if (!new_target)
+				{
+					client->setMessage(reply(ERR_USERNOTINCHANNEL, client, chan->getName(), client->get_arg()[1] ));
+					return;
+				}
+
+				std::string comment = "kicked\r\n";
+				if (client->get_arg().size() == 3)
+					comment = client->get_arg().back();
+				std::string kick_msg = ":"+ client->get_nickname() + "@" + client->get_hostname() + " KICK " + chan->getName() + " " +new_target->get_nickname()+ " :" + comment + "\r\n";
+				new_target->setMessage(kick_msg);
+				chan->deleteClientFromChan(new_target);
+				broadcast_all(client, chan, kick_msg);
+				return;
+			}
+		}
+		else
+		{
+				client->setMessage(reply(ERR_NOTONCHANNEL, client, chan->getName()));
+				return;
+		}
+	}
+	else 
+	{
+		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, client->get_arg()[0]));
+		return;
+	}
 }
 
 //______________________________TEST CTRLC
