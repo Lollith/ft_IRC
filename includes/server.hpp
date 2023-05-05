@@ -57,6 +57,11 @@ public:
 	void 				join( Client *client);
 	void 				part( Client *client);
 	void 				topic(Client *client);
+	void 				names( Client *client );
+	void 				mode(Client *client);
+	void 				list(Client *client);
+	void 				invite(Client *client);
+	void 				kick(Client *client);
 
 	void				privmsg( Client *client);
 	void 				notice( Client *client);
@@ -64,11 +69,11 @@ public:
 
 	void 				stop();
 	Channel *			searchChan(std::string name);
+	Client*				searchClient(std::string name);
 	void 				welcome_new_chan( Client *client, Channel *channel );
 	void 				broadcast_all(Client *client, Channel *chan, std::string msg);
 	void 				privmsg_to_chan(Client *client, std::string &priv, std::string &targe, std::string &msgt);
 	void 				privmg_to_client(Client *client,std::string &priv, std::string &target,std::string &msg );
-	void 				names( Client *client );
  	Channel *			has_chan(Client* client);
 
 private:

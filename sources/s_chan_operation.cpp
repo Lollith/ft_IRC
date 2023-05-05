@@ -2,8 +2,18 @@
 //-----fct _channels------------------------------------------------------------
 void Server::parse_msg_recv(Client *client, std::string msg_recv)
 {
-	int nb_fct = 4;
-	std::string funct_names[] = {"JOIN", "PART", "TOPIC", "PRIVMSG", "NOTICE", "NAMES"};
+	int nb_fct = 10;
+	std::string funct_names[] = {
+		"JOIN", 
+		"PART", 
+		"TOPIC", 
+		"PRIVMSG", 
+		"NOTICE", 
+		"NAMES", 
+		"MODE", 
+		"LIST", 
+		"INVITE",
+		"KICK"};
 
 	void (Server::*fct_member[])(Client *client) = { 
 		&Server::join, 
@@ -11,7 +21,11 @@ void Server::parse_msg_recv(Client *client, std::string msg_recv)
 		&Server::topic,
 		&Server::privmsg, 
 		&Server::notice,
-		&Server::names};
+		&Server::names,
+		&Server::mode,
+		&Server::list,
+		&Server::invite,
+		&Server::kick};
 
 	for (int i = 0; i < nb_fct; i++)
 	{
@@ -42,6 +56,29 @@ Channel *Server::searchChan(std::string name)
 	{
 		if (_channels[i]->getName() == name)
 			return _channels[i];
+	}
+	return (NULL);
+}
+
+
+Client*Server::searchClient(std::string name)
+{
+	for (size_t i = 0; i < _client.size(); i++)
+	{
+		if (_client[i]->get_nickname() == name)
+			return _client[i];
+	}
+	return (NULL);
+}
+
+ Channel *Server::has_chan(Client * client)
+{
+	std::string chan = client->get_arg().at(0);
+	std::vector<Channel*>::iterator it_chan;	
+	for (it_chan = this->_channels.begin(); it_chan != _channels.end(); it_chan++)
+	{
+		if ((*it_chan)->getName() == chan)
+			return (*it_chan);
 	}
 	return (NULL);
 }
@@ -90,17 +127,7 @@ void Server::welcome_new_chan(Client *client, Channel *channel)
 	client->setMessage(join_msg);
 }
 
- Channel *Server::has_chan(Client * client)
-{
-	std::string chan = client->get_arg().at(0);
-	std::vector<Channel*>::iterator it_chan;	
-	for (it_chan = this->_channels.begin(); it_chan != _channels.end(); it_chan++)
-	{
-		if ((*it_chan)->getName() == chan)
-			return (*it_chan);
-	}
-	return (NULL);
-}
+
 
 void Server::part(Client *client)
 {	
@@ -140,6 +167,7 @@ void Server::part(Client *client)
 		return;
 	}
 }
+
 
 void Server::topic(Client *client)
 {
@@ -190,32 +218,203 @@ void Server::topic(Client *client)
 }
 
 
+void Server::mode(Client *client)
+{	
+	std::string message;
+	std::string target = client->get_arg()[0];
+	std::string msg = "-i";
+
+	if (client->get_arg().size() == 2)
+		msg = client->get_arg()[1];
+
+	if (target[0] == '#')
+		message += ":" + client->get_nickname()+ "@" + client->get_hostname() + " MODE " + target + " " + msg + "\r\n";
+	else
+		message +=  ":" + client->get_nickname()+ "@" + client->get_hostname() + " MODE " + target + " " + msg + "\r\n";
+	client->setMessage(message);
+}
+
+
+
 	//TODO name tous les chans de la list 
 	// The NAMES command is used to view the nicknames joined to a channel and their 
 	// channel membership prefixes. The param of this command is a list of channel names, 
 	// delimited by a comma (",", 0x2C) character . pb tokenisation]
+	//FIXME pas de tokenisation?
 void Server::names(Client *client){ // TODO
-	
+// (void) client;
+	// si  1 arg
 	Channel *chan_arg = has_chan(client);
-	// std::vector<std::string> chan_list = split(has_chan(client)->getName(),",");
 	std::string msg;
 
 	// for(size_t i = 0; i < chan_list.size(); i++)
 	// {
 	// 	std::cout << chan_list[i]<< " "<< std::endl;
 	// }
+	
 	if(chan_arg)
+	{
 		msg += reply(RPL_NAMREPLY, client, chan_arg);
-	msg += reply(RPL_ENDOFNAMES, client, chan_arg->getName());
-	client->setMessage(msg);
+		// msg += reply(RPL_ENDOFNAMES, client, chan_arg->getName());
+		// client->setMessage(msg);
+	}
+	else
+	{
+		msg += (reply(ERR_NOSUCHCHANNEL, client,client->get_arg()[0]));
+	}
+		msg += reply(RPL_ENDOFNAMES, client, client->get_arg()[0]);
+		client->setMessage(msg);
 
+
+	// // //liste arg
+	// std::vector<std::string> chan_list; 
+	// for(size_t i = 0; i < client->get_arg().size() - 1; i++)
+	// {
+	// 	chan_list = split(client->get_arg()[i], ",");
+	// 	std::cout << chan_list[i] << std::endl;
+	// }
+// 
+	// = split(has_chan(client)->getName(),",");
+	
 	return;
 
 }
-//TODO
-// list message
+
+void Server::list(Client *client)
+{
+	std::string msg;
+
+	if (client->get_arg()[0]== "")  //si == 0 ne rentre pas ds la fonction => pareil pour Name => pas de lecture de requette
+	{
+		msg += reply(RPL_LISTSTART, client, "");
+		for (size_t i = 0; i < _channels.size(); i++)
+		{
+			msg += reply(RPL_LIST, client, _channels[i]);
+		}
+		msg += reply(RPL_LISTEND, client, "");
+	}
+	else
+	{
+		std::vector<std::string> chan_list; 
+		msg += reply(RPL_LISTSTART, client, "");
+		chan_list = split(client->get_arg()[0], ",");
+		for (size_t i = 0; i < chan_list.size(); i++)
+		{
+			Channel *chan = searchChan(chan_list[i]);
+			if (chan)
+				msg += reply(RPL_LIST, client, chan);
+		}
+		msg += reply(RPL_LISTEND, client, "");
+	}
+		client->setMessage(msg);
+	return;
+}
 //invite message: operator
-//kick : operator
+
+void Server::invite(Client *client)
+{
+	if (client->get_arg().size() < 2)
+	{
+		client->setMessage(reply(ERR_NEEDMOREPARAMS, client, ""));
+		return;
+	}
+	Channel *chan = searchChan(client->get_arg()[1]); // check si chan existe
+	if(chan!= NULL)
+	{
+		if(chan->has_clients(client))
+		{
+			if (!client->is_operator(chan))
+			{
+				client->setMessage(reply(ERR_CHANOPRIVSNEEDED , client, chan->getName()));
+				return;
+			}
+			Client *new_target = searchClient(client->get_arg()[0]);
+			if (!new_target)
+			{
+				client->setMessage(reply(ERR_NOSUCHNICK, client, chan->getName() ));
+				return;
+			}
+			if (chan->has_clients(client->get_arg()[0]))
+			{
+				client->setMessage(reply(ERR_USERONCHANNEL, client, chan->getName()));
+				return;
+			}
+
+			std::string msg = reply( RPL_INVITING, client, chan->getName());
+			client->setMessage(msg);
+			std::string invite_msg = ":"+ new_target->get_nickname() + "@" + new_target->get_hostname() + " INVITE " + new_target->get_nickname()+ " " +chan->getName() + "\r\n";
+			new_target->setMessage(invite_msg);
+			return;
+		}
+		else
+		{
+			client->setMessage(reply(ERR_NOTONCHANNEL, client, chan->getName()));
+			return;
+		}
+	}
+	else 
+	{
+		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, client->get_arg()[1]));
+		return;
+	}
+
+}
+
+//Kick <channel> <user>(","<user>)(comment)
+void Server::kick(Client *client)
+{
+	if (client->get_arg().size() < 2)
+	{
+		client->setMessage(reply(ERR_NEEDMOREPARAMS, client, ""));
+		return;
+	}
+	
+	Channel *chan = searchChan(client->get_arg()[0]); // check si chan existe
+	if(chan)
+	{
+		if(chan->has_clients(client))
+		{
+			if (!client->is_operator(chan))
+			{
+				client->setMessage(reply(ERR_CHANOPRIVSNEEDED , client, chan->getName()));
+				return;
+			}
+
+			std::vector<std::string> client_list; 
+			client_list = split(client->get_arg()[1], ",");
+			for (size_t i = 0; i < client_list.size(); i++)
+			{
+				Client *new_target = searchClient(client_list[i]);
+
+
+				if (!new_target)
+				{
+					client->setMessage(reply(ERR_USERNOTINCHANNEL, client, chan->getName(), client->get_arg()[1] ));
+					return;
+				}
+
+				std::string comment = "kicked\r\n";
+				if (client->get_arg().size() == 3)
+					comment = client->get_arg().back();
+				std::string kick_msg = ":"+ client->get_nickname() + "@" + client->get_hostname() + " KICK " + chan->getName() + " " +new_target->get_nickname()+ " :" + comment + "\r\n";
+				new_target->setMessage(kick_msg);
+				chan->deleteClientFromChan(new_target);
+				broadcast_all(client, chan, kick_msg);
+				return;
+			}
+		}
+		else
+		{
+				client->setMessage(reply(ERR_NOTONCHANNEL, client, chan->getName()));
+				return;
+		}
+	}
+	else 
+	{
+		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, client->get_arg()[0]));
+		return;
+	}
+}
 
 //______________________________TEST CTRLC
 void Server::stop()
