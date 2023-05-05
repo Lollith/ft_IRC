@@ -187,23 +187,23 @@ void Client::checkPassword(std::string const &psswd)
 			this->_flag_password_ok = true;
 			std::cout << GREEN_TXT << "PASSWORD OK : " << _flag_password_ok << RESET_TXT << std::endl;
 		}
-	}
-	else if (isAuthenticate())
-	{
-		setMessage(reply(ERR_ALREADYREGISTERED, this));
-		return;
-	}
-	else if ((_cmd_registration == "PASS") && (_arg_registration.empty()))
-	{
-		rpl = reply(ERR_NEEDMOREPARAMS, this);
-		rpl += "ERROR: Server closing a client connection because need registration.\r\n";
-		setMessage(rpl);
-		_flag_shut_client = true;
-		return;
+		else
+		{
+			rpl = reply(ERR_PASSWDMISMATCH, this);
+			rpl += "ERROR: Server closing a client connection because need registration.\r\n";
+			setMessage(rpl);
+			_flag_shut_client = true;
+			return;
+		}
+		if (isAuthenticate())
+		{
+			setMessage(reply(ERR_ALREADYREGISTERED, this));
+			return;
+		}
 	}
 	else
 	{
-		rpl = reply(ERR_PASSWDMISMATCH, this);
+		rpl = reply(ERR_NEEDMOREPARAMS, this);
 		rpl += "ERROR: Server closing a client connection because need registration.\r\n";
 		setMessage(rpl);
 		_flag_shut_client = true;
