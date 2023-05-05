@@ -355,9 +355,10 @@ void Client::quit(std::string const &)
 	}
 	quit_reason = res;
 
+	broadcast_rpl = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "QUIT " + quit_reason + "\r\n";
 	setMessage("ERROR: Server closing a client connection\r\n");
 	std::vector<Channel *>::iterator it_chan;
-	broadcast_rpl = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "QUIT " + quit_reason + "\r\n";
+	setMessage(broadcast_rpl);
 	for (it_chan = this->_channels->begin(); it_chan != _channels->end(); it_chan++)
 	{
 		if ((*it_chan)->has_clients(this))
@@ -376,7 +377,6 @@ void Client::quit(std::string const &)
 			return;
 		}
 	}
-	setMessage(broadcast_rpl);
 	this->_flag_shut_client = true;
 }
 
