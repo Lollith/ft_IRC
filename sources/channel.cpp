@@ -50,14 +50,26 @@ this->_clients.push_back(client);
 //check si le client est dans le  vector
 bool Channel::has_clients(Client *client)
 {
-std::vector<Client*>::iterator it_client;
-for (it_client = _clients.begin(); it_client != _clients.end(); it_client++)// ici si remplace _clients par getClients())
+	std::vector<Client*>::iterator it_client;
+	for (it_client = _clients.begin(); it_client != _clients.end(); it_client++)// ici si remplace _clients par getClients())
+	{
+		if ((*it_client)->getSocketClient() == client->getSocketClient())
+			return true;
+	}
+		return false;
+}
+
+bool Channel::has_clients(std::string newclient)
 {
-	if ((*it_client)->getSocketClient() == client->getSocketClient())
-		return true;
+	std::vector<Client*>::iterator it_client;
+	for (it_client = _clients.begin(); it_client != _clients.end(); it_client++)// ici si remplace _clients par getClients())
+	{
+		if ((*it_client)->get_nickname() == newclient)
+			return true;
+	}
+		return false;
 }
-return false;
-}
+
 
 void Channel::deleteClientFromChan(Client *client)
 {
