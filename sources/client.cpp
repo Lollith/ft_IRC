@@ -330,6 +330,9 @@ void Client::clean_ping_mode(std::string const &)
 	setMessage(msg);
 }
 
+// ONGOING
+
+// FIXME : un quit hors chan quand les auutres clients sont ds un chan
 void Client::quit(std::string const &)
 {
 	INFO("HERE QUIT FUNC\n");
@@ -352,13 +355,14 @@ void Client::quit(std::string const &)
 	}
 	quit_reason = res;
 
+	broadcast_rpl = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "QUIT " + quit_reason + "\r\n";
 	setMessage("ERROR: Server closing a client connection\r\n");
 	std::vector<Channel *>::iterator it_chan;
+	setMessage(broadcast_rpl);
 	for (it_chan = this->_channels->begin(); it_chan != _channels->end(); it_chan++)
 	{
 		if ((*it_chan)->has_clients(this))
 		{
-			broadcast_rpl = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "QUIT " + quit_reason + "\r\n";
 			std::vector<Client *> vectclients = (*it_chan)->getClients();
 			std::vector<Client *>::iterator it_client;
 			for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
@@ -372,12 +376,8 @@ void Client::quit(std::string const &)
 			this->_flag_shut_client = true;
 			return;
 		}
-		else
-		{
-			setMessage(reply(ERR_NOTONCHANNEL, this, (*it_chan)));
-			return;
-		}
 	}
+	this->_flag_shut_client = true;
 }
 
 void Client::checkParams(std::string const &password)
@@ -478,3 +478,6 @@ void Client::authenticationValid()
 		_already_auth = true;
 	}
 }
+
+// TODO
+//  tester et corriger broadcast pour nick et quit quand plusieurs clients sont co sur plusieurs channels
