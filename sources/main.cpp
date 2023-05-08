@@ -17,10 +17,18 @@ int main(int ac, char **av)
 	// char *buf;
 
 	if (ac != 3)
+	{
+		std::cout << "need more parameters" <<std::endl;
 		return (1);
+	}
 	else
 	{
 		int sock_serv = atoi(av[1]);
+		if (sock_serv < 1024 || sock_serv > 65535)
+		{
+			std::cout << "bad port : 1024-65535" << std::endl;
+			return 1;
+		}
 		Server serv(sock_serv, av[2]);
 		//FIXME ctrl c
 		struct sigaction act;

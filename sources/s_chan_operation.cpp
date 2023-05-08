@@ -83,7 +83,7 @@ Client*Server::searchClient(std::string name)
 	return (NULL);
 }
 
-void Server::join( Client *client)
+void Server::join( Client *client )
 {
 
 	if (client->get_arg().size() < 1)
@@ -97,18 +97,18 @@ void Server::join( Client *client)
 	for (size_t i = 0; i < chan_list.size(); i++)
 	{
 		Channel *chan = searchChan(chan_list[i]);
+		std::cout<< chan_list[i ] << std::endl;
 		if (!chan)
 		{
-			chan = new Channel( client->get_arg()[i]);
+			chan = new Channel( chan_list[i]);
 			_channels.push_back(chan); // si chan n existe pas => le creer
-			INFO("creation Channel " + client->get_arg()[i] + "\n");
+			INFO("creation Channel " + chan_list[i] + "\n");
 			client->add_chan_ope(chan);
 		}
-			INFO("=>Join le channel\n");
-			(chan)->addClient(client);
-			welcome_new_chan(client, chan);
-			chan->check_vctor(client);
-		i++;
+		INFO("=>Join le channel\n");
+		(chan)->addClient(client);
+		welcome_new_chan(client, chan);
+		chan->check_vctor(client);
 	}
 }
 
