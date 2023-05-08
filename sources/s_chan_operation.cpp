@@ -226,17 +226,23 @@ void Server::mode(Client *client)
 {	
 	std::string message;
 	std::string target = client->get_arg()[0];
-	std::string msg = "-i";
+	std::string msg = client->get_mode();
 
 	if (client->get_arg().size() == 2)
 		msg = client->get_arg()[1];
+	// std::cout << msg << std::endl;
 
 	if (target[0] == '#')
+	{
 		message += ":" + client->get_nickname()+ "@" + client->get_hostname() + 
 			" MODE " + target + " " + msg + "\r\n";
+	}
 	else
+	{
+		client->set_mode(msg);
 		message +=  ":" + client->get_nickname()+ "@" + client->get_hostname() + 
-			" MODE " + target + " " + msg + "\r\n";
+			" MODE " + target + " " + msg + "\r\n";	
+	}
 	client->setMessage(message);
 }
 
@@ -246,7 +252,7 @@ void Server::mode(Client *client)
 	// channel membership prefixes. The param of this command is a list of channel names, 
 	// delimited by a comma (",", 0x2C) character . pb tokenisation]
 void Server::names(Client *client){
-	// Channel *chan_arg = has_chan(client);
+	
 	std::string msg;
 
 	std::vector<std::string> chan_list; 

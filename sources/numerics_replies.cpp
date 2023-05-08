@@ -21,9 +21,17 @@ std::string reply (int reply, Client *client, Channel *channel)
 		
 
 		case RPL_NAMREPLY:
-			for (size_t  j = 0; j < channel->getClients().size(); j++)
-				name += channel->getClients()[j]->get_nickname()+ " ";
-			msg = "353 " + client->get_nickname() + " = " + channel->getName() + " :@" + name + "\r\n";
+			for (size_t  i = 0; i < channel->getClients().size(); i++)
+			{
+					if (channel->getClients()[i]->get_mode() == "+i" && !channel->has_clients(client))
+						name += " ";
+					else
+						name += channel->getClients()[i]->get_nickname()+ " ";
+			}
+			if (name != " ")
+				msg = "353 " + client->get_nickname() + " = " + channel->getName() + " :@" + name + "\r\n";
+			else
+				msg = "353 " + client->get_nickname() + " = " + channel->getName() + "\r\n";
 			break;
 		
 		default:

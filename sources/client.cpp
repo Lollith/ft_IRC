@@ -4,14 +4,16 @@
 
 Client::Client(void) : _step_registration(0), _flag_password_ok(false), _flag_password_provided(false),
 					   _flag_shut_client(false), _pass_ok(false), _nick_ok(false), _user_ok(false),
-					   _flag_not_registered(false), _already_auth(false), _user(""), _nickname(""), _hostname("")
+					   _flag_not_registered(false), _already_auth(false),
+					_user(""), _nickname(""), _hostname(""), _mode("+i")
 {
 }
 
 Client::Client(int sock_client) : _socket_client(sock_client), _step_registration(0), _flag_password_ok(false),
 								  _flag_password_provided(false), _flag_shut_client(false),
 								  _pass_ok(false), _nick_ok(false), _user_ok(false),
-								  _flag_not_registered(false), _already_auth(false), _user(""), _nickname(""), _hostname("")
+								  _flag_not_registered(false), _already_auth(false), 
+								  _user(""), _nickname(""), _hostname(""), _mode("+i")
 
 {
 	// 	std::cout << "create client" << std::endl;
@@ -89,6 +91,17 @@ void Client::setFlagPsswd(bool boolean)
 void Client::setFlagPsswdProvided(bool boolean)
 {
 	this->_flag_password_provided = boolean;
+}
+	
+std::string	Client::get_mode( void )
+{
+	return _mode;
+}
+
+void Client::set_mode(std::string mode)
+{
+	if (mode == "+i" || mode == "-i")
+		_mode = mode;
 }
 
 std::vector<std::string> Client::get_arg(void) const

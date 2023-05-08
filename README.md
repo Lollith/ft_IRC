@@ -34,9 +34,9 @@
 <!-- - channels = group d un ou +ieurs clients, receive all message; creee lorsque le 1er client joins et rm when last leave, name rules -->
 <!-- - JOIN message -->
 <!-- - PART message -->
-<!-- - topic message -->
-- names message
-<!-- - list message -->
+- topic message : mode +t
+- names message chan +s  user+i
+- list message chan +s chan +i
 <!-- - invite message -->
 
 
