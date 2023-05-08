@@ -106,6 +106,7 @@ void Server::welcome_new_chan(Client *client, Channel *channel)
 	client->setMessage(join_msg);
 }
 
+///JOIN #test,#test2
 void Server::join( Client *client )
 {
 	if (client->get_arg().size() < 1)
@@ -119,7 +120,6 @@ void Server::join( Client *client )
 	for (size_t i = 0; i < chan_list.size(); i++)
 	{
 		Channel *chan = searchChan(chan_list[i]);
-		std::cout<< chan_list[i ] << std::endl;
 		if (!chan)
 		{
 			chan = new Channel( chan_list[i]);
@@ -150,7 +150,6 @@ void Server::part(Client *client)
 	for (size_t i = 0; i < chan_list.size(); i++)
 	{
 		Channel *chan = searchChan(chan_list[i]);
-		std::cout<< chan_list[i ] << std::endl;
 		if(!chan)
 		{
 			client->setMessage(reply(ERR_NOSUCHCHANNEL, client, chan_list[i]));
@@ -243,46 +242,24 @@ void Server::mode(Client *client)
 
 
 
-	//TODO name tous les chans de la list 
 	// The NAMES command is used to view the nicknames joined to a channel and their 
 	// channel membership prefixes. The param of this command is a list of channel names, 
 	// delimited by a comma (",", 0x2C) character . pb tokenisation]
-	//FIXME pas de tokenisation?
-void Server::names(Client *client){ // TODO
-// (void) client;
-	// si  1 arg
-	Channel *chan_arg = has_chan(client);
+void Server::names(Client *client){
+	// Channel *chan_arg = has_chan(client);
 	std::string msg;
 
-	// for(size_t i = 0; i < chan_list.size(); i++)
-	// {
-	// 	std::cout << chan_list[i]<< " "<< std::endl;
-	// }
-	
-	if(chan_arg)
+	std::vector<std::string> chan_list; 
+	chan_list = split(client->get_arg()[0], ",");
+	for (size_t i = 0; i < chan_list.size(); i++)
 	{
-		msg += reply(RPL_NAMREPLY, client, chan_arg);
-		// msg += reply(RPL_ENDOFNAMES, client, chan_arg->getName());
-		// client->setMessage(msg);
-	}
-	else
-	{
-		msg += (reply(ERR_NOSUCHCHANNEL, client,client->get_arg()[0]));
-	}
-		msg += reply(RPL_ENDOFNAMES, client, client->get_arg()[0]);
+		Channel *chan = searchChan(chan_list[i]);
+		
+		if(chan)
+			msg += reply(RPL_NAMREPLY, client, chan);
+		msg += reply(RPL_ENDOFNAMES, client, chan_list[i]);
 		client->setMessage(msg);
-
-
-	// // //liste arg
-	// std::vector<std::string> chan_list; 
-	// for(size_t i = 0; i < client->get_arg().size() - 1; i++)
-	// {
-	// 	chan_list = split(client->get_arg()[i], ",");
-	// 	std::cout << chan_list[i] << std::endl;
-	// }
-// 
-	// = split(has_chan(client)->getName(),",");
-	
+	}
 	return;
 
 }
