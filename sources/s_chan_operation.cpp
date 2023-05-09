@@ -79,6 +79,22 @@ Client *Server::searchClient(std::string &name)
 	return (NULL);
 }
 
+Channel* Server::check_chan(Client *client, std::string &chan_arg)
+{
+	Channel *chan = searchChan(chan_arg); // check si chan existe
+	if(!chan)
+	{
+		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, chan_arg));
+		return NULL;
+	}
+	if(!chan->has_clients(client))
+	{
+		client->setMessage(reply(ERR_NOTONCHANNEL, client, chan->getName()));
+		return NULL;
+	}
+	return chan;
+}
+
 //A JOIN message with the client as the message <source> and the channel they 
 //have joined as the first parameter of the message.
 // The <source> of the message represents the user or server that sent the message, 
@@ -132,6 +148,7 @@ void Server::join( Client *client )
 			return(client->setMessage(reply(ERR_INVITEONLYCHAN, client, chan->getName())));
 	}
 }
+
 
 void Server::part(Client *client)
 {
@@ -322,26 +339,6 @@ void Server::list(Client *client)
 	return;
 }
 
-Channel* Server::check_chan(Client *client, std::string &chan_arg)
-{
-	Channel *chan = searchChan(chan_arg); // check si chan existe
-	if(!chan)
-	{
-		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, chan_arg));
-		return NULL;
-	}
-	if(!chan->has_clients(client))
-	{
-		client->setMessage(reply(ERR_NOTONCHANNEL, client, chan->getName()));
-		return NULL;
-	}
-	if (!client->is_operator(chan) && chan->get_mode()[I] == "+")
-	{
-		client->setMessage(reply(ERR_CHANOPRIVSNEEDED, client, chan->getName()));
-		return NULL;
-	}
-	return chan;
-}
 
 void Server::invite(Client *client)
 {
@@ -351,7 +348,9 @@ void Server::invite(Client *client)
 	Channel *chan = check_chan(client, client->get_arg()[1]); // check si chan existe
 	if (!chan)
 		return;
-
+	if (!client->is_operator(chan) && chan->get_mode()[I] == "+")
+		return(client->setMessage(reply(ERR_CHANOPRIVSNEEDED, client, chan->getName())));
+	
 	Client *new_target = searchClient(client->get_arg()[0]);
 	if (!new_target)
 		return(client->setMessage(reply(ERR_NOSUCHNICK, client, chan->getName())));
@@ -373,12 +372,10 @@ void Server::kick(Client *client)
 {
 	if (client->get_arg().size() < 2)
 		return(client->setMessage(reply(ERR_NEEDMOREPARAMS, client, "")));
-	
-	Channel *chan = searchChan(client->get_arg()[0]); // check si chan existe
-	if(!chan)
-		return(client->setMessage(reply(ERR_NOSUCHCHANNEL, client, client->get_arg()[0])));
-	if(!chan->has_clients(client))
-		return(client->setMessage(reply(ERR_NOTONCHANNEL, client, chan->getName())));
+
+	Channel *chan = check_chan(client, client->get_arg()[0]); // check si chan existe
+	if (!chan)
+		return;
 	if (!client->is_operator(chan))
 		return(client->setMessage(reply(ERR_CHANOPRIVSNEEDED , client, chan->getName())));
 
