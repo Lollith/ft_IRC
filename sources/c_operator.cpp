@@ -29,3 +29,14 @@ void Client::add_chan_ope( Channel *chan )
 {
 	_chan_ope.push_back(chan);
 }
+
+Channel* Client::search_chan(std::string chan)
+{
+	std::vector<Channel*>::iterator it;
+	for (it = _channels->begin(); it != _channels->end(); it++)
+	{
+		if ((*it)->getName() == chan)
+			return (*it);
+	}
+		return NULL;
+}

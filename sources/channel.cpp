@@ -1,10 +1,12 @@
 #include "irc.hpp"
 
-Channel::Channel(std::string name) : _name(name)
-{
-	_flag_erase_chan = false;
-	_topic = "welcome";
-	// std::cout << "constructeur channel par default"<< std::endl;
+Channel::Channel ( std::string name ): _name(name){
+_flag_erase_chan = false;
+_topic = "welcome";
+	_mode[I]= "-";
+	_mode[S]= "-";
+	_mode[T]= "-";
+// std::cout << "constructeur channel par default"<< std::endl;
 }
 
 std::string Channel::getName(void) const
@@ -32,14 +34,37 @@ void Channel::set_topic_time(time_t timestamp)
 	_topic_time = timestamp;
 }
 
-std::vector<Client *> Channel::getClients(void) const
-{
-	return (this->_clients);
+time_t Channel::get_create_time( void ) const{
+	return this->_topic_time;
 }
 
-bool Channel::get_flag_erase_chan(void) const
+void Channel::set_create_time( time_t timestamp )
 {
-	return (_flag_erase_chan);
+	_create_time = timestamp;
+}
+
+
+std::vector<Client *> Channel::getClients( void ) const {
+return(this->_clients);
+}
+
+std::string	*Channel::get_mode( void )
+{
+	return _mode;
+}
+
+void Channel::set_mode(std::string mode)
+{
+	if (mode == "+i" || mode == "-i")
+		_mode[I] = mode[0]; // recup le + ou -
+	if (mode == "+s" || mode == "-s")
+		_mode[S] = mode[0];
+	if (mode == "+t" || mode == "-t")
+		_mode[T] = mode[0];
+}
+
+bool	Channel::get_flag_erase_chan( void ) const{
+return(_flag_erase_chan);
 }
 
 void Channel::set_flag_erase_chan(bool mybool)
@@ -47,10 +72,21 @@ void Channel::set_flag_erase_chan(bool mybool)
 	_flag_erase_chan = mybool;
 }
 
-void Channel::addClient(Client *client)
+bool Channel::is_invited(Client *client)
 {
-	INFO("client" << client->getSocketClient() << " rejoint" << std::endl);
-	this->_clients.push_back(client);
+	if(client->get_nickname() == this->_invited)
+		return true;
+	return false;
+}
+
+void Channel::set_invite(Client *newclient)
+{
+	_invited = newclient->get_nickname();
+}
+
+void Channel::addClient(Client *client){
+INFO("client"<< client->getSocketClient()<<" rejoint" << std::endl);
+this->_clients.push_back(client);
 }
 
 // check si le client est dans le  vector

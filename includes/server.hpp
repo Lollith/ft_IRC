@@ -67,14 +67,17 @@ public:
 	void 				notice( Client *client);
 	// void				changeNick( Client *client);
 
+	void 				welcome_new_chan( Client *client, Channel *channel );
+	void 				chan_mode(Client *client, std::string &target, std::string &mode);
+	void 				user_mode(Client *client, std::string &target, std::string &mode);
+	void 				user_mode(Client *client);
 	void 				stop();
 	Channel *			searchChan(std::string name);
+ 	Channel *			has_chan(Client* client);
 	Client*				searchClient(std::string name);
-	void 				welcome_new_chan( Client *client, Channel *channel );
 	void 				broadcast_all(Client *client, Channel *chan, std::string msg);
 	void 				privmsg_to_chan(Client *client, std::string &priv, std::string &targe, std::string &msgt);
 	void 				privmg_to_client(Client *client,std::string &priv, std::string &target,std::string &msg );
- 	Channel *			has_chan(Client* client);
 
 private:
 	// useless constructor
