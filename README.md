@@ -34,10 +34,10 @@
 <!-- - channels = group d un ou +ieurs clients, receive all message; creee lorsque le 1er client joins et rm when last leave, name rules -->
 <!-- - JOIN message -->
 <!-- - PART message -->
-<!-- - topic message -->
-- names message
-<!-- - list message -->
-<!-- - invite message -->
+<!-- - topic message : mode +t -->
+<!-- - names message chan +s  user+i -->
+<!-- - list message chan +s -->
+<!-- - invite message chan +i -->
 
 
 <!-- - JOIN = create ou se connecter  -->
@@ -51,16 +51,9 @@
 <!-- -	privmsg -->
 <!-- - notice -->
 	
-- If <target> is a channel name, it may be prefixed with one or more channel membership prefix character (@, +, etc) and the message will be delivered only to the members of that channel with the given or higher status in the channel.
-	Servers that support this feature will list the prefixes which this is supported for in the STATUSMSG RPL_ISUPPORT parameter, and this SHOULD NOT be attempted by clients unless the prefix has been advertised in this token.
-	<!-- - ERR_NOSUCHNICK (401) -->
-	<!-- - ERR_NOSUCHCHANNEL -->
 	- ERR_CANNOTSENDTOCHAN (404)=>  This is generally sent in response to channel modes, such as a channel being moderated and the client not having permission to speak on the channel, or not being joined to a channel with the no external messages mode set.
-	- If a message cannot be delivered to a channel, the server SHOULD respond with an ERR_CANNOTSENDTOCHAN (404) numeric to let the user know that this message could not be delivered.
 
-5. server operators// chan operator // utilisateurs basiques: 
-- OPER command: server operator
-a special class of clients (operators) are allowed to perform general maintenance functions on the network.
+5. server operators // non implementes 
 allowed to perform maintenance: 
 	- KILL = close the connection between a client and server,.... 
 	can disconnect and reconnect servers:

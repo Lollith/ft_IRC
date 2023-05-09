@@ -30,11 +30,14 @@ public:
 	std::string					getMsgRecvSave( void )const;
 	
 	void						setMessage( std::string );
-	void						clearMessage();
+	void						clearMessage( void );
 	std::string					getMessage( void ) const;
 
 	void		 				setFlagPsswdProvided(bool boolean);
 	void				 		setFlagPsswd(bool boolean);
+
+	std::string					get_mode( void );
+	void						set_mode(std::string mode);
 
 	bool				 		getFlagMustShutClient();
 
@@ -85,6 +88,7 @@ public:
 
 	void 						deleteOperator(Channel *chan);
 	bool 						is_operator(Channel *chan);
+	Channel						*search_chan(std::string chan);
 	
 
 private:
@@ -114,6 +118,7 @@ private:
 	std::string					_nickname;
 	std::string					_hostname;
 	std::string					_realname;
+	std::string					_mode; // "+i ou -i"
 	
 	std::vector<std::string>	_arg_registration;
 	std::vector<Client*>		*_client;
