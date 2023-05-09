@@ -212,11 +212,11 @@ void Server::myrecv(Client *client)
 	char buf[1024] = {0};
 
 	int res_rd = recv(client->getSocketClient(), buf, sizeof(buf), 0);
-	if (res_rd < 0)
+	if (res_rd <= 0)
 	{
-		perror("receive client failed");
+		// perror("receive client failed");
 		close(client->getSocketClient());
-		// return false;
+		return;
 	}
 	if (buf[0])
 	{
