@@ -5,14 +5,14 @@
 Client::Client(void) : _step_registration(0), _flag_password_ok(false), _flag_password_provided(false),
 					   _flag_shut_client(false), _pass_ok(false), _nick_ok(false), _user_ok(false),
 					   _flag_not_registered(false), _already_auth(false),
-					_user(""), _nickname(""), _hostname(""), _mode("+i")
+					   _user(""), _nickname(""), _hostname(""), _mode("+i")
 {
 }
 
 Client::Client(int sock_client) : _socket_client(sock_client), _step_registration(0), _flag_password_ok(false),
 								  _flag_password_provided(false), _flag_shut_client(false),
 								  _pass_ok(false), _nick_ok(false), _user_ok(false),
-								  _flag_not_registered(false), _already_auth(false), 
+								  _flag_not_registered(false), _already_auth(false),
 								  _user(""), _nickname(""), _hostname(""), _mode("+i")
 
 {
@@ -92,15 +92,15 @@ void Client::setFlagPsswdProvided(bool boolean)
 {
 	this->_flag_password_provided = boolean;
 }
-	
-std::string	Client::get_mode( void )
+
+std::string Client::get_mode(void)
 {
 	return _mode;
 }
 
 void Client::set_mode(std::string mode)
 {
-		_mode = mode;
+	_mode = mode;
 }
 
 std::vector<std::string> Client::get_arg(void) const
@@ -124,7 +124,6 @@ void Client::setFlagMustShutClient(bool boolean)
 {
 	this->_flag_shut_client = boolean;
 }
-
 
 bool Client::getFlagMustShutClient()
 {
@@ -392,6 +391,17 @@ void Client::quit(std::string const &)
 			if ((*it_chan)->getClients().size() < 1)
 				(*it_chan)->set_flag_erase_chan(true);
 		}
+		// TODO delete chan si plus de clients dedans
+		// for (size_t i = 0; i < _channels.size();)
+		// {
+		// 	if (_channels[i]->get_flag_erase_chan() == true)
+		// 	{
+		// 		delete (_channels[i]);
+		// 		_channels.erase(_channels.begin() + i);
+		// 	}
+		// 	else
+		// 		i++;
+		// }
 	}
 	this->_flag_shut_client = true;
 }
