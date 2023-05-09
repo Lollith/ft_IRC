@@ -373,8 +373,6 @@ void Client::quit(std::string const &)
 			((*it_chan)->deleteClientFromChan(this));
 			if ((*it_chan)->getClients().size() < 1)
 				(*it_chan)->set_flag_erase_chan(true);
-			this->_flag_shut_client = true;
-			return;
 		}
 	}
 	this->_flag_shut_client = true;
