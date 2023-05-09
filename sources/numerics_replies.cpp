@@ -188,7 +188,6 @@ std::vector<std::string> split(const std::string &str, const char *set_delim)
 	std::vector<std::string> list;
 
 	std::size_t pos = str.find_first_of(set_delim);
-
 	while (pos != std::string::npos)
 	{
 		if (pos == i)
@@ -202,7 +201,6 @@ std::vector<std::string> split(const std::string &str, const char *set_delim)
 		}
 		pos = str.find_first_of(set_delim, pos);
 	}
-
 	if (i != str.length())
 		list.push_back(str.substr(i, str.length()));
 

@@ -200,11 +200,6 @@ void Server::mySelect(fd_set &rd, fd_set &wr)
 		//here: déclencher le QUIT ? STOP le serveur ou autre
 		// return; // continue?? si errno == eintr
 	}
-	// else if (select_ready == 0) //utile?
-	// {
-	// 	std::cout <<"timeout"<< std::endl;
-	// 	continue;
-	// }
 }
 
 void Server::myrecv(Client *client)
@@ -230,7 +225,7 @@ void Server::myrecv(Client *client)
 
 void Server::mysend(Client *client)
 {
-	if (!client->getMessage().empty()) // comme je reinitialise a la fin le message
+	if (!client->getMessage().empty()) 
 	{
 		INFO("=>Repond au client:" << std::endl);
 		INFO("=>Message envoye a client " << client->getSocketClient()
@@ -297,7 +292,7 @@ bool Server::loop_recept_send()
 				client->setVectorChan(&_channels);
 				client->getCmdLine(_password);
 				parse_msg_recv(client, client->getMsgRecvSave());
-				check_vectors(); //DEBUG si /part puis quit
+				check_vectors();
 			}
 			if (FD_ISSET(client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
 				mysend(client);
@@ -323,7 +318,6 @@ void Server::check_vectors()
 		}
 	}
 	DEBUG(std::endl);
-	
 	DEBUG("vector _clients: ");
 	std::vector<Client*>::iterator it2;	
 	for (it2 = _client.begin(); it2 != _client.end(); it2++)

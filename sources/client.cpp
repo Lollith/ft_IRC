@@ -2,14 +2,14 @@
 
 //__________________________________________________canonic form
 
-Client::Client(void) : _step_registration(0), _flag_password_ok(false), _flag_password_provided(false),
+Client::Client(void) : _message(""), _step_registration(0), _flag_password_ok(false), _flag_password_provided(false),
 					   _flag_shut_client(false), _pass_ok(false), _nick_ok(false), _user_ok(false),
 					   _flag_not_registered(false), _already_auth(false),
 					_user(""), _nickname(""), _hostname(""), _mode("+i")
 {
 }
 
-Client::Client(int sock_client) : _socket_client(sock_client), _step_registration(0), _flag_password_ok(false),
+Client::Client(int sock_client) :_message(""), _socket_client(sock_client), _step_registration(0), _flag_password_ok(false),
 								  _flag_password_provided(false), _flag_shut_client(false),
 								  _pass_ok(false), _nick_ok(false), _user_ok(false),
 								  _flag_not_registered(false), _already_auth(false), 
