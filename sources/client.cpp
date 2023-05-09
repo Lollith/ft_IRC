@@ -100,7 +100,6 @@ std::string	Client::get_mode( void )
 
 void Client::set_mode(std::string mode)
 {
-	if (mode == "+i" || mode == "-i")
 		_mode = mode;
 }
 

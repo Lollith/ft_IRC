@@ -4,6 +4,7 @@ std::string reply (int reply, Client *client, Channel *channel)
 {
 	std::string msg;
 	std::string name;
+	std::string mymode;
 	
 	switch(reply)
 	{
@@ -11,6 +12,15 @@ std::string reply (int reply, Client *client, Channel *channel)
 			msg = "322 " + client->get_nickname() + " " + channel->getName() + " " +ft_itoa(channel->getClients().size()) + " :" + channel->getTopic() +"\r\n";
 			break;
 
+		case RPL_CHANNELMODEIS:
+			mymode = channel->get_mode()[I] + "i" + channel->get_mode()[S] + "s" + channel->get_mode()[T] + "t";
+			msg = "324 " + client->get_nickname() + " " + channel->getName() + " " + mymode +"\r\n";
+			break;
+		
+		case RPL_CREATIONTIME:
+			msg = "329 " + client->get_nickname() + " " + channel->getName() + " " + ft_itoa(channel->get_create_time()) +"\r\n";
+			break;
+		
 		case RPL_TOPIC:
 			msg = "332 " + client->get_nickname() + " " + channel->getName() + " " + channel->getTopic() +"\r\n";
 			break;
@@ -19,23 +29,22 @@ std::string reply (int reply, Client *client, Channel *channel)
 			msg = "333 " + client->get_nickname() + " " + channel->getName() + " " + client->get_nickname() + " " +ft_itoa(channel->get_topic_time()) + "\r\n";
 			break;
 		
-
 		case RPL_NAMREPLY:
 			for (size_t  i = 0; i < channel->getClients().size(); i++)
 			{
 					if (channel->getClients()[i]->get_mode() == "+i" && !channel->has_clients(client))
-						name += " ";
+						name += "";
 					else
 						name += channel->getClients()[i]->get_nickname()+ " ";
 			}
-			if (name != " ")
+			if (name != "")
 				msg = "353 " + client->get_nickname() + " = " + channel->getName() + " :@" + name + "\r\n";
 			else
 				msg = "353 " + client->get_nickname() + " = " + channel->getName() + "\r\n";
 			break;
 		
 		default:
-			msg = "erreur";   // a redefinir
+			msg = "error : no find reply \r\n";
 	}
 	return (msg);
 }
@@ -89,9 +98,13 @@ std::string reply (int reply, Client *client, std::string target)
 		case ERR_CHANOPRIVSNEEDED:
 			msg = "482 " + client->get_nickname() + " " + target + " :You're not channel operator\r\n";
 			break;
+		
+		case ERR_INVITEONLYCHAN:
+			msg = "473 " + client->get_nickname() + " " + target + " :Cannot join channel (+i)\r\n";
+			break;
 
 		default:
-			msg = "erreur";   // a redefinir
+			msg = "error : no find reply \r\n";
 	}
 	return (msg);
 }
@@ -106,12 +119,8 @@ std::string reply (int reply, Client *client, std::string target, std::string ne
 			msg = "441 " + client->get_nickname() + " " + newnick + " " + target + " :They aren't on that channel\r\n";
 			break;
 		
-		// case ERR_USERONCHANNEL: //TODO ici
-			// msg = "443 " + client->get_nickname() + " " + client->get_arg()[0] + " " + target + " :is already on channel\r\n";
-			// break;
-		
 		default:
-			msg = "erreur";   // a redefinir
+			msg = "error : no find reply \r\n";
 	}
 	return (msg);
 }
@@ -122,6 +131,9 @@ std::string reply (int reply, Client *client)
 
 	switch(reply)
 	{
+		case RPL_UMODEIS:
+			msg = "221 " + client->get_nickname() + " " + client->get_mode() + "\r\n";
+			break;
 		case ERR_ERRONEUSNICKNAME:
 			msg = "432 " + client->get_nickname() + " " + client->get_nickname() + " :Erroneus nickname\r\n";
 			break;
@@ -146,8 +158,15 @@ std::string reply (int reply, Client *client)
 		case ERR_PASSWDMISMATCH:
 			msg = "464 " + client->get_nickname() + " :Password incorrect\r\n";
 			break;
+		case ERR_UMODEUNKNOWNFLAG:
+			msg = "501 " + client->get_nickname() + " :Unknown MODE flag\r\n";
+			break;
+		case ERR_USERSDONTMATCH:
+			msg = "502 " + client->get_nickname() + " :Cant change mode for other users\r\n";
+			break;
+
 		default:
-			msg = "erreur";   // a redefinir
+			msg = "error : no find reply \r\n";
 	}
 	return (msg);
 }

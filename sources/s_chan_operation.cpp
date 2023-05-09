@@ -61,7 +61,7 @@ Channel *Server::searchChan(std::string name)
 }
 
 
-Client*Server::searchClient(std::string name)
+Client *Server::searchClient(std::string name)
 {
 	for (size_t i = 0; i < _client.size(); i++)
 	{
@@ -71,6 +71,7 @@ Client*Server::searchClient(std::string name)
 	return (NULL);
 }
 
+//mal ecrit => search _cahn retourn un chan, has_chan retourn un boool
  Channel *Server::has_chan(Client * client)
 {
 	std::string chan = client->get_arg().at(0);
@@ -101,6 +102,7 @@ void Server::welcome_new_chan(Client *client, Channel *channel)
 		join_msg += reply(RPL_NOTOPIC, client, channel->getName());
 	else
 		join_msg += reply(RPL_TOPIC, client, channel);
+	channel->set_topic_time(std::time(NULL));
 	join_msg += reply(RPL_NAMREPLY, client, channel);
 	join_msg += reply(RPL_ENDOFNAMES, client, channel->getName());
 	client->setMessage(join_msg);
@@ -123,14 +125,23 @@ void Server::join( Client *client )
 		if (!chan)
 		{
 			chan = new Channel( chan_list[i]);
+			chan->set_create_time(std::time(NULL));
 			_channels.push_back(chan);
 			INFO("creation Channel " + chan_list[i] + "\n");
 			client->add_chan_ope(chan);
 		}
-		INFO("=>Join le channel\n");
-		(chan)->addClient(client);
-		welcome_new_chan(client, chan);
-		chan->check_vctor(client);
+		if ( chan->get_mode()[I] == "-" || chan->is_invited(client))
+		{
+			INFO("=>Join le channel\n");
+			(chan)->addClient(client);
+			welcome_new_chan(client, chan);
+			chan->check_vctor(client);
+		}
+		else
+		{
+			client->setMessage(reply(ERR_INVITEONLYCHAN, client, chan->getName()));
+			return;
+		}
 	}
 }
 
@@ -175,7 +186,10 @@ void Server::part(Client *client)
 	return;
 }
 
-
+// +t: If this mode is enabled, users must have channel privileges such as halfop 
+// or operator status in order to change the topic of a channel. In a channel 
+// that does not have this mode enabled, anyone may set the topic of the channel 
+// using the TOPIC command.
 void Server::topic(Client *client)
 {
 	if (client->get_arg().size() < 1)
@@ -186,17 +200,16 @@ void Server::topic(Client *client)
 	std::string msg;
 	Channel *chan = has_chan(client);
 	std::string chan_arg = client->get_arg().at(0);
-
-	if (chan) // arg[0]
+	if (!chan) // arg[0]
+	{
+		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, chan_arg));
+		return;
+	}
+	if ((chan->get_mode()[T] == "+" && client->is_operator(chan)) || chan->get_mode()[T] == "-" )
 	{
 		if(!chan->has_clients(client))
 		{
 			client->setMessage(reply(ERR_NOTONCHANNEL, client, chan_arg));
-			return;
-		}
-		if(!client->is_operator(chan))
-		{
-			client->setMessage(reply(ERR_CHANOPRIVSNEEDED, client, chan->getName()));
 			return;
 		}
 		if (client->get_arg().size() == 2)
@@ -206,51 +219,99 @@ void Server::topic(Client *client)
 		}
 		else if (client->get_arg().size() == 1)	
 		{
-				chan->setTopic( "" );
-				msg = reply(RPL_NOTOPIC, client, chan->getName());
+			chan->setTopic( "" );
+			msg = reply(RPL_NOTOPIC, client, chan->getName());
 		}
 		chan->set_topic_time(std::time(NULL));
 		msg += reply(RPL_TOPICWHOTIME, client, chan);
-		std::cout << msg << std::endl;
 		broadcast_all(client, chan, msg);
 	}
-	else 
+	else
 	{
-		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, chan_arg));
+		client->setMessage(reply(ERR_CHANOPRIVSNEEDED, client, chan->getName()));
 		return;
 	}
 }
 
-
+// /mode target [<+i>]
 void Server::mode(Client *client)
 {	
-	std::string message;
 	std::string target = client->get_arg()[0];
-	std::string msg = client->get_mode();
+	std::string mode = client->get_mode();
 
-	if (client->get_arg().size() == 2)
-		msg = client->get_arg()[1];
-	// std::cout << msg << std::endl;
-
+	if (client->get_arg().size() == 2 && 
+		(client->get_arg()[1][0] == '+' ||client->get_arg()[1][0] == '-' )) // ctrl apparition de lettres
+			mode = client->get_arg()[1];
 	if (target[0] == '#')
+		chan_mode(client, target, mode);
+	else
+		user_mode(client, target, mode);
+}
+
+void Server::chan_mode(Client *client, std::string &target, std::string &mode)
+{
+	std::string message;
+	Channel *chan = client->search_chan(target);
+	if( !chan)
 	{
+		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, target));
+		return;
+	}
+	if (client->get_arg().size() < 2)
+	{
+		std::string rep = (reply (RPL_CHANNELMODEIS, client, chan));	
+		rep += reply ( RPL_CREATIONTIME, client, chan);	
+		client->setMessage(rep);
+		return;
+	}
+	if (client->is_operator(chan))
+	{
+		chan->set_mode(mode);
 		message += ":" + client->get_nickname()+ "@" + client->get_hostname() + 
-			" MODE " + target + " " + msg + "\r\n";
+		" MODE " + target + " " + mode + "\r\n";
+		broadcast_all(client, chan, message);
 	}
 	else
 	{
-		client->set_mode(msg);
-		message +=  ":" + client->get_nickname()+ "@" + client->get_hostname() + 
-			" MODE " + target + " " + msg + "\r\n";	
+		client->setMessage(reply(ERR_CHANOPRIVSNEEDED , client, chan->getName()));
+		return;
 	}
-	client->setMessage(message);
 }
 
-
+void Server::user_mode(Client *client, std::string &target, std::string &mode)
+{
+	std::string message;
+	if (!searchClient(target))
+	{
+		client->setMessage(reply(ERR_NOSUCHNICK, client, target ));
+		return;
+	}
+	if ( client->get_nickname() != target )
+	{
+		client->setMessage(reply(ERR_USERSDONTMATCH, client));
+		return;
+	}
+	if (client->get_arg().size() < 2)
+	{
+		client->setMessage(reply (RPL_UMODEIS, client));	
+		return;
+	}
+	if (mode == "+i" || mode == "-i")
+	{
+		client->set_mode(mode);
+		message +=  ":" + client->get_nickname()+ "@" + client->get_hostname() + 
+			" MODE " + target + " " + mode + "\r\n";
+		client->setMessage(message);
+	}
+	else
+		client->setMessage(reply (ERR_UMODEUNKNOWNFLAG, client));	
+}
 
 	// The NAMES command is used to view the nicknames joined to a channel and their 
 	// channel membership prefixes. The param of this command is a list of channel names, 
 	// delimited by a comma (",", 0x2C) character . pb tokenisation]
+	// /names <channel>,<channel> 
+	// chan mode +s, user mode +i
 void Server::names(Client *client){
 	
 	std::string msg;
@@ -261,11 +322,17 @@ void Server::names(Client *client){
 	{
 		Channel *chan = searchChan(chan_list[i]);
 		
-		if(chan)
+		if (!chan || (chan->get_mode()[S] == "+" && !chan->has_clients(client)))
+		{
+			msg += reply(RPL_ENDOFNAMES, client, chan_list[i]);
+		}
+		else 
+		{
 			msg += reply(RPL_NAMREPLY, client, chan);
-		msg += reply(RPL_ENDOFNAMES, client, chan_list[i]);
-		client->setMessage(msg);
+			msg += reply(RPL_ENDOFNAMES, client, chan_list[i]);
+		}
 	}
+	client->setMessage(msg);
 	return;
 
 }
@@ -274,11 +341,14 @@ void Server::list(Client *client)
 {
 	std::string msg;
 
-	if (client->get_arg()[0]== "")  //si == 0 ne rentre pas ds la fonction => pareil pour Name => pas de lecture de requette
+	if (client->get_arg()[0]== "")
 	{
 		msg += reply(RPL_LISTSTART, client, "");
 		for (size_t i = 0; i < _channels.size(); i++)
-			msg += reply(RPL_LIST, client, _channels[i]);
+		{
+			if (_channels[i]->get_mode()[S] == "-"  )
+				msg += reply(RPL_LIST, client, _channels[i]);
+		}
 		msg += reply(RPL_LISTEND, client, "");
 	}
 	else
@@ -316,31 +386,30 @@ void Server::invite(Client *client)
 		client->setMessage(reply(ERR_NOTONCHANNEL, client, chan->getName()));
 		return;
 	}
-
-			if (!client->is_operator(chan))
-			{
-				client->setMessage(reply(ERR_CHANOPRIVSNEEDED , client, chan->getName()));
-				return;
-			}
-			Client *new_target = searchClient(client->get_arg()[0]);
-			if (!new_target)
-			{
-				client->setMessage(reply(ERR_NOSUCHNICK, client, chan->getName() ));
-				return;
-			}
-			if (chan->has_clients(client->get_arg()[0]))
-			{
-				client->setMessage(reply(ERR_USERONCHANNEL, client, chan->getName()));
-				return;
-			}
-
-			std::string msg = reply( RPL_INVITING, client, chan->getName());
-			client->setMessage(msg);
-			std::string invite_msg = ":"+ new_target->get_nickname() + "@" + 
-				new_target->get_hostname() + " INVITE " + new_target->get_nickname()+ 
-				" " +chan->getName() + "\r\n";
-			new_target->setMessage(invite_msg);
-			return;
+	if (!client->is_operator(chan) && chan->get_mode()[I] == "+")
+	{
+		client->setMessage(reply(ERR_CHANOPRIVSNEEDED , client, chan->getName()));
+		return;
+	}
+	Client *new_target = searchClient(client->get_arg()[0]);
+	if (!new_target)
+	{
+		client->setMessage(reply(ERR_NOSUCHNICK, client, chan->getName() ));
+		return;
+	}
+	if (chan->has_clients(client->get_arg()[0]))
+	{
+		client->setMessage(reply(ERR_USERONCHANNEL, client, chan->getName()));
+		return;
+	}
+	std::string msg = reply( RPL_INVITING, client, chan->getName());
+	client->setMessage(msg);
+	chan->set_invite(new_target);
+	std::string invite_msg = ":"+ new_target->get_nickname() + "@" + 
+		new_target->get_hostname() + " INVITE " + new_target->get_nickname()+ 
+		" " +chan->getName() + "\r\n";
+	new_target->setMessage(invite_msg);
+	return;
 }
 
 //Kick <channel> <user>(","<user>)(comment)
@@ -375,7 +444,6 @@ void Server::kick(Client *client)
 	for (size_t i = 0; i < client_list.size(); i++)
 	{
 		Client *new_target = searchClient(client_list[i]);
-
 
 		if (!new_target)
 		{

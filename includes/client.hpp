@@ -88,6 +88,7 @@ public:
 
 	void 						deleteOperator(Channel *chan);
 	bool 						is_operator(Channel *chan);
+	Channel						*search_chan(std::string chan);
 	
 
 private:
