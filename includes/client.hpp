@@ -36,6 +36,7 @@ public:
 	void		 				setFlagPsswdProvided(bool boolean);
 	void				 		setFlagPsswd(bool boolean);
 
+	void						setFlagMustShutClient(bool boolean);
 	bool				 		getFlagMustShutClient();
 
 	void 						set_arg( void );
@@ -65,7 +66,6 @@ public:
 	bool						NicknameIsValid();
 	void						Nick(std::string const&);
 	bool						checkNick();
-	// bool						checkSameNick(std::string const &old_nick);
 	bool						checkSameNick();
 	void						changeNick(std::string const& old_nick);
 	void						checkUser( std::string const& );

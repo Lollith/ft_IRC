@@ -108,6 +108,12 @@ std::string Client::get_cmd(void) const
 	return (this->_cmd_registration);
 }
 
+void Client::setFlagMustShutClient(bool boolean)
+{
+	this->_flag_shut_client = boolean;
+}
+
+
 bool Client::getFlagMustShutClient()
 {
 	return this->_flag_shut_client;
