@@ -387,21 +387,15 @@ void Client::quit(std::string const &)
 				if (*it_client != this) // do not send the message channels times to this
 					(*it_client)->setMessage(broadcast_rpl);
 			}
+			// ONGOING
 			((*it_chan)->deleteClientFromChan(this));
+			(this)->deleteOperator(*it_chan);
 			if ((*it_chan)->getClients().size() < 1)
 				(*it_chan)->set_flag_erase_chan(true);
+			else
+				(*it_chan)->search_new_ope(this);
+			(*it_chan)->check_vctor(this);
 		}
-		// TODO delete chan si plus de clients dedans
-		// for (size_t i = 0; i < _channels.size();)
-		// {
-		// 	if (_channels[i]->get_flag_erase_chan() == true)
-		// 	{
-		// 		delete (_channels[i]);
-		// 		_channels.erase(_channels.begin() + i);
-		// 	}
-		// 	else
-		// 		i++;
-		// }
 	}
 	this->_flag_shut_client = true;
 }
