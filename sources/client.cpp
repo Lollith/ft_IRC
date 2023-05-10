@@ -2,14 +2,14 @@
 
 //__________________________________________________canonic form
 
-Client::Client(void) : _message(""), _step_registration(0), _flag_password_ok(false), _flag_password_provided(false),
+Client::Client(void) : _step_registration(0), _flag_password_ok(false), _flag_password_provided(false),
 					   _flag_shut_client(false), _pass_ok(false), _nick_ok(false), _user_ok(false),
 					   _flag_not_registered(false), _already_auth(false),
 					   _user(""), _nickname(""), _hostname(""), _mode("+i")
 {
 }
 
-Client::Client(int sock_client) :_message(""), _socket_client(sock_client), _step_registration(0), _flag_password_ok(false),
+Client::Client(int sock_client) :_socket_client(sock_client), _step_registration(0), _flag_password_ok(false),
 								  _flag_password_provided(false), _flag_shut_client(false),
 								  _pass_ok(false), _nick_ok(false), _user_ok(false),
 								  _flag_not_registered(false), _already_auth(false),
@@ -21,13 +21,41 @@ Client::Client(int sock_client) :_message(""), _socket_client(sock_client), _ste
 	//
 }
 
-// Client::Client(Client const &cpy)
-// {
-// }
+Client::Client(Client const &cpy)
+{
+	*this = cpy;
+}
 
-// Client &Client::operator=(Client const &rhs)
-// {
-// }
+Client &Client::operator=(Client const &rhs)
+{
+	if (this != &rhs)
+	{
+		_message = rhs._message;
+		_socket_client = rhs._socket_client;
+		_step_registration = rhs._step_registration;
+		_flag_password_ok = rhs._flag_password_ok;
+		_flag_password_provided = rhs._flag_password_provided;
+		_flag_shut_client = rhs._flag_shut_client;
+		_pass_ok = rhs._pass_ok;
+		_nick_ok = rhs._nick_ok;
+		_user_ok = rhs._user_ok;
+		_flag_not_registered = rhs._flag_not_registered;
+		_already_auth = rhs._already_auth;
+		_message_recv = rhs._message_recv;
+		_message_recv_save = rhs._message_recv_save;
+		_cmd_registration = rhs._cmd_registration;
+		_user =rhs._user;
+		_nickname = rhs._nickname;
+		_hostname = rhs._hostname;
+		_realname = rhs._realname;
+		_mode = rhs._mode;
+		_arg_registration = rhs._arg_registration;
+		_client = rhs._client;
+		_channels = rhs._channels;
+		_chan_ope = rhs._chan_ope;
+	}
+	return (*this);
+}
 
 Client::~Client(void)
 {
@@ -354,6 +382,8 @@ void Client::quit(std::string const &)
 	std::string quit_reason;
 	std::string broadcast_rpl;
 	std::string self_rpl;
+	std::vector<Client *> saveclient;
+
 
 	// récupere le parametre apres les ´:´ (reason param)
 	size_t pos = 0;
@@ -386,8 +416,12 @@ void Client::quit(std::string const &)
 			std::vector<Client *>::iterator it_client;
 			for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
 			{
-				if (*it_client != this) // do not send the message channels times to this
+				if (*it_client != this && !hasalready(*it_client, saveclient))// do not send the message channels times to this
+				{
+					saveclient.push_back(*it_client);
 					(*it_client)->setMessage(broadcast_rpl);
+				}
+				
 			}
 			((*it_chan)->deleteClientFromChan(this));
 			(this)->deleteOperator(*it_chan);
@@ -462,8 +496,21 @@ void Client::getCmdLine(std::string const &password)
 	}
 }
 
+bool Client::hasalready(Client *client, std::vector<Client *> saveclient)
+{
+	std::vector<Client *>::iterator it_client;
+	for (it_client = saveclient.begin(); it_client != saveclient.end(); it_client++) // ici si remplace _clients par getClients())
+	{
+		if ((*it_client)->getSocketClient() == client->getSocketClient())
+			return true;
+	}
+	return false;
+}
+
 void Client::broadcaster(std::string const &reply)
 {
+	std::vector<Client *> saveclient;
+
 	std::vector<Channel *>::iterator it_chan;
 	for (it_chan = this->_channels->begin(); it_chan != _channels->end(); it_chan++)
 	{
@@ -473,8 +520,11 @@ void Client::broadcaster(std::string const &reply)
 			std::vector<Client *>::iterator it_client;
 			for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
 			{
-				if (*it_client != this) // do not send the message channels times to this
+				if (*it_client != this && !hasalready(*it_client, saveclient))// do not send the message channels times to this
+				{
 					(*it_client)->setMessage(reply);
+					saveclient.push_back(*it_client);
+				}
 			}
 		}
 	}

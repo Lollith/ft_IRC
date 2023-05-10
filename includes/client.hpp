@@ -11,6 +11,8 @@ public:
 	//__________________________________________________canonic form
 
 	Client(int sock_client);
+	Client(Client const &cpy);
+	Client &operator=(Client const &rhs);
 
 
 	~Client(void);
@@ -87,12 +89,11 @@ public:
 	bool 						is_operator(Channel *chan);
 	Channel						*search_chan(std::string chan);
 	
+	bool 					hasalready(Client *client, std::vector<Client *> saveclient);
 
 private:
 	// useless constructor
 	Client(void);
-	Client(Client const &cpy);
-	Client &operator=(Client const &rhs);
 
 	//attributes________________________________________________________________
 	Message 					_message;

@@ -8,7 +8,7 @@ class Message
 {
 	//__________________________________________________canonic form
 public:
-	Message(std::string const &buffer);
+	Message(void);
 	Message(Message const &copy);
 	~Message(void);
 	Message &operator=(Message const &rhs);
@@ -20,7 +20,7 @@ public:
 	// attributes________________________________________________________________
 protected:
 	std::string _buffer;
-	Message(void);
+
 
 };
 

@@ -1,6 +1,27 @@
 #include "irc.hpp"
 Channel::~Channel(){}
 
+Channel::Channel(Channel const &copy )
+{
+	*this = copy;
+}
+
+Channel &Channel::operator=( Channel const &rhs )
+{
+	if (this != &rhs)
+	{
+		_clients = rhs._clients;
+		_name = rhs._name;
+		_flag_erase_chan = rhs._flag_erase_chan;
+		_topic = rhs._topic;
+		_topic_time = rhs._topic_time;
+		_mode[3] = rhs._mode[3];
+		_create_time = rhs._create_time;
+		_invited = rhs._invited;
+	}
+	return (*this);
+}
+
 Channel::Channel( std::string name ): _name(name){
 _flag_erase_chan = false;
 _topic = "welcome";
@@ -115,7 +136,6 @@ void Channel::deleteClientFromChan(Client *client)
 {
 	std::vector<Client*>::iterator it = this->_clients.begin();
 	while( it != _clients.end())
-
 	{
 		if ((*it)->getSocketClient() == client->getSocketClient())
 			_clients.erase(it);

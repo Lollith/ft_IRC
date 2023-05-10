@@ -4,10 +4,6 @@
 Message::Message( void ){
 }
 
-Message::Message( std::string const &buffer ): _buffer(buffer){
-}
-
-
 Message::Message( Message const &copy ){
 	*this = copy;
 }

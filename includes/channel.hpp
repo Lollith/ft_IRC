@@ -8,6 +8,8 @@ class Channel{
 	public:
 		Channel( std::string name );
 		~Channel( void );
+		Channel( Channel const &copy );
+		Channel &operator=( Channel const &rhs );
 
 
 		std::vector<Client *>	getClients( void ) const;
@@ -52,8 +54,6 @@ class Channel{
 		std::string				_invited;
 		
 		Channel( void );
-		Channel( Channel const &copy );
-		Channel &operator=( Channel const &rhs );
 
 };
 
