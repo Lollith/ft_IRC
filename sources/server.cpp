@@ -70,6 +70,11 @@ Server::~Server(void)
 // return false si la création de la socket a échoué
 //__________________________________________________________________________
 
+bool Server::getFlagKeepLoop()
+{
+	return this->_flag_keep_loop;
+}
+
 bool Server::setSocketServer()
 {
 	this->_socket_server = socket(AF_INET, SOCK_STREAM, 0);
@@ -217,12 +222,24 @@ bool Server::mySelect(fd_set &rd, fd_set &wr)
 	int select_ready = select(FD_SETSIZE, &rd, &wr, NULL, NULL);
 	if (select_ready == -1)
 	{
-		// perror("select");
-		return false;
-		//here: déclencher le QUIT ? STOP le serveur ou autre
-		// return; // continue?? si errno == eintr
+		perror("select");
+		if (_flag_keep_loop == false)
+			return false;
+		else
+		{
+			for (size_t i = 0; i < _client.size(); i++)
+			{
+				_client[i]->setFlagMustShutClient(true);
+			}
+			for (size_t i = 0; i < _channels.size(); i++)
+			{
+				_channels[i]->set_flag_erase_chan(true);
+			}
+			update();
+		}
+		// here: déclencher le QUIT ? STOP le serveur ou autre
 	}
-	return(true);
+	return (true);
 	// else if (select_ready == 0) //utile?
 	// {
 	// 	std::cout <<"timeout"<< std::endl;
@@ -237,7 +254,7 @@ void Server::myrecv(Client *client)
 	int res_rd = recv(client->getSocketClient(), buf, sizeof(buf), 0);
 	if (res_rd <= 0)
 	{
-		// perror("receive client failed");
+		perror("receive client failed");
 		close(client->getSocketClient());
 		return;
 	}
@@ -253,7 +270,7 @@ void Server::myrecv(Client *client)
 
 void Server::mysend(Client *client)
 {
-	if (!client->getMessage().empty()) 
+	if (!client->getMessage().empty())
 	{
 		INFO("=>Repond au client:" << std::endl);
 		INFO("=>Message envoye a client " << client->getSocketClient()
@@ -301,7 +318,7 @@ bool Server::loop_recept_send()
 	{
 		std::vector<Client *>::iterator it;
 
-		if(mySelect(rd, wr) == false)
+		if (mySelect(rd, wr) == false)
 			return false;
 
 		if (FD_ISSET(_socket_server, &rd)) // check si notre socket est pret a lire // recoi le client, et ces logs
@@ -326,9 +343,8 @@ bool Server::loop_recept_send()
 			if (FD_ISSET(client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
 				mysend(client);
 		}
-		
-		update();
 
+		update();
 	}
 	return true;
 }
@@ -336,20 +352,20 @@ bool Server::loop_recept_send()
 void Server::check_vectors()
 {
 	DEBUG("vector _channels: ");
-	std::vector<Channel*>::iterator it;	
+	std::vector<Channel *>::iterator it;
 	for (it = _channels.begin(); it != _channels.end(); it++)
 	{
-		DEBUG((*it)->getName()<<" ");
-		std::vector<Client*> clients = (*it)->getClients();
-		for (std::vector<Client*>::iterator cit =  clients.begin(); cit != clients.end(); cit++)
+		DEBUG((*it)->getName() << " ");
+		std::vector<Client *> clients = (*it)->getClients();
+		for (std::vector<Client *>::iterator cit = clients.begin(); cit != clients.end(); cit++)
 		{
 			DEBUG("  << " + (*cit)->get_nickname());
 		}
 	}
 	DEBUG(std::endl);
 	DEBUG("vector _clients: ");
-	std::vector<Client*>::iterator it2;	
+	std::vector<Client *>::iterator it2;
 	for (it2 = _client.begin(); it2 != _client.end(); it2++)
-		DEBUG((*it2)->getSocketClient()<<" "); 
+		DEBUG((*it2)->getSocketClient() << " ");
 	DEBUG(std::endl);
 }
