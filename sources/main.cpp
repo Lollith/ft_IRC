@@ -42,7 +42,7 @@ int main(int ac, char **av)
 			return 1;
 		}
 		sp = &serv; // sp pointe sur l'instance serv
-		if(serv.loop_recept_send() ==false)
+		if(serv.loop_recept_send() == false)
 		{
 			std::cout << "byebye"<< std::endl;
 			return(1);

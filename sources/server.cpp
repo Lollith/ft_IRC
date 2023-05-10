@@ -32,6 +32,12 @@ Server::~Server(void)
 		delete (*it);
 	}
 	_client.clear();
+	std::vector<Channel *>::iterator it2;
+	for (it2 = _channels.begin(); it2 != _channels.end(); it2++)
+	{
+		delete (*it2);
+	}
+	_channels.clear();
 	shutdown(this->_socket_server, SHUT_RDWR);
 	close(this->_socket_server);
 }
@@ -196,7 +202,7 @@ bool Server::mySelect(fd_set &rd, fd_set &wr)
 	int select_ready = select(FD_SETSIZE, &rd, &wr, NULL, NULL);
 	if (select_ready == -1)
 	{
-		perror("select");
+		// perror("select");
 		return false;
 		//here: déclencher le QUIT ? STOP le serveur ou autre
 		// return; // continue?? si errno == eintr
@@ -269,7 +275,7 @@ void Server::update()
 		}
 		else
 			i++;
-	}//TODO a faire aussi lorsaue l on /quit ds un chan
+	}
 }
 
 bool Server::loop_recept_send()
