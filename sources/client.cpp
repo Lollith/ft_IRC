@@ -381,8 +381,9 @@ void Client::quit(std::string const &)
 	std::string res;
 	std::string quit_reason;
 	std::string broadcast_rpl;
-	std::string self;
+	std::string self_rpl;
 	std::vector<Client *> saveclient;
+
 
 	// récupere le parametre apres les ´:´ (reason param)
 	size_t pos = 0;
@@ -402,12 +403,11 @@ void Client::quit(std::string const &)
 	}
 	quit_reason = res;
 
-	self += "ERROR: Server closing a client connection\r\n";
-	self += ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "QUIT " + quit_reason + "\r\n";
-	setMessage(self);
-	broadcast_rpl += ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "QUIT " + quit_reason + "\r\n";
+	self_rpl += "ERROR: Server closing a client connection\r\n";
+	self_rpl += ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "Quit " + quit_reason + "\r\n";
+	setMessage(self_rpl);
+	broadcast_rpl += ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "Quit " + quit_reason + "\r\n";
 	std::vector<Channel *>::iterator it_chan;
-	// setMessage(broadcast_rpl);
 	for (it_chan = this->_channels->begin(); it_chan != _channels->end(); it_chan++)
 	{
 		if ((*it_chan)->has_clients(this))
@@ -423,14 +423,12 @@ void Client::quit(std::string const &)
 				}
 				
 			}
-			// ONGOING
 			((*it_chan)->deleteClientFromChan(this));
 			(this)->deleteOperator(*it_chan);
 			if ((*it_chan)->getClients().size() < 1)
 				(*it_chan)->set_flag_erase_chan(true);
 			else
 				(*it_chan)->search_new_ope(this);
-			(*it_chan)->check_vctor(this);
 		}
 	}
 	this->_flag_shut_client = true;
