@@ -89,6 +89,7 @@ public:
 	bool 						is_operator(Channel *chan);
 	Channel						*search_chan(std::string chan);
 	
+	bool 					hasalready(Client *client, std::vector<Client *> saveclient);
 
 private:
 	// useless constructor

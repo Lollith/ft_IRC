@@ -381,6 +381,8 @@ void Client::quit(std::string const &)
 	std::string res;
 	std::string quit_reason;
 	std::string broadcast_rpl;
+	std::string self;
+	std::vector<Client *> saveclient;
 
 	// récupere le parametre apres les ´:´ (reason param)
 	size_t pos = 0;
@@ -400,10 +402,12 @@ void Client::quit(std::string const &)
 	}
 	quit_reason = res;
 
-	broadcast_rpl = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "QUIT " + quit_reason + "\r\n";
-	setMessage("ERROR: Server closing a client connection\r\n");
+	self += "ERROR: Server closing a client connection\r\n";
+	self += ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "QUIT " + quit_reason + "\r\n";
+	setMessage(self);
+	broadcast_rpl += ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "QUIT " + quit_reason + "\r\n";
 	std::vector<Channel *>::iterator it_chan;
-	setMessage(broadcast_rpl);
+	// setMessage(broadcast_rpl);
 	for (it_chan = this->_channels->begin(); it_chan != _channels->end(); it_chan++)
 	{
 		if ((*it_chan)->has_clients(this))
@@ -412,8 +416,12 @@ void Client::quit(std::string const &)
 			std::vector<Client *>::iterator it_client;
 			for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
 			{
-				if (*it_client != this) // do not send the message channels times to this
+				if (*it_client != this && !hasalready(*it_client, saveclient))// do not send the message channels times to this
+				{
+					saveclient.push_back(*it_client);
 					(*it_client)->setMessage(broadcast_rpl);
+				}
+				
 			}
 			// ONGOING
 			((*it_chan)->deleteClientFromChan(this));
@@ -490,8 +498,21 @@ void Client::getCmdLine(std::string const &password)
 	}
 }
 
+bool Client::hasalready(Client *client, std::vector<Client *> saveclient)
+{
+	std::vector<Client *>::iterator it_client;
+	for (it_client = saveclient.begin(); it_client != saveclient.end(); it_client++) // ici si remplace _clients par getClients())
+	{
+		if ((*it_client)->getSocketClient() == client->getSocketClient())
+			return true;
+	}
+	return false;
+}
+
 void Client::broadcaster(std::string const &reply)
 {
+	std::vector<Client *> saveclient;
+
 	std::vector<Channel *>::iterator it_chan;
 	for (it_chan = this->_channels->begin(); it_chan != _channels->end(); it_chan++)
 	{
@@ -501,8 +522,11 @@ void Client::broadcaster(std::string const &reply)
 			std::vector<Client *>::iterator it_client;
 			for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
 			{
-				if (*it_client != this) // do not send the message channels times to this
+				if (*it_client != this && !hasalready(*it_client, saveclient))// do not send the message channels times to this
+				{
 					(*it_client)->setMessage(reply);
+					saveclient.push_back(*it_client);
+				}
 			}
 		}
 	}
