@@ -177,7 +177,7 @@ bool Server::startServer()
 // on doit vérifier que notre socket serveur est prêt en écriture :
 
 // select verifie si des donnes sont dispo en lecture , ecruiture sur notre socket et retourne le nombre
-void Server::mySelect(fd_set &rd, fd_set &wr)
+bool Server::mySelect(fd_set &rd, fd_set &wr)
 {
 	FD_ZERO(&rd);
 	FD_ZERO(&wr);
@@ -197,9 +197,11 @@ void Server::mySelect(fd_set &rd, fd_set &wr)
 	if (select_ready == -1)
 	{
 		perror("select");
+		return false;
 		//here: déclencher le QUIT ? STOP le serveur ou autre
 		// return; // continue?? si errno == eintr
 	}
+	return(true);
 	// else if (select_ready == 0) //utile?
 	// {
 	// 	std::cout <<"timeout"<< std::endl;
@@ -278,7 +280,8 @@ bool Server::loop_recept_send()
 	{
 		std::vector<Client *>::iterator it;
 
-		mySelect(rd, wr);
+		if(mySelect(rd, wr) == false)
+			return false;
 
 		if (FD_ISSET(_socket_server, &rd)) // check si notre socket est pret a lire // recoi le client, et ces logs
 		{
