@@ -30,7 +30,6 @@ int main(int ac, char **av)
 			return 1;
 		}
 		Server serv(sock_serv, av[2]);
-		//FIXME ctrl c
 		struct sigaction act;
 		act.sa_handler = sigHandler;
 		sigemptyset(&act.sa_mask);
@@ -43,7 +42,11 @@ int main(int ac, char **av)
 			return 1;
 		}
 		sp = &serv; // sp pointe sur l'instance serv
-		serv.loop_recept_send();
+		if(serv.loop_recept_send() ==false)
+		{
+			std::cout << "byebye"<< std::endl;
+			return(1);
+		}
 	}
 	return (0);
 }

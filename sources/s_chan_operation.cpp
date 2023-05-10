@@ -104,7 +104,7 @@ void Server::welcome_new_chan(Client *client, Channel *channel)
 {
 	std::string nickname = client->get_nickname();
 	std::string join_msg_all = ":"+ nickname + "@" + client->get_hostname() + 
-		" JOIN " + _channels.back()->getName() + "\r\n";
+		" JOIN " + channel->getName() + "\r\n";
 	broadcast_all(client, channel, join_msg_all);
 	
 	std::string join_msg;

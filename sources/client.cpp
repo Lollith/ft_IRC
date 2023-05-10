@@ -5,14 +5,14 @@
 Client::Client(void) : _message(""), _step_registration(0), _flag_password_ok(false), _flag_password_provided(false),
 					   _flag_shut_client(false), _pass_ok(false), _nick_ok(false), _user_ok(false),
 					   _flag_not_registered(false), _already_auth(false),
-					_user(""), _nickname(""), _hostname(""), _mode("+i")
+					   _user(""), _nickname(""), _hostname(""), _mode("+i")
 {
 }
 
 Client::Client(int sock_client) :_message(""), _socket_client(sock_client), _step_registration(0), _flag_password_ok(false),
 								  _flag_password_provided(false), _flag_shut_client(false),
 								  _pass_ok(false), _nick_ok(false), _user_ok(false),
-								  _flag_not_registered(false), _already_auth(false), 
+								  _flag_not_registered(false), _already_auth(false),
 								  _user(""), _nickname(""), _hostname(""), _mode("+i")
 
 {
@@ -92,15 +92,15 @@ void Client::setFlagPsswdProvided(bool boolean)
 {
 	this->_flag_password_provided = boolean;
 }
-	
-std::string	Client::get_mode( void )
+
+std::string Client::get_mode(void)
 {
 	return _mode;
 }
 
 void Client::set_mode(std::string mode)
 {
-		_mode = mode;
+	_mode = mode;
 }
 
 std::vector<std::string> Client::get_arg(void) const
@@ -118,6 +118,11 @@ void Client::set_arg(void)
 std::string Client::get_cmd(void) const
 {
 	return (this->_cmd_registration);
+}
+
+void Client::setFlagMustShutClient(bool boolean)
+{
+	this->_flag_shut_client = boolean;
 }
 
 bool Client::getFlagMustShutClient()
@@ -342,9 +347,6 @@ void Client::clean_ping_mode(std::string const &)
 	setMessage(msg);
 }
 
-// ONGOING
-
-// FIXME : un quit hors chan quand les auutres clients sont ds un chan
 void Client::quit(std::string const &)
 {
 	INFO("HERE QUIT FUNC\n");
@@ -360,10 +362,13 @@ void Client::quit(std::string const &)
 			pos = i;
 	}
 	res = _arg_registration[pos];
-	pos++;
-	for (; pos != _arg_registration.size(); pos++)
+	if (_arg_registration.size() > 1)
 	{
-		res += " " + _arg_registration[pos];
+		pos++;
+		for (; pos != _arg_registration.size(); pos++)
+		{
+			res += " " + _arg_registration[pos];
+		}
 	}
 	quit_reason = res;
 
@@ -385,9 +390,18 @@ void Client::quit(std::string const &)
 			((*it_chan)->deleteClientFromChan(this));
 			if ((*it_chan)->getClients().size() < 1)
 				(*it_chan)->set_flag_erase_chan(true);
-			this->_flag_shut_client = true;
-			return;
 		}
+		// TODO delete chan si plus de clients dedans
+		// for (size_t i = 0; i < _channels.size();)
+		// {
+		// 	if (_channels[i]->get_flag_erase_chan() == true)
+		// 	{
+		// 		delete (_channels[i]);
+		// 		_channels.erase(_channels.begin() + i);
+		// 	}
+		// 	else
+		// 		i++;
+		// }
 	}
 	this->_flag_shut_client = true;
 }
@@ -490,6 +504,3 @@ void Client::authenticationValid()
 		_already_auth = true;
 	}
 }
-
-// TODO
-//  tester et corriger broadcast pour nick et quit quand plusieurs clients sont co sur plusieurs channels

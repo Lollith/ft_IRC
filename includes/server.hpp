@@ -40,7 +40,7 @@ public:
 
 	void 				crash_protector( void );
 	bool				startServer( void);
-	void				mySelect(fd_set &rd, fd_set &wr);
+	bool				mySelect(fd_set &rd, fd_set &wr);
 	void  				myrecv(Client *client);
 	void 				mysend(Client *client);
 	bool				loop_recept_send( void );
