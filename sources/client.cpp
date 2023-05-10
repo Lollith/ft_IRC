@@ -415,9 +415,14 @@ void Client::quit(std::string const &)
 				if (*it_client != this) // do not send the message channels times to this
 					(*it_client)->setMessage(broadcast_rpl);
 			}
+			// ONGOING
 			((*it_chan)->deleteClientFromChan(this));
+			(this)->deleteOperator(*it_chan);
 			if ((*it_chan)->getClients().size() < 1)
 				(*it_chan)->set_flag_erase_chan(true);
+			else
+				(*it_chan)->search_new_ope(this);
+			(*it_chan)->check_vctor(this);
 		}
 	}
 	this->_flag_shut_client = true;
