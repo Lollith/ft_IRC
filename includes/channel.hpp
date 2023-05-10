@@ -3,9 +3,11 @@
 
 #include "irc.hpp"
 class Client;
+
 class Channel{
 	public:
 		Channel( std::string name );
+		~Channel( void );
 
 
 		std::vector<Client *>	getClients( void ) const;
@@ -49,8 +51,9 @@ class Channel{
 		std::string				_create_time;
 		std::string				_invited;
 		
-		
 		Channel( void );
+		Channel( Channel const &copy );
+		Channel &operator=( Channel const &rhs );
 
 };
 

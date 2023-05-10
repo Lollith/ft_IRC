@@ -1,12 +1,12 @@
 #include "irc.hpp"
+Channel::~Channel(){}
 
-Channel::Channel ( std::string name ): _name(name){
+Channel::Channel( std::string name ): _name(name){
 _flag_erase_chan = false;
 _topic = "welcome";
 	_mode[I]= "-";
 	_mode[S]= "-";
 	_mode[T]= "-";
-// std::cout << "constructeur channel par default"<< std::endl;
 }
 
 std::string Channel::getName(void) const
@@ -43,7 +43,6 @@ void Channel::set_create_time( time_t timestamp )
 	_create_time = timestamp;
 }
 
-
 std::vector<Client *> Channel::getClients( void ) const {
 return(this->_clients);
 }
@@ -64,7 +63,7 @@ void Channel::set_mode(std::string mode)
 }
 
 bool	Channel::get_flag_erase_chan( void ) const{
-return(_flag_erase_chan);
+	return(_flag_erase_chan);
 }
 
 void Channel::set_flag_erase_chan(bool mybool)
@@ -85,8 +84,8 @@ void Channel::set_invite(Client *newclient)
 }
 
 void Channel::addClient(Client *client){
-INFO("client"<< client->getSocketClient()<<" rejoint" << std::endl);
-this->_clients.push_back(client);
+	INFO("client"<< client->getSocketClient()<<" rejoint" << std::endl);
+	this->_clients.push_back(client);
 }
 
 // check si le client est dans le  vector
@@ -114,8 +113,9 @@ bool Channel::has_clients(std::string newclient)
 
 void Channel::deleteClientFromChan(Client *client)
 {
-	std::vector<Client *>::iterator it = this->_clients.begin();
-	while (it != _clients.end())
+	std::vector<Client*>::iterator it = this->_clients.begin();
+	while( it != _clients.end())
+
 	{
 		if ((*it)->getSocketClient() == client->getSocketClient())
 			_clients.erase(it);
@@ -136,11 +136,8 @@ void Channel::check_vctor(Client *client)
 	DEBUG("vector _client in chan " << this->getName() << " :");
 	std::vector<Client *>::iterator it_client;
 	for (it_client = _clients.begin(); it_client != _clients.end(); it_client++) // ici si remplace _clients par getClients())
-		DEBUG((*it_client)->get_nickname() << " ");
-
-	std::cout << std::endl;
-
-	// 	std::vector<Channel*>::iterator it2_chan;
-	// 	for (it2_chan = client->get_chan_ope().begin(); it2_chan != client->get_chan_ope().end(); it2_chan++)// ici si remplace _clients par getClients())
-	// 		DEBUG (client->get_nickname()<<" is operator of chan "<< (*it2_chan)->getName()<< std::endl);
+	std::cout <<std::endl;
+// 	std::vector<Channel*>::iterator it2_chan;
+// 	for (it2_chan = client->get_chan_ope().begin(); it2_chan != client->get_chan_ope().end(); it2_chan++)// ici si remplace _clients par getClients())
+// 		DEBUG (client->get_nickname()<<" is operator of chan "<< (*it2_chan)->getName()<< std::endl);
 }

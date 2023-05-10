@@ -33,24 +33,19 @@ void Server::parse_msg_recv(Client *client, std::string msg_recv)
 		{
 			(this->*fct_member[i])(client);
 			client->set_arg();
-			// client->setMsgRecvSave(""); // reinitialise le message recu sinon boucle sur /quit
 		}
 	}
 }
 
-void Server::broadcast_all(Client *client, Channel *chan, std:: string msg)
+void Server::broadcast_all(Client *client, Channel *chan, std:: string &msg)
 {
 	std::string nickname = client->get_nickname();
 	for (size_t i = 0; i!= chan->getClients().size(); i++)
-	{
-		// if (chan->getClients()[i] != client)
-			chan->getClients()[i]->setMessage(msg);
-	}
+		chan->getClients()[i]->setMessage(msg);
 	return;
-
 }
 
-Channel *Server::searchChan(std::string name)
+Channel *Server::searchChan(std::string &name)
 {
 	for (size_t i = 0; i < _channels.size(); i++)
 	{
@@ -61,7 +56,7 @@ Channel *Server::searchChan(std::string name)
 }
 
 
-Client *Server::searchClient(std::string name)
+Client *Server::searchClient(std::string &name)
 {
 	for (size_t i = 0; i < _client.size(); i++)
 	{
@@ -71,8 +66,8 @@ Client *Server::searchClient(std::string name)
 	return (NULL);
 }
 
-//mal ecrit => search _cahn retourn un chan, has_chan retourn un boool
- Channel *Server::has_chan(Client * client)
+//mal ecrit => search _cahn retourn un chan, has_chan retourn un bool
+ Channel *Server::has_chan(Client *client)
 {
 	std::string chan = client->get_arg().at(0);
 	std::vector<Channel*>::iterator it_chan;	
@@ -84,12 +79,27 @@ Client *Server::searchClient(std::string name)
 	return (NULL);
 }
 
+Channel* Server::check_chan(Client *client, std::string &chan_arg)
+{
+	Channel *chan = searchChan(chan_arg); // check si chan existe
+	if(!chan)
+	{
+		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, chan_arg));
+		return NULL;
+	}
+	if(!chan->has_clients(client))
+	{
+		client->setMessage(reply(ERR_NOTONCHANNEL, client, chan->getName()));
+		return NULL;
+	}
+	return chan;
+}
+
 //A JOIN message with the client as the message <source> and the channel they 
 //have joined as the first parameter of the message.
 // The <source> of the message represents the user or server that sent the message, 
 // and the <target> represents the target of that PRIVMSG (which may be the client, 
 // a channel, etc).
-
 void Server::welcome_new_chan(Client *client, Channel *channel)
 {
 	std::string nickname = client->get_nickname();
@@ -108,15 +118,12 @@ void Server::welcome_new_chan(Client *client, Channel *channel)
 	client->setMessage(join_msg);
 }
 
+
 ///JOIN #test,#test2
 void Server::join( Client *client )
 {
 	if (client->get_arg().size() < 1)
-	{
-		client->setMessage(reply(ERR_NEEDMOREPARAMS, client, ""));
-		return;
-	}
-
+		return(client->setMessage(reply(ERR_NEEDMOREPARAMS, client, "")));
 	std::vector<std::string> chan_list; 
 	chan_list = split(client->get_arg()[0], ",");
 	for (size_t i = 0; i < chan_list.size(); i++)
@@ -138,40 +145,31 @@ void Server::join( Client *client )
 			chan->check_vctor(client);
 		}
 		else
-		{
-			client->setMessage(reply(ERR_INVITEONLYCHAN, client, chan->getName()));
-			return;
-		}
+			return(client->setMessage(reply(ERR_INVITEONLYCHAN, client, chan->getName())));
 	}
 }
 
+
 void Server::part(Client *client)
 {
-	if (client->get_arg().size() < 1)
-	{
-		client->setMessage(reply(ERR_NEEDMOREPARAMS, client, ""));
-		return;
-	}	
 	std::string msg = "";
+	
+	if (client->get_arg().size() < 1)
+		return(client->setMessage(reply(ERR_NEEDMOREPARAMS, client, "")));
+	
 	if (client->get_arg().size() == 2)
 		msg = client->get_arg().back();
-
 	std::vector<std::string> chan_list; 
 	chan_list = split(client->get_arg()[0], ",");
 	for (size_t i = 0; i < chan_list.size(); i++)
 	{
 		Channel *chan = searchChan(chan_list[i]);
 		if(!chan)
-		{
-			client->setMessage(reply(ERR_NOSUCHCHANNEL, client, chan_list[i]));
-			return;
-		}
-		INFO("=>leave le channel" << std::endl);
+			return(client->setMessage(reply(ERR_NOSUCHCHANNEL, client, chan_list[i])));
 		if(!chan->has_clients(client))
-		{
-			client->setMessage(reply(ERR_NOTONCHANNEL, client, chan_list[i]));
-			return;
-		}
+			return(client->setMessage(reply(ERR_NOTONCHANNEL, client, chan_list[i])));
+		
+		INFO("=>leave le channel" << std::endl);
 		std::string message =  ":" + client->get_nickname()+ "@" + 
 		client->get_hostname() + " PART " + chan_list[i] + " " + msg + "\r\n";
 		broadcast_all(client, chan, message);
@@ -193,25 +191,17 @@ void Server::part(Client *client)
 void Server::topic(Client *client)
 {
 	if (client->get_arg().size() < 1)
-	{
-		client->setMessage(reply(ERR_NEEDMOREPARAMS, client, ""));
-		return;  
-	}
+		return(client->setMessage(reply(ERR_NEEDMOREPARAMS, client, "")));
+	
 	std::string msg;
 	Channel *chan = has_chan(client);
 	std::string chan_arg = client->get_arg().at(0);
 	if (!chan) // arg[0]
-	{
-		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, chan_arg));
-		return;
-	}
+		return(client->setMessage(reply(ERR_NOSUCHCHANNEL, client, chan_arg)));
 	if ((chan->get_mode()[T] == "+" && client->is_operator(chan)) || chan->get_mode()[T] == "-" )
 	{
 		if(!chan->has_clients(client))
-		{
-			client->setMessage(reply(ERR_NOTONCHANNEL, client, chan_arg));
-			return;
-		}
+			return(client->setMessage(reply(ERR_NOTONCHANNEL, client, chan_arg)));
 		if (client->get_arg().size() == 2)
 		{
 			chan->setTopic(client->get_arg().at(1));
@@ -227,10 +217,7 @@ void Server::topic(Client *client)
 		broadcast_all(client, chan, msg);
 	}
 	else
-	{
-		client->setMessage(reply(ERR_CHANOPRIVSNEEDED, client, chan->getName()));
-		return;
-	}
+		return(client->setMessage(reply(ERR_CHANOPRIVSNEEDED, client, chan->getName())));
 }
 
 // /mode target [<+i>]
@@ -254,8 +241,7 @@ void Server::chan_mode(Client *client, std::string &target, std::string &mode)
 	Channel *chan = client->search_chan(target);
 	if( !chan)
 	{
-		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, target));
-		return;
+		return(client->setMessage(reply(ERR_NOSUCHCHANNEL, client, target)));
 	}
 	if (client->get_arg().size() < 2)
 	{
@@ -272,30 +258,19 @@ void Server::chan_mode(Client *client, std::string &target, std::string &mode)
 		broadcast_all(client, chan, message);
 	}
 	else
-	{
-		client->setMessage(reply(ERR_CHANOPRIVSNEEDED , client, chan->getName()));
-		return;
-	}
+		return(client->setMessage(reply(ERR_CHANOPRIVSNEEDED , client, chan->getName())));
 }
 
 void Server::user_mode(Client *client, std::string &target, std::string &mode)
 {
 	std::string message;
 	if (!searchClient(target))
-	{
-		client->setMessage(reply(ERR_NOSUCHNICK, client, target ));
-		return;
-	}
+		return(client->setMessage(reply(ERR_NOSUCHNICK, client, target )));
 	if ( client->get_nickname() != target )
-	{
-		client->setMessage(reply(ERR_USERSDONTMATCH, client));
-		return;
-	}
+		return(client->setMessage(reply(ERR_USERSDONTMATCH, client)));
 	if (client->get_arg().size() < 2)
-	{
-		client->setMessage(reply (RPL_UMODEIS, client));	
-		return;
-	}
+		return(client->setMessage(reply (RPL_UMODEIS, client)));	
+	
 	if (mode == "+i" || mode == "-i")
 	{
 		client->set_mode(mode);
@@ -321,11 +296,8 @@ void Server::names(Client *client){
 	for (size_t i = 0; i < chan_list.size(); i++)
 	{
 		Channel *chan = searchChan(chan_list[i]);
-		
 		if (!chan || (chan->get_mode()[S] == "+" && !chan->has_clients(client)))
-		{
 			msg += reply(RPL_ENDOFNAMES, client, chan_list[i]);
-		}
 		else 
 		{
 			msg += reply(RPL_NAMREPLY, client, chan);
@@ -334,7 +306,6 @@ void Server::names(Client *client){
 	}
 	client->setMessage(msg);
 	return;
-
 }
 
 void Server::list(Client *client)
@@ -368,40 +339,24 @@ void Server::list(Client *client)
 	return;
 }
 
+
 void Server::invite(Client *client)
 {
 	if (client->get_arg().size() < 2)
-	{
-		client->setMessage(reply(ERR_NEEDMOREPARAMS, client, ""));
+		return(client->setMessage(reply(ERR_NEEDMOREPARAMS, client, "")));
+	
+	Channel *chan = check_chan(client, client->get_arg()[1]); // check si chan existe
+	if (!chan)
 		return;
-	}
-	Channel *chan = searchChan(client->get_arg()[1]); // check si chan existe
-	if(!chan)
-	{
-		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, client->get_arg()[1]));
-		return;
-	}
-	if(!chan->has_clients(client))
-	{
-		client->setMessage(reply(ERR_NOTONCHANNEL, client, chan->getName()));
-		return;
-	}
 	if (!client->is_operator(chan) && chan->get_mode()[I] == "+")
-	{
-		client->setMessage(reply(ERR_CHANOPRIVSNEEDED , client, chan->getName()));
-		return;
-	}
+		return(client->setMessage(reply(ERR_CHANOPRIVSNEEDED, client, chan->getName())));
+	
 	Client *new_target = searchClient(client->get_arg()[0]);
 	if (!new_target)
-	{
-		client->setMessage(reply(ERR_NOSUCHNICK, client, chan->getName() ));
-		return;
-	}
+		return(client->setMessage(reply(ERR_NOSUCHNICK, client, chan->getName())));
 	if (chan->has_clients(client->get_arg()[0]))
-	{
-		client->setMessage(reply(ERR_USERONCHANNEL, client, chan->getName()));
-		return;
-	}
+		return(client->setMessage(reply(ERR_USERONCHANNEL, client, chan->getName())));
+	
 	std::string msg = reply( RPL_INVITING, client, chan->getName());
 	client->setMessage(msg);
 	chan->set_invite(new_target);
@@ -416,45 +371,29 @@ void Server::invite(Client *client)
 void Server::kick(Client *client)
 {
 	if (client->get_arg().size() < 2)
-	{
-		client->setMessage(reply(ERR_NEEDMOREPARAMS, client, ""));
-		return;
-	}
-	
-	Channel *chan = searchChan(client->get_arg()[0]); // check si chan existe
-	if(!chan)
-	{
-		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, client->get_arg()[0]));
-		return;
-	}
-	if(!chan->has_clients(client))
-	{
-		client->setMessage(reply(ERR_NOTONCHANNEL, client, chan->getName()));
-		return;
-	}
+		return(client->setMessage(reply(ERR_NEEDMOREPARAMS, client, "")));
 
-	if (!client->is_operator(chan))
-	{
-		client->setMessage(reply(ERR_CHANOPRIVSNEEDED , client, chan->getName()));
+	Channel *chan = check_chan(client, client->get_arg()[0]); // check si chan existe
+	if (!chan)
 		return;
-	}
+	if (!client->is_operator(chan))
+		return(client->setMessage(reply(ERR_CHANOPRIVSNEEDED , client, chan->getName())));
 
 	std::vector<std::string> client_list; 
 	client_list = split(client->get_arg()[1], ",");
 	for (size_t i = 0; i < client_list.size(); i++)
 	{
 		Client *new_target = searchClient(client_list[i]);
-
 		if (!new_target)
-		{
-			client->setMessage(reply(ERR_USERNOTINCHANNEL, client, chan->getName(), client->get_arg()[1] ));
-			return;
-		}
+			return(client->setMessage(reply(ERR_USERNOTINCHANNEL, client, 
+				chan->getName(), client->get_arg()[1])));
 
 		std::string comment = "kicked\r\n";
 		if (client->get_arg().size() == 3)
 			comment = client->get_arg().back();
-		std::string kick_msg = ":"+ client->get_nickname() + "@" + client->get_hostname() + " KICK " + chan->getName() + " " +new_target->get_nickname()+ " :" + comment + "\r\n";
+		std::string kick_msg = ":"+ client->get_nickname() + "@" + 
+			client->get_hostname() + " KICK " + chan->getName() + " " + 
+			new_target->get_nickname()+ " :" + comment + "\r\n";
 		new_target->setMessage(kick_msg);
 		chan->deleteClientFromChan(new_target);
 		broadcast_all(client, chan, kick_msg);

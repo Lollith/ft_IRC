@@ -13,9 +13,6 @@ public:
 	//__________________________________________________canonic form
 
 	Server(const int port, const std::string password);
-	// Server(Server const &cpy);
-
-	// Server &operator=(Server const &rhs);
 
 	~Server(void);
 
@@ -71,17 +68,20 @@ public:
 	void 				chan_mode(Client *client, std::string &target, std::string &mode);
 	void 				user_mode(Client *client, std::string &target, std::string &mode);
 	void 				user_mode(Client *client);
-	void 				stop();
-	Channel *			searchChan(std::string name);
+	Channel* 			check_chan(Client *client, std::string &chan_arg);
+	void 				stop( void );
+	Channel *			searchChan(std::string &name);
  	Channel *			has_chan(Client* client);
-	Client*				searchClient(std::string name);
-	void 				broadcast_all(Client *client, Channel *chan, std::string msg);
+	Client*				searchClient(std::string &name);
+	void 				broadcast_all(Client *client, Channel *chan, std::string &msg);
 	void 				privmsg_to_chan(Client *client, std::string &priv, std::string &targe, std::string &msgt);
 	void 				privmg_to_client(Client *client,std::string &priv, std::string &target,std::string &msg );
 
 private:
 	// useless constructor
 	Server(void);
+	Server(Server const &cpy);
+	Server &operator=(Server const &rhs);
 
 	//attributes________________________________________________________________
 
