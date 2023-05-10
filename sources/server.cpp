@@ -14,13 +14,28 @@ Server::Server(const int port, const std::string password)
 	setAddrServ();
 }
 
-// Server::Server(Server const &cpy)
-// {
-// }
+Server::Server(Server const &cpy)
+{
+	*this = cpy;
+}
 
-// Server &Server::operator=(Server const &rhs)
-// {
-// }
+Server &Server::operator=(Server const &rhs)
+{
+	if (this != &rhs)
+	{
+		_port = rhs._port;
+		_socket_server = rhs._socket_server;
+		_addr_server = rhs._addr_server;
+		_client_addr = rhs._client_addr;
+		_sin_size = rhs._sin_size;
+		_password = rhs._password;
+		_flag_keep_loop = rhs._flag_keep_loop;
+		_flag_notice = rhs._flag_notice;
+		_client = rhs._client;
+		_channels = rhs._channels;
+	}
+	return (*this);
+}
 
 Server::~Server(void)
 {

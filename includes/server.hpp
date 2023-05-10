@@ -13,6 +13,8 @@ public:
 	//__________________________________________________canonic form
 
 	Server(const int port, const std::string password);
+	Server(Server const &cpy);
+	Server &operator=(Server const &rhs);
 
 	~Server(void);
 
@@ -80,8 +82,6 @@ public:
 private:
 	// useless constructor
 	Server(void);
-	Server(Server const &cpy);
-	Server &operator=(Server const &rhs);
 
 	//attributes________________________________________________________________
 

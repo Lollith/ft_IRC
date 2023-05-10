@@ -11,6 +11,8 @@ public:
 	//__________________________________________________canonic form
 
 	Client(int sock_client);
+	Client(Client const &cpy);
+	Client &operator=(Client const &rhs);
 
 
 	~Client(void);
@@ -91,8 +93,6 @@ public:
 private:
 	// useless constructor
 	Client(void);
-	Client(Client const &cpy);
-	Client &operator=(Client const &rhs);
 
 	//attributes________________________________________________________________
 	Message 					_message;
