@@ -108,16 +108,21 @@ struct sockaddr {
 
 
 
-//-----------------------commande-------------------------------------------------
-nc : Privmessage :
-: <nickname> PRIVMSG <#chan> :<message>
+//-----------------------commande------------------------------------------------
+# Privmessage :
+- nc: ": <nickname> PRIVMSG <#chan> :<message>"
+- /msg <target>,<target> <texte> (target = #chan, nick)
 
-info topic
+
+# info topic
 /topic #chan
 
-mode:
+# mode:
 attention user en +i a la connexion
 
-invite
+# invite
 nimporte qui peut invite
 sauf si mode chan +i (invite only) => seulment operator 
+
+# kick
+/kick <chan> <user>,<user> [comment]

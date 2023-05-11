@@ -31,7 +31,8 @@ class Channel{
 		void					set_mode(std::string mode);
 		
 		bool 					has_clients(Client *client);
-		bool 					has_clients(std::string newclient);
+		bool 					has_clients(std::string &newclient);
+		Client 					*searchClient(std::string &name);
 
 		bool					is_invited(Client *client);
 		void 					set_invite(Client *client);
