@@ -65,10 +65,13 @@ void Server::join( Client *client )
 {
 	if (client->get_arg().size() < 1)
 		return(client->setMessage(reply(ERR_NEEDMOREPARAMS, client, "")));
-	std::vector<std::string> chan_list; 
+	std::vector<std::string> chan_list;
 	chan_list = split(client->get_arg()[0], ",");
 	for (size_t i = 0; i < chan_list.size(); i++)
 	{
+		if (chan_list[i][0] != '#')
+			chan_list[i] =  "#" + chan_list[i]; 
+		
 		Channel *chan = searchChan(chan_list[i]);
 		if (!chan)
 		{
