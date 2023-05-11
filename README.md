@@ -48,15 +48,15 @@
 Tous les port en dessous de 1024 sont réservés.
 Utiliser n'importe quel port au dessus de 1024 jusqu'à 65535.
 
-```/connect localhost 3333 123```
-```/join #canal```
-```/nick newname```
-```/msg pseudotosend monmessage + ctrl n```
+- ```/connect localhost 3333 123```
+- ```/join #canal```
+- ```/nick newname```
+- ```/msg pseudotosend monmessage + ctrl n```
 
-```~ nc localhost <port>```
-```PASS <pass>```
-```NICK <nick>```
-```USER <nick> <user> <user> <user>```
+- ```~ nc localhost <port>```
+- ```PASS <pass>```
+- ```NICK <nick>```
+- ```USER <nick> <user> <user> <user>```
 
 
  ## COMMANDES
