@@ -2,9 +2,8 @@
 
 # Plan de bataille 
 
-1. 
+1. communication
 	- initialisation - debut send-recev - sockets -select
-
 	- recevoir et parcer un message envoye
 
 2. authentification 
