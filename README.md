@@ -8,30 +8,30 @@
 
 
 2. authentification 
-- CAP message
-- AUTHENTICATE message
-- PASS message
-- NICK message
-- USER message
-- PING message
-- PONG message
-- OPER message
-- QUIT message
+	- CAP message
+	- AUTHENTICATE message
+	- PASS message
+	- NICK message
+	- USER message
+	- PING message
+	- PONG message
+	- OPER message
+	- QUIT message
 
 
 3. Channel Operations
-- channels 
-- JOIN message
-- PART message
-- topic message : mode +t
-- names message chan +s  user+i
-- list message chan +s
-- invite message chan +i
+	- channels 
+	- JOIN message
+	- PART message
+	- topic message : mode +t
+	- names message chan +s  user+i
+	- list message chan +s
+	- invite message chan +i
 
 
 4. messages prives
-- privmsgs
-- notices
+	- privmsgs
+	- notices
 
 
 5. Channel moderators are identified by the channel member prefix ('@' for standard channel operators
@@ -40,7 +40,7 @@
 	- MODE: Change the channel’s modes,
 	- INVITE: Invite a client to an invite-only channel (mode +i),
 	- TOPIC: Change the channel topic in a mode +t channel,  
-	
+
 	
 //-----------------------------PORTS--------------------------------------------
 Tous les port en dessous de 1024 sont réservés.
@@ -55,8 +55,6 @@ Utiliser n'importe quel port au dessus de 1024 jusqu'à 65535.
 PASS <pass>
 NICK <nick>
 USER <nick> <user> <user> <user>
-
-
 
 
 //-----------------------commande------------------------------------------------
