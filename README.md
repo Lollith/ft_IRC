@@ -42,7 +42,7 @@
 	- TOPIC: Change the channel topic in a mode +t channel,  
 
 	
-//-----------------------------PORTS--------------------------------------------
+//-----------------------------------------------PORTS--------------------------------------------
 
 Tous les port en dessous de 1024 sont réservés.
 Utiliser n'importe quel port au dessus de 1024 jusqu'à 65535.
@@ -58,9 +58,9 @@ NICK <nick>
 USER <nick> <user> <user> <user>
 
 
-//-----------------------commandes------------------------------------------------
+//---------------------------------------commandes------------------------------------------------
 # mode
-- mode user initialised : +i 
+- mode user initialised : ```+i``` 
 - user mode : ```i```
 - chan mode : ```i```/```s```/```t```
 
@@ -98,10 +98,10 @@ USER <nick> <user> <user> <user>
 - chan mode ```+i``` : invite only : only channel operator can invite
 
 # kick
-- "/kick <chan> <user>,<user> [comment]"
+- ```/kick <chan> <user>,<user> [comment]```
 
 
-//-----------------------definition de la structure ( contenue ds la lib )------
+//-----------------------definition de la structure ( contenue ds la lib )---------------------
 ```c
 #include <arpa/inet.h>
 
