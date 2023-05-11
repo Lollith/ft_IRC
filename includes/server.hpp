@@ -37,6 +37,8 @@ public:
 	void 				setSinSize();
 	socklen_t 			getSinSize();
 
+	bool				getFlagKeepLoop();
+
 
 	//__________________________________________________members functions
 

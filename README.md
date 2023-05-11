@@ -105,3 +105,19 @@ struct sockaddr {
  	struct in_addr		sin_addr; //adresse internet de lhote
  	unsigned char		sin_zero[8];// contient uniquement des zéros (étant donné que l'adresse IP et le port occupent 6 octets, les 8 octets restants doivent être à zéro)
  };```
+
+
+
+//-----------------------commande-------------------------------------------------
+nc : Privmessage :
+: <nickname> PRIVMSG <#chan> :<message>
+
+info topic
+/topic #chan
+
+mode:
+attention user en +i a la connexion
+
+invite
+nimporte qui peut invite
+sauf si mode chan +i (invite only) => seulment operator 

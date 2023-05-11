@@ -312,12 +312,12 @@ void Server::list(Client *client)
 {
 	std::string msg;
 
-	if (client->get_arg()[0]== "")
+	if (client->get_arg().size() == 0)
 	{
 		msg += reply(RPL_LISTSTART, client, "");
 		for (size_t i = 0; i < _channels.size(); i++)
 		{
-			if (_channels[i]->get_mode()[S] == "-"  )
+			if (_channels[i]->get_mode()[S] == "-")
 				msg += reply(RPL_LIST, client, _channels[i]);
 		}
 		msg += reply(RPL_LISTEND, client, "");
@@ -339,7 +339,7 @@ void Server::list(Client *client)
 	return;
 }
 
-
+ // / invite nickanem channel
 void Server::invite(Client *client)
 {
 	if (client->get_arg().size() < 2)
