@@ -61,11 +61,11 @@ USER <nick> <user> <user> <user>
 //-----------------------commandes------------------------------------------------
 # mode
 - mode user initialised : +i 
-- user mode :i
+- user mode : i
 - chan mode : i/s/t
 
 # Privmsg :
-- nc: ": <nickname> PRIVMSG <#chan> :<message>"
+- nc: ```: <nickname> PRIVMSG <#chan> :<message>```
 - "/msg <target>,<target> <texte>" (target = #chan, nick)
 - "/notice <target>,<target> <texte>" (target = #chan, nick)
 
