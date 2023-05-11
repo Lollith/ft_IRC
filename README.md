@@ -6,6 +6,7 @@
 	- initialisation - debut send-recev - sockets -select
 	- recevoir et parcer un message envoye
 
+
 2. authentification 
 - CAP message
 - AUTHENTICATE message
@@ -17,8 +18,9 @@
 - OPER message
 - QUIT message
 
+
 3. Channel Operations
-- channels = group d un ou +ieurs clients, receive all message; creee lorsque le 1er client joins et rm when last leave, name rules
+- channels 
 - JOIN message
 - PART message
 - topic message : mode +t
@@ -26,9 +28,11 @@
 - list message chan +s
 - invite message chan +i
 
+
 4. messages prives
--	privmsg
-- notice
+- privmsgs
+- notices
+
 
 5. Channel moderators are identified by the channel member prefix ('@' for standard channel operators
 1er connecte sur le chan
@@ -36,6 +40,7 @@
 	- MODE: Change the channel’s modes,
 	- INVITE: Invite a client to an invite-only channel (mode +i),
 	- TOPIC: Change the channel topic in a mode +t channel,  
+	
 	
 //-----------------------------PORTS--------------------------------------------
 Tous les port en dessous de 1024 sont réservés.
