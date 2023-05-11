@@ -1,6 +1,6 @@
 # ft_IRC
 
-# Plan de bataille 
+## Plan de bataille 
 
 1. communication
 	- initialisation - debut send-recev - sockets -select
@@ -43,8 +43,8 @@
 
 
 
-//--------------------------------------------------------------------------------------------------------------------
-//                                                      #PORTS
+//--------------------------------------------------------------------------------------------------------------------                                          
+## PORTS
 //--------------------------------------------------------------------------------------------------------------------
 
 Tous les port en dessous de 1024 sont réservés.
@@ -62,53 +62,52 @@ USER <nick> <user> <user> <user>
 
 
 //--------------------------------------------------------------------------------------------------------------------
-//                                                      #COMMANDES
+ ## COMMANDES
 //--------------------------------------------------------------------------------------------------------------------
 
-# mode
+### mode
 - mode user initialised : ```+i``` 
 - user mode : ```i```
 - chan mode : ```i```/```s```/```t```
 
-# Privmsg :
+### Privmsg :
 - nc: ```<nickname> PRIVMSG <#chan> :<message>```
 - ```/msg <target>,<target> <texte>```
 - ```/notice <target>,<target> <texte>``` 
 - target = #chan/ nick
 
-# join :
+### join :
 - ```/join <chan>[,<chan>]```
 
-# part :
+### part :
 - ```/part <chan>[,<chan>] [reason]```
 
-# topic
+### topic
 - change the topic : ```/topic #chan newtopic```
 - info: ```/topic #chan```
 - chan mode ```+t``` : ```protected topic: only operator chan can change```
 
-# names
+### names
 - view nicknames joined on chan
 - ```/names <channel>[,channel] ```
 - chan mode ```+s``` : secret : if user not on chan => can 't view nicknames
 - user mode ```+i``` : invisible : if user not on chan => invisble user is not shown
 
-# list
+### list
 - list of all visible channels  + info : ```/list```
 - info of the given chans : ```/list <chan>,<chan>```
 - chan mode ```+s``` : secret : chan not shown
 
-# invite
+### invite
 - invite user on chan
 - ```/invite <nickname><channel>```
 - chan mode ```+i``` : invite only : only channel operator can invite
 
-# kick
+### kick
 - ```/kick <chan> <user>,<user> [comment]```
 
 
-//--------------------------------------------------------------------------------------------------------------------
-//                                                      
+//--------------------------------------------------------------------------------------------------------------------                                                      
 ## STRUCTURE
 //--------------------------------------------------------------------------------------------------------------------
 ```c
