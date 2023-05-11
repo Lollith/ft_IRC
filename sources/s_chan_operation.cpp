@@ -1,5 +1,5 @@
 #include "irc.hpp"
-//-----fct _channels------------------------------------------------------------
+
 void Server::parse_msg_recv(Client *client, std::string msg_recv)
 {
 	int nb_fct = 10;
@@ -37,64 +37,6 @@ void Server::parse_msg_recv(Client *client, std::string msg_recv)
 	}
 }
 
-void Server::broadcast_all(Client *client, Channel *chan, std:: string &msg)
-{
-	std::string nickname = client->get_nickname();
-	for (size_t i = 0; i!= chan->getClients().size(); i++)
-		chan->getClients()[i]->setMessage(msg);
-	return;
-}
-
-Channel *Server::searchChan(std::string &name)
-{
-	for (size_t i = 0; i < _channels.size(); i++)
-	{
-		if (_channels[i]->getName() == name)
-			return _channels[i];
-	}
-	return (NULL);
-}
-
-
-Client *Server::searchClient(std::string &name)
-{
-	for (size_t i = 0; i < _client.size(); i++)
-	{
-		if (_client[i]->get_nickname() == name)
-			return _client[i];
-	}
-	return (NULL);
-}
-
-//mal ecrit => search _cahn retourn un chan, has_chan retourn un bool
- Channel *Server::has_chan(Client *client)
-{
-	std::string chan = client->get_arg().at(0);
-	std::vector<Channel*>::iterator it_chan;	
-	for (it_chan = this->_channels.begin(); it_chan != _channels.end(); it_chan++)
-	{
-		if ((*it_chan)->getName() == chan)
-			return (*it_chan);
-	}
-	return (NULL);
-}
-
-Channel* Server::check_chan(Client *client, std::string &chan_arg)
-{
-	Channel *chan = searchChan(chan_arg); // check si chan existe
-	if(!chan)
-	{
-		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, chan_arg));
-		return NULL;
-	}
-	if(!chan->has_clients(client))
-	{
-		client->setMessage(reply(ERR_NOTONCHANNEL, client, chan->getName()));
-		return NULL;
-	}
-	return chan;
-}
-
 //A JOIN message with the client as the message <source> and the channel they 
 //have joined as the first parameter of the message.
 // The <source> of the message represents the user or server that sent the message, 
@@ -117,7 +59,6 @@ void Server::welcome_new_chan(Client *client, Channel *channel)
 	join_msg += reply(RPL_ENDOFNAMES, client, channel->getName());
 	client->setMessage(join_msg);
 }
-
 
 ///JOIN #test,#test2
 void Server::join( Client *client )
@@ -148,7 +89,6 @@ void Server::join( Client *client )
 			return(client->setMessage(reply(ERR_INVITEONLYCHAN, client, chan->getName())));
 	}
 }
-
 
 void Server::part(Client *client)
 {
@@ -396,8 +336,8 @@ void Server::kick(Client *client)
 			return;
 		
 		std::string comment = "kicked\r\n";
-		if (client->get_arg().size() == 3)
-			comment = client->get_arg().back();
+		if (client->get_arg().size() > 2)
+			comment = append_user_message(client);
 		std::string kick_msg = ":"+ client->get_nickname() + "@" + 
 			client->get_hostname() + " KICK " + chan->getName() + " " + 
 			new_target->get_nickname()+ " :" + comment + "\r\n";
@@ -408,9 +348,4 @@ void Server::kick(Client *client)
 	}
 }
 
-//______________________________TEST CTRLC
-void Server::stop()
-{
-	this->_flag_keep_loop = false;
-}
 

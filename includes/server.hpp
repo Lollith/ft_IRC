@@ -80,6 +80,7 @@ public:
 	void 				broadcast_all(Client *client, Channel *chan, std::string &msg);
 	void 				privmsg_to_chan(Client *client, std::string &priv, std::string &targe, std::string &msgt);
 	void 				privmg_to_client(Client *client,std::string &priv, std::string &target,std::string &msg );
+	std::string		append_user_message(Client *client);
 
 private:
 	// useless constructor
