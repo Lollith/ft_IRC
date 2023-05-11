@@ -32,18 +32,3 @@ void 	Message::setBuffer( std::string buffer ){
 void 	Message::resetBuffer(){
 	this->_buffer.clear();
 }
-
-// // / CLASSES ENFANTS: Connection__
-
-// Connection::Connection(): Message(){}
-// Connection::Connection(std::string &buffer): Message(buffer){}
-// Connection::Connection(Connection const& cpy): Message(cpy){}
-// Connection::~Connection(){}
-// Connection &Connection::operator=( Connection const &rhs )
-// {
-//     if (this != &rhs)
-//     {
-//         this->_buffer = rhs._buffer;
-//     }
-//     return (*this);
-// }

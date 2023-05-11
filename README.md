@@ -130,4 +130,4 @@ ps -a
 
 sudo lsof -nP -iTCP -sTCP:LISTEN
 
-sudo ss -tulpn
+sudo ss -tulpnvfd
