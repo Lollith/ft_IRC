@@ -60,20 +60,20 @@ USER <nick> <user> <user> <user>
 
 //-----------------------commandes------------------------------------------------
 # mode
-attention user initialises en +i a la connexion
-user mode :i
-chan mode : i/s/t
+- mode user initialised : +i 
+- user mode :i
+- chan mode : i/s/t
 
 # Privmsg :
 - nc: ": <nickname> PRIVMSG <#chan> :<message>"
-- /msg <target>,<target> <texte> (target = #chan, nick)
-- /notice <target>,<target> <texte> (target = #chan, nick)
+- "/msg <target>,<target> <texte>" (target = #chan, nick)
+- "/notice <target>,<target> <texte>" (target = #chan, nick)
 
 # join :
-- /join <chan>[,<chan>]
+- "/join <chan>[,<chan>]"
 
 # part :
-- /part <chan>[,<chan>] [reason]
+- "/part <chan>[,<chan>] [reason]"
 
 # topic
 - change the topic : /topic #chan newtopic
@@ -82,7 +82,7 @@ chan mode : i/s/t
 
 # names
 - view nicknames joined on chan
-- /names <channel>[,channel] 
+- "/names <channel>[,channel] "
 - chan mode +s : secret : if user not on chan => can 't view nicknames
 - user mode +i : invisible : if user not on chan => invisble user is not shown
 
@@ -93,11 +93,11 @@ chan mode : i/s/t
 
 # invite
 - invite user on chan
-- /invite <nickname><channel>
+- "/invite <nickname><channel>"
 - chan mode +i : invite only : only channel operator can invite
 
 # kick
-- /kick <chan> <user>,<user> [comment]
+- "/kick <chan> <user>,<user> [comment]"
 
 
 //-----------------------definition de la structure ( contenue ds la lib )------
