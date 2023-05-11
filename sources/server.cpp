@@ -339,6 +339,23 @@ bool Server::loop_recept_send()
 				client->getCmdLine(_password);
 				parse_msg_recv(client, client->getMsgRecvSave());
 				check_vectors();
+
+				// TODO
+				// here add condition pour verifier si on repart ds le select en cas de commandes
+				// de 334 a 338 a mettre ds rcv et mettre parsing ds 343 a 344 writing en boolean
+				// check le \n si oui parsing  si non parsing
+				// partielle : if (!client->getMessageReceived().empty() && *(client->getMessageReceived().end() - 1) == '\n')
+				// {
+				// 	try
+				// 	{
+				// 		parseCommands(*client);
+				// 	}
+				// 	catch (std::exception &e)
+				// 	{
+				// 		client->appendMessageToSend("ERROR :" + std::string(e.what()) + "\r\n");
+				// 		client->setFatalError();
+				// 	}
+				// }
 			}
 			if (FD_ISSET(client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
 				mysend(client);

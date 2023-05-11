@@ -121,3 +121,13 @@ attention user en +i a la connexion
 invite
 nimporte qui peut invite
 sauf si mode chan +i (invite only) => seulment operator 
+
+#test
+
+POur vérifier les ports écouté: 
+//-----------------------commande-------------------------------------------------
+ps -a 
+
+sudo lsof -nP -iTCP -sTCP:LISTEN
+
+sudo ss -tulpn
