@@ -43,6 +43,7 @@
 
 	
 //-----------------------------PORTS--------------------------------------------
+
 Tous les port en dessous de 1024 sont réservés.
 Utiliser n'importe quel port au dessus de 1024 jusqu'à 65535.
 
@@ -57,22 +58,22 @@ NICK <nick>
 USER <nick> <user> <user> <user>
 
 
-//-----------------------commande------------------------------------------------
+//-----------------------commandes------------------------------------------------
 # mode
 attention user initialises en +i a la connexion
 user mode :i
 chan mode : i/s/t
 
-# Privmessage :
+# Privmsg :
 - nc: ": <nickname> PRIVMSG <#chan> :<message>"
 - /msg <target>,<target> <texte> (target = #chan, nick)
 - /notice <target>,<target> <texte> (target = #chan, nick)
 
 # join :
-/join <chan>[,<chan>]
+- /join <chan>[,<chan>]
 
 # part :
-/part <chan>[,<chan>] [reason]
+- /part <chan>[,<chan>] [reason]
 
 # topic
 - change the topic : /topic #chan newtopic
@@ -96,11 +97,10 @@ chan mode : i/s/t
 - chan mode +i : invite only : only channel operator can invite
 
 # kick
-/kick <chan> <user>,<user> [comment]
+- /kick <chan> <user>,<user> [comment]
 
 
-//------------------------------------------------------------------------------
-definition de la structure ( contenue ds la lib )
+//-----------------------definition de la structure ( contenue ds la lib )------
 ```c
 #include <arpa/inet.h>
 
