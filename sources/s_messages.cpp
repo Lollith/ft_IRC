@@ -14,6 +14,7 @@ void Server::privmsg( Client *client){
 	targets = split(client->get_arg()[0], ",");
 	for (size_t i = 0; i < targets.size(); i++)
 	{
+
 		if (targets[i][0] == '#')
 			privmsg_to_chan(client, priv_notice, targets[i], msg);
 		else
@@ -36,6 +37,7 @@ void Server::privmsg_to_chan(Client *client, std::string &priv_notice, std::stri
 	std::vector<Channel*>::iterator it_chan;	
 	for (it_chan = _channels.begin(); it_chan != _channels.end(); it_chan++)
 	{
+		std::cout<<(*it_chan)->getName()<<std::endl;
 		if ((*it_chan)->getName() == target)
 		{
 			std::string message = ":" + client->get_nickname() + priv_notice +
@@ -50,14 +52,11 @@ void Server::privmsg_to_chan(Client *client, std::string &priv_notice, std::stri
 			_flag_notice = false;
 			return;
 		}
-		else
-		{
-			if(_flag_notice == false)
-				client->setMessage(reply(ERR_NOSUCHCHANNEL, client, target));
-			_flag_notice = false;
-			return;
-		}
 	}
+	if(_flag_notice == false)
+		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, target));
+	_flag_notice = false;
+	return;
 }
 
 
