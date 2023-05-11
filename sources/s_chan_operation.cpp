@@ -227,6 +227,10 @@ void Server::mode(Client *client)
 	std::string mode = client->get_mode();
 
 	if (client->get_arg().size() == 2 && 
+		(client->get_arg()[1][0] != '+' ||client->get_arg()[1][0] != '-' )) // ctrl apparition de lettres
+		return;
+	
+	if (client->get_arg().size() == 2 && 
 		(client->get_arg()[1][0] == '+' ||client->get_arg()[1][0] == '-' )) // ctrl apparition de lettres
 			mode = client->get_arg()[1];
 	if (target[0] == '#')
@@ -383,11 +387,14 @@ void Server::kick(Client *client)
 	client_list = split(client->get_arg()[1], ",");
 	for (size_t i = 0; i < client_list.size(); i++)
 	{
-		Client *new_target = searchClient(client_list[i]);
+		Client *new_target = chan->searchClient(client_list[i]);
 		if (!new_target)
 			return(client->setMessage(reply(ERR_USERNOTINCHANNEL, client, 
 				chan->getName(), client->get_arg()[1])));
 
+		if (client == new_target)
+			return;
+		
 		std::string comment = "kicked\r\n";
 		if (client->get_arg().size() == 3)
 			comment = client->get_arg().back();
