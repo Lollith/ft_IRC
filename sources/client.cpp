@@ -93,7 +93,7 @@ void Client::clearMessage()
 
 void Client::setMsgRecv(std::string buf)
 {
-	_message_recv = buf;
+	_message_recv += buf;
 }
 
 std::string Client::getMsgRecv(void) const

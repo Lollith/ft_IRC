@@ -334,16 +334,20 @@ bool Server::loop_recept_send()
 			if (FD_ISSET(client->getSocketClient(), &rd))
 			{
 				myrecv(client);
-				client->setVectorClient(&_client);
-				client->setVectorChan(&_channels);
-				client->getCmdLine(_password);
-				parse_msg_recv(client, client->getMsgRecvSave());
 				check_vectors();
+				if (!client->getMsgRecv().empty() && (*(client->getMsgRecv().end() - 1) == '\n'))
+				{
+					client->setVectorClient(&_client);
+					client->setVectorChan(&_channels);
+					client->getCmdLine(_password);
+					parse_msg_recv(client, client->getMsgRecvSave());
+				}
+				else
+					break; // à voir s'il faut modifier
 			}
 			if (FD_ISSET(client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
 				mysend(client);
 		}
-
 		update();
 	}
 	return true;
