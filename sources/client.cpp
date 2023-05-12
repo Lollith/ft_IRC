@@ -2,14 +2,14 @@
 
 //__________________________________________________canonic form
 
-Client::Client(void) : _step_registration(0), _flag_password_ok(false), _flag_password_provided(false),
+Client::Client(void) : _flag_erroneus(false), _step_registration(0), _flag_password_ok(false), _flag_password_provided(false),
 					   _flag_shut_client(false), _pass_ok(false), _nick_ok(false), _user_ok(false),
 					   _flag_not_registered(false), _already_auth(false),
 					   _user(""), _nickname(""), _hostname(""), _mode("+i")
 {
 }
 
-Client::Client(int sock_client) :_socket_client(sock_client), _step_registration(0), _flag_password_ok(false),
+Client::Client(int sock_client) : _flag_erroneus(false), _socket_client(sock_client), _step_registration(0), _flag_password_ok(false),
 								  _flag_password_provided(false), _flag_shut_client(false),
 								  _pass_ok(false), _nick_ok(false), _user_ok(false),
 								  _flag_not_registered(false), _already_auth(false),
@@ -44,7 +44,7 @@ Client &Client::operator=(Client const &rhs)
 		_message_recv = rhs._message_recv;
 		_message_recv_save = rhs._message_recv_save;
 		_cmd_registration = rhs._cmd_registration;
-		_user =rhs._user;
+		_user = rhs._user;
 		_nickname = rhs._nickname;
 		_hostname = rhs._hostname;
 		_realname = rhs._realname;
@@ -313,7 +313,8 @@ void Client::Nick(std::string const &)
 		std::cout << BLUE_TXT << "condition nickname not valid should respond" << RESET_TXT << std::endl;
 		std::cout << _nickname << std::endl;
 		setMessage(reply(ERR_ERRONEUSNICKNAME, this));
-		_flag_shut_client = true;
+		if (isAuthenticate())
+			_nickname = old_nick;
 		return;
 	}
 	if (checkSameNick() == true)
@@ -384,7 +385,6 @@ void Client::quit(std::string const &)
 	std::string self_rpl;
 	std::vector<Client *> saveclient;
 
-
 	// récupere le parametre apres les ´:´ (reason param)
 	size_t pos = 0;
 	for (size_t i = 0; i != _arg_registration.size(); i++)
@@ -416,12 +416,11 @@ void Client::quit(std::string const &)
 			std::vector<Client *>::iterator it_client;
 			for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
 			{
-				if (*it_client != this && !hasalready(*it_client, saveclient))// do not send the message channels times to this
+				if (*it_client != this && !hasalready(*it_client, saveclient)) // do not send the message channels times to this
 				{
 					saveclient.push_back(*it_client);
 					(*it_client)->setMessage(broadcast_rpl);
 				}
-				
 			}
 			((*it_chan)->deleteClientFromChan(this));
 			(this)->deleteOperator(*it_chan);
@@ -520,7 +519,7 @@ void Client::broadcaster(std::string const &reply)
 			std::vector<Client *>::iterator it_client;
 			for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
 			{
-				if (*it_client != this && !hasalready(*it_client, saveclient))// do not send the message channels times to this
+				if (*it_client != this && !hasalready(*it_client, saveclient)) // do not send the message channels times to this
 				{
 					(*it_client)->setMessage(reply);
 					saveclient.push_back(*it_client);

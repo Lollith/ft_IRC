@@ -101,6 +101,7 @@ private:
 
 
 	// Client	_client_data;	//données à récupérer et à stocker ? container: set ?
+	bool						_flag_erroneus;
 	int 						_socket_client;
 	int							_step_registration; //compteur des étapes d'authentification
 	bool						_flag_password_ok;
@@ -124,6 +125,7 @@ private:
 	std::vector<Client*>		*_client;
 	std::vector<Channel*>		*_channels;
 	std::vector <Channel *>		_chan_ope;
+
 
 };
 
