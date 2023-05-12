@@ -340,7 +340,8 @@ bool Server::loop_recept_send()
 					client->setVectorClient(&_client);
 					client->setVectorChan(&_channels);
 					client->getCmdLine(_password);
-					parse_msg_recv(client, client->getMsgRecvSave());
+					if (client->isAuthenticate() == true)
+						parse_msg_recv(client, client->getMsgRecvSave());
 				}
 				else
 					break; // à voir s'il faut modifier

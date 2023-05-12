@@ -301,7 +301,6 @@ void Client::Nick(std::string const &)
 	if (_arg_registration.empty())
 	{
 		setMessage(reply(ERR_NONICKNAMEGIVEN, this));
-		_flag_shut_client = true;
 		return;
 	}
 	std::string old_nick = _nickname;
@@ -313,6 +312,8 @@ void Client::Nick(std::string const &)
 		std::cout << BLUE_TXT << "condition nickname not valid should respond" << RESET_TXT << std::endl;
 		std::cout << _nickname << std::endl;
 		setMessage(reply(ERR_ERRONEUSNICKNAME, this));
+		this->_flag_erroneus = true;
+		std::cout << CYAN_TXT << "flag erroneus is in invalid nick" << _flag_erroneus << RESET_TXT << std::endl;
 		if (isAuthenticate())
 			_nickname = old_nick;
 		return;
@@ -326,6 +327,7 @@ void Client::Nick(std::string const &)
 	}
 	if (_nick_ok == false)
 	{
+		std::cout << CYAN_TXT << "rentre ds confirmation registration nick" << _flag_erroneus << RESET_TXT << std::endl;
 		this->_nick_ok = true;
 		this->_step_registration += 1;
 	}
@@ -336,6 +338,10 @@ void Client::checkUser(std::string const &)
 {
 	std::cout << GREEN_TXT << "here is USER check func" << RESET_TXT << std::endl;
 
+	if (this->_nick_ok == false) // si nick n'est pas provided avant user : nickname non given
+	{
+		setMessage(reply(ERR_NONICKNAMEGIVEN, this));
+	}
 	if (this->_already_auth == true && this->_flag_password_provided == true)
 	{
 		setMessage(reply(ERR_ALREADYREGISTERED, this));
