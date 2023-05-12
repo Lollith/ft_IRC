@@ -63,7 +63,11 @@ std::string Server::append_user_message(Client *client)
 	std::string msg;
 
 	for (size_t i = 1; i < client->get_arg().size(); i++)
-		msg += client->get_arg()[i] + " ";
+	{
+		msg += client->get_arg()[i];
+		if (i != client->get_arg().size() - 1)
+			msg += " ";
+	}
 	msg += "\r\n";
 	return (msg);
 }
