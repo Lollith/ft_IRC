@@ -169,12 +169,13 @@ void Server::mode(Client *client)
 	std::string target = client->get_arg()[0];
 	std::string mode = client->get_mode();
 
+	if (client->get_arg().size() == 2)
+	{ 
+		if (!(client->get_arg()[1][0] == '+' || client->get_arg()[1][0] == '-' )) // ctrl apparition de lettres
+			return;
+	}
 	if (client->get_arg().size() == 2 && 
-		(client->get_arg()[1][0] != '+' ||client->get_arg()[1][0] != '-' )) // ctrl apparition de lettres
-		return;
-	
-	if (client->get_arg().size() == 2 && 
-		(client->get_arg()[1][0] == '+' ||client->get_arg()[1][0] == '-' )) // ctrl apparition de lettres
+		(client->get_arg()[1][0] == '+' || client->get_arg()[1][0] == '-' )) // ctrl apparition de lettres
 			mode = client->get_arg()[1];
 	if (target[0] == '#')
 		chan_mode(client, target, mode);
@@ -217,7 +218,7 @@ void Server::user_mode(Client *client, std::string &target, std::string &mode)
 		return(client->setMessage(reply(ERR_USERSDONTMATCH, client)));
 	if (client->get_arg().size() < 2)
 		return(client->setMessage(reply (RPL_UMODEIS, client)));	
-	
+	std::cout << mode << std::endl;	
 	if (mode == "+i" || mode == "-i")
 	{
 		client->set_mode(mode);
