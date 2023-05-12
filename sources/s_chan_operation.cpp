@@ -308,9 +308,9 @@ void Server::invite(Client *client)
 	std::string msg = reply( RPL_INVITING, client, chan->getName());
 	client->setMessage(msg);
 	chan->set_invite(new_target);
-	std::string invite_msg = ":"+ new_target->get_nickname() + "@" + 
-		new_target->get_hostname() + " INVITE " + new_target->get_nickname()+ 
-		" " +chan->getName() + "\r\n";
+	std::string invite_msg = ":"+ client->get_nickname() + "@" + 
+		client->get_hostname() + " INVITE " + new_target->get_nickname()+ 
+		" " + chan->getName() + "\r\n";
 	new_target->setMessage(invite_msg);
 	return;
 }
