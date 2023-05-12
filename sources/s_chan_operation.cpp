@@ -260,7 +260,7 @@ void Server::list(Client *client)
 {
 	std::string msg;
 
-	if (client->get_arg()[0] == "")
+	if (client->get_arg().size() == 0 || client->get_arg()[0] == "")
 	{
 		msg += reply(RPL_LISTSTART, client, "");
 		for (size_t i = 0; i < _channels.size(); i++)
