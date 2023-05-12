@@ -121,7 +121,7 @@ bool Channel::has_clients(Client *client)
 	return false;
 }
 
-bool Channel::has_clients(std::string newclient)
+bool Channel::has_clients(std::string &newclient)
 {
 	std::vector<Client *>::iterator it_client;
 	for (it_client = _clients.begin(); it_client != _clients.end(); it_client++) // ici si remplace _clients par getClients())
@@ -130,6 +130,16 @@ bool Channel::has_clients(std::string newclient)
 			return true;
 	}
 	return false;
+}
+
+Client *Channel::searchClient(std::string &name)
+{
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		if (_clients[i]->get_nickname() == name)
+			return _clients[i];
+	}
+	return (NULL);
 }
 
 void Channel::deleteClientFromChan(Client *client)

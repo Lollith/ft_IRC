@@ -4,18 +4,22 @@
 // as to send messages to channels. <target> is the nickname of a client or the name of a channel.(#)
 
 void Server::privmsg( Client *client){
-	int size = client->get_arg().size() - 2;
-	std::string target = client->get_arg()[size];
-	std::string msg = client->get_arg().back();
-	std::string priv_notice = " PRIVMSG ";
 
+	std::string msg = append_user_message(client);
+
+	std::string priv_notice = " PRIVMSG ";
 	if(_flag_notice == true)
 		priv_notice = " NOTICE ";
+	std::vector<std::string> targets; 
+	targets = split(client->get_arg()[0], ",");
+	for (size_t i = 0; i < targets.size(); i++)
+	{
 
-	if (target[0] == '#')
-		privmsg_to_chan(client, priv_notice, target, msg);
-	else
-		privmg_to_client(client, priv_notice, target, msg);
+		if (targets[i][0] == '#')
+			privmsg_to_chan(client, priv_notice, targets[i], msg);
+		else
+			privmg_to_client(client, priv_notice, targets[i], msg);
+	}
 }
 
 // The difference between NOTICE and PRIVMSG is that automatic replies must never
@@ -33,6 +37,7 @@ void Server::privmsg_to_chan(Client *client, std::string &priv_notice, std::stri
 	std::vector<Channel*>::iterator it_chan;	
 	for (it_chan = _channels.begin(); it_chan != _channels.end(); it_chan++)
 	{
+		std::cout<<(*it_chan)->getName()<<std::endl;
 		if ((*it_chan)->getName() == target)
 		{
 			std::string message = ":" + client->get_nickname() + priv_notice +
@@ -47,14 +52,11 @@ void Server::privmsg_to_chan(Client *client, std::string &priv_notice, std::stri
 			_flag_notice = false;
 			return;
 		}
-		else
-		{
-			if(_flag_notice == false)
-				client->setMessage(reply(ERR_NOSUCHCHANNEL, client, target));
-			_flag_notice = false;
-			return;
-		}
 	}
+	if(_flag_notice == false)
+		client->setMessage(reply(ERR_NOSUCHCHANNEL, client, target));
+	_flag_notice = false;
+	return;
 }
 
 
