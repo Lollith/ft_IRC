@@ -265,7 +265,7 @@ void Server::list(Client *client)
 		msg += reply(RPL_LISTSTART, client, "");
 		for (size_t i = 0; i < _channels.size(); i++)
 		{
-			if (_channels[i]->get_mode()[S] == "-")
+			if (_channels[i]->get_mode()[S] == "-" || _channels[i]->has_clients(client))
 				msg += reply(RPL_LIST, client, _channels[i]);
 		}
 		msg += reply(RPL_LISTEND, client, "");
