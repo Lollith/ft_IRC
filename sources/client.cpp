@@ -439,28 +439,28 @@ void Client::quit(std::string const &)
 	this->_flag_shut_client = true;
 }
 
-void Client::checkParams(std::string const &password)
+void Client::cap(const std::string &) {} // obligee de prendre en compte cvette commande pour ne pas interrompre le traitement des cmd
+
+bool Client::checkParams(std::string const &password)
 {
-	int i = 0;
-	int nb_func = 5;
+	unsigned int i = 0;
 	std::string rpl;
 
 	void (Client::*func_list[])(std::string const &arg) =
-		{&Client::checkPassword, &Client::Nick, &Client::checkUser,
+		{&Client::cap, &Client::checkPassword, &Client::Nick, &Client::checkUser,
 		 &Client::clean_ping_mode, &Client::quit};
-	std::string cmd_to_check[] = {"PASS", "NICK", "USER", "PING", "QUIT"};
-	while (i < nb_func)
+	std::string cmd_to_check[] = {"CAP", "PASS", "NICK", "USER", "PING", "QUIT"};
+	while (i < (sizeof(func_list) / sizeof(*func_list))) // calcul le nombre d'element d'un tableau present SUR LA STACK (only)
 	{
 		if (_cmd_registration == cmd_to_check[i])
 		{
-			if (i > 0 && _flag_password_provided == false && _flag_not_registered == false)
+			if (i > 1 && _flag_password_provided == false && _flag_not_registered == false)
 			{
 				rpl = reply(ERR_NOTREGISTERED, this);
 				rpl += "ERROR: Server closing a client connection because need registration.\r\n";
 				setMessage(rpl);
 				_flag_shut_client = true;
 				_flag_not_registered = true;
-				break;
 			}
 			else
 			{
@@ -468,11 +468,14 @@ void Client::checkParams(std::string const &password)
 				(this->*(func_list[i]))(password);
 				if (before_step != this->_step_registration)
 					this->authenticationValid();
-				break;
 			}
+			return true;
 		}
 		i++;
 	}
+	DEBUG("sort de check params\n");
+	DEBUG(_cmd_registration);
+	return false;
 }
 
 void Client::Clean_arg()
@@ -482,7 +485,7 @@ void Client::Clean_arg()
 		_arg_registration.erase(it);
 }
 
-void Client::getCmdLine(std::string const &password)
+bool Client::getCmdLine(/*std::string const &password*/)
 {
 	const std::string eol_marker = "\r\n"; // à mettre ds un define?
 
@@ -490,15 +493,17 @@ void Client::getCmdLine(std::string const &password)
 	std::string cmd_line;
 
 	pos = this->_message_recv.find(eol_marker);
-	while (pos != std::string::npos)
-	{
-		cmd_line = _message_recv.substr(0, pos);
-		set_arg();
-		tokenization_cmd(cmd_line);
-		checkParams(password);
-		_message_recv.erase(_message_recv.begin(), (_message_recv.begin() + pos + eol_marker.length()));
-		pos = this->_message_recv.find(eol_marker);
-	}
+	if (pos == std::string::npos)
+		return false;
+
+	cmd_line = _message_recv.substr(0, pos);
+	set_arg();
+	tokenization_cmd(cmd_line);
+	// if (checkParams(password) == false)
+	// 	return;
+	_message_recv.erase(_message_recv.begin(), (_message_recv.begin() + pos + eol_marker.length()));
+	// pos = this->_message_recv.find(eol_marker);
+	return true;
 }
 
 bool Client::hasalready(Client *client, std::vector<Client *> saveclient)

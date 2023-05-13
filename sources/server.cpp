@@ -335,16 +335,31 @@ bool Server::loop_recept_send()
 			{
 				myrecv(client);
 				check_vectors();
-				if (!client->getMsgRecv().empty() && (*(client->getMsgRecv().end() - 1) == '\n'))
+				// if (!client->getMsgRecv().empty() && (*(client->getMsgRecv().end() - 1) == '\n'))
+				// {
+				// 	while (client->tokenize())
+				// 	{
+				// 		client->setVectorClient(&_client);
+				// 		client->setVectorChan(&_channels);
+				// 		client->getCmdLine(_password);
+				// 		if (client->isAuthenticate() == true)
+				// 			parse_msg_recv(client);
+				// 	}
+				// }
+				// else
+				// 	break; // à voir s'il faut modifier
+
+				while (client->getCmdLine())
 				{
 					client->setVectorClient(&_client);
 					client->setVectorChan(&_channels);
-					client->getCmdLine(_password);
-					if (client->isAuthenticate() == true)
-						parse_msg_recv(client, client->getMsgRecvSave());
+					if (client->checkParams(_password) == false)
+					{
+						if (client->isAuthenticate() == true)
+							parse_msg_recv(client);
+						//send une error en cas de non registration?
+					}
 				}
-				else
-					break; // à voir s'il faut modifier
 			}
 			if (FD_ISSET(client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
 				mysend(client);

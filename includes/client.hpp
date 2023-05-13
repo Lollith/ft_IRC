@@ -58,16 +58,17 @@ public:
 	//__________________________________________________MEMBERS
 	// dans cette fonction split du buf pour récuperer une pair commande - argument
 	void 						tokenization_cmd( std::string& cmd_line );
-	void 						getCmdLine( std::string const& password );
+	bool 						getCmdLine(/* std::string const& password */);
 
 	//here fonctions qui vont check d'éventuelles d'erreurs et construire un objet
 	// Conncexioin pour envoyer la réponse adéquate
-	void 						checkParams( std::string const& password );
+	bool 						checkParams( std::string const& password );
 	void						ignoreCap( std::string const& );
 	void						checkPassword( std::string const& password );
 	bool						NicknameIsValid();
 	void						Nick(std::string const&);
 	bool						checkNick();
+	void						cap(std::string const&);
 	bool						checkSameNick();
 	void						changeNick(std::string const& old_nick);
 	void						checkUser( std::string const& );

@@ -1,6 +1,6 @@
 #include "irc.hpp"
 
-void Server::parse_msg_recv(Client *client, std::string msg_recv)
+void Server::parse_msg_recv(Client *client)
 {
 	int nb_fct = 10;
 	std::string funct_names[] = {
@@ -29,7 +29,7 @@ void Server::parse_msg_recv(Client *client, std::string msg_recv)
 
 	for (int i = 0; i < nb_fct; i++)
 	{
-		if (msg_recv.find(funct_names[i]) != std::string::npos)
+		if (funct_names[i] == client->get_cmd())
 		{
 			(this->*fct_member[i])(client);
 			client->set_arg();
