@@ -147,6 +147,11 @@ void Client::set_arg(void)
 		_arg_registration.erase(it);
 }
 
+void Client::set_arg_0(void)
+{
+	_arg_registration[0] = "connexion lost";
+}
+
 std::string Client::get_cmd(void) const
 {
 	return (this->_cmd_registration);

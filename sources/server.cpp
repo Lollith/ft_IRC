@@ -255,10 +255,12 @@ void Server::myrecv(Client *client)
 		close(client->getSocketClient());
 		return;
 	}
-	else if (res_rd == 0)
+	else if (res_rd == 0)// ctrl C - nc
 	{
 		std::cout << "HERE JE SET LE FLAG SHUT CLIENT" << std::endl;
 		client->setFlagMustShutClient(true);
+		client->set_arg_0();
+		client->quit("");
 		return;
 	}
 	

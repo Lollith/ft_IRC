@@ -43,6 +43,7 @@ public:
 
 	void 						set_arg( void );
 	std::vector<std::string>  	get_arg( void ) const;
+	void						set_arg_0(void);
 	
 	std::string					get_cmd( void ) const;
 	

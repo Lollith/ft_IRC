@@ -171,11 +171,11 @@ void Server::mode(Client *client)
 
 	if (client->get_arg().size() == 2)
 	{ 
-		if (!(client->get_arg()[1][0] == '+' || client->get_arg()[1][0] == '-' )) // ctrl apparition de lettres
+		if (!(client->get_arg()[1][0] == '+' || client->get_arg()[1][0] == '-' ))
 			return;
 	}
 	if (client->get_arg().size() == 2 && 
-		(client->get_arg()[1][0] == '+' || client->get_arg()[1][0] == '-' )) // ctrl apparition de lettres
+		(client->get_arg()[1][0] == '+' || client->get_arg()[1][0] == '-' ))
 			mode = client->get_arg()[1];
 	if (target[0] == '#')
 		chan_mode(client, target, mode);
