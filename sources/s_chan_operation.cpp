@@ -168,7 +168,6 @@ void Server::mode(Client *client)
 {	
 	std::string target = client->get_arg()[0];
 	std::string mode = client->get_mode()[I];
-	std::cout << "MODE here "<< mode << std::endl;	
 
 	if (client->get_arg().size() == 2)
 	{ 

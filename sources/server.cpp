@@ -107,11 +107,6 @@ bool Server::AcceptSocketClient()
 	return true;
 }
 
-// int Server::getSocketClient()
-// {
-// 	return Client::_socket_client;
-// }
-
 // data from params_________________________________________________________
 
 int Server::getPort()

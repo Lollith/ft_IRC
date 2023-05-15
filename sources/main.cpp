@@ -14,8 +14,6 @@ void sigHandler(int sig)
 
 int main(int ac, char **av)
 {
-	// char *buf;
-
 	if (ac != 3)
 	{
 		std::cout << "need more parameters" <<std::endl;
