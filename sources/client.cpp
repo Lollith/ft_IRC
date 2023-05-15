@@ -390,6 +390,7 @@ void Client::quit(std::string const &)
 
 	// récupere le parametre apres les ´:´ (reason param)
 	size_t pos = 0;
+
 	for (size_t i = 0; i != _arg_registration.size(); i++)
 	{
 		if (_arg_registration[i].find_first_of(':', 0) != std::string::npos)
