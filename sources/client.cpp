@@ -298,7 +298,7 @@ void Client::changeNick(std::string const &old_nick)
 void Client::Nick(std::string const &)
 {
 	std::cout << GREEN_TXT << "here is NICK func" << RESET_TXT << std::endl;
-	if (_arg_registration.empty())
+	if (this->_pass_ok == true && _arg_registration.empty())
 	{
 		setMessage(reply(ERR_NONICKNAMEGIVEN, this));
 		return;
