@@ -217,8 +217,6 @@ bool Server::mySelect(fd_set &rd, fd_set &wr)
 	int select_ready = select(FD_SETSIZE, &rd, &wr, NULL, NULL);
 	if (select_ready == -1)
 	{
-		std::cout << CYAN_TXT << "detect error from select: shutting client, erase chan " << RESET_TXT << std::endl;
-
 		perror("select");
 		if (_flag_keep_loop == false)
 			return false;
@@ -226,8 +224,6 @@ bool Server::mySelect(fd_set &rd, fd_set &wr)
 		{
 			for (size_t i = 0; i < _client.size(); i++)
 			{
-				std::cout << CYAN_TXT << "here, setting flag must shut client for:  " << _client[i]->get_nickname() << RESET_TXT << std::endl;
-
 				_client[i]->setFlagMustShutClient(true);
 			}
 			for (size_t i = 0; i < _channels.size(); i++)
@@ -236,7 +232,6 @@ bool Server::mySelect(fd_set &rd, fd_set &wr)
 			}
 			update();
 		}
-		// here: déclencher le QUIT ? STOP le serveur ou autre
 	}
 	return (true);
 }
@@ -246,18 +241,14 @@ void Server::myrecv(Client *client)
 	char buf[1024] = {0};
 
 	int res_rd = recv(client->getSocketClient(), buf, sizeof(buf), 0);
-	// if (res_rd <= 0)
 	if (res_rd < 0)
 	{
-		std::cout << CYAN_TXT << "recv : " << res_rd << RESET_TXT << std::endl;
-
 		perror("receive client failed");
 		close(client->getSocketClient());
 		return;
 	}
 	else if (res_rd == 0)// ctrl C - nc
 	{
-		std::cout << "HERE JE SET LE FLAG SHUT CLIENT" << std::endl;
 		client->setFlagMustShutClient(true);
 		client->set_arg_0();
 		client->quit("");
@@ -286,7 +277,6 @@ void Server::mysend(Client *client)
 		{
 			perror("send client failed");
 			close(client->getSocketClient());
-			// return false;
 		}
 		client->clearMessage(); // reinitialise le message , sinon boucle
 	}
@@ -296,9 +286,8 @@ void Server::update()
 {
 	for (size_t i = 0; i < _client.size();)
 	{
-		if (_client[i]->getFlagMustShutClient() == true) // boucle
+		if (_client[i]->getFlagMustShutClient() == true)
 		{
-			std::cout << CYAN_TXT << "flag in update: " << _client[i]->get_nickname() << " rentre dans must shut client" << RESET_TXT << std::endl;
 			delete _client[i];
 			_client.erase(_client.begin() + i);
 		}
@@ -325,14 +314,14 @@ bool Server::loop_recept_send()
 	{
 		std::vector<Client *>::iterator it;
 
-		if (mySelect(rd, wr) == false) // conition?
+		if (mySelect(rd, wr) == false)
 			return false;
 
 		if (FD_ISSET(_socket_server, &rd)) // check si notre socket est pret a lire // recoi le client, et ces logs
 		{
 			INFO("=>Accept le nouvel entrant: ");
 			if (AcceptSocketClient() == false)
-				return false; // exit here ? server should not stop?
+				return false;
 		}
 		for (it = _client.begin(); it != _client.end(); it++)
 		{
@@ -340,7 +329,7 @@ bool Server::loop_recept_send()
 
 			if (FD_ISSET(client->getSocketClient(), &rd))
 			{
-				myrecv(client); // ici verif return val?
+				myrecv(client);
 				check_vectors();
 
 				while (client->getCmdLine())
@@ -351,7 +340,6 @@ bool Server::loop_recept_send()
 					{
 						if (client->isAuthenticate() == true)
 							parse_msg_recv(client);
-						// send une error en cas de non registration?
 					}
 				}
 			}

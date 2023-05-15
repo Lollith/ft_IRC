@@ -231,7 +231,6 @@ void Client::checkPassword(std::string const &psswd)
 			this->_pass_ok = true;
 			this->_step_registration += 1;
 			this->_flag_password_ok = true;
-			std::cout << GREEN_TXT << "PASSWORD OK : " << _flag_password_ok << RESET_TXT << std::endl;
 		}
 		else
 		{
@@ -281,7 +280,6 @@ bool Client::checkSameNick()
 	{
 		if ((*_client)[i] != this && (*_client)[i]->get_nickname() == this->_nickname)
 		{
-			std::cout << BLUE_TXT << "differents clients have same nickname" << RESET_TXT << std::endl;
 			setMessage(reply(ERR_NICKNAMEINUSE, this));
 			return true;
 		}
@@ -318,25 +316,20 @@ void Client::Nick(std::string const &)
 	std::cout << "new nickname= " << _nickname << std::endl;
 	if (!NicknameIsValid())
 	{
-		std::cout << BLUE_TXT << "condition nickname not valid should respond" << RESET_TXT << std::endl;
-		std::cout << _nickname << std::endl;
 		setMessage(reply(ERR_ERRONEUSNICKNAME, this));
 		this->_flag_erroneus = true;
-		std::cout << CYAN_TXT << "flag erroneus is in invalid nick" << _flag_erroneus << RESET_TXT << std::endl;
 		if (isAuthenticate())
 			_nickname = old_nick;
 		return;
 	}
 	if (checkSameNick() == true)
 	{
-		std::cout << CYAN_TXT << "here, same nicks == true" << RESET_TXT << std::endl;
 		if (isAuthenticate())
 			_nickname = old_nick; // revenir en  arrière en cas de nick already use
 		return;
 	}
 	if (_nick_ok == false)
 	{
-		std::cout << CYAN_TXT << "rentre ds confirmation registration nick" << _flag_erroneus << RESET_TXT << std::endl;
 		this->_nick_ok = true;
 		this->_step_registration += 1;
 	}
@@ -378,7 +371,6 @@ void Client::checkUser(std::string const &)
 		res += " " + _arg_registration[pos];
 	}
 	this->_realname = res;
-	std::cout << BLUE_TXT << "realname is ->" << _realname << RESET_TXT << std::endl;
 }
 
 void Client::clean_ping_mode(std::string const &)
@@ -444,7 +436,7 @@ void Client::quit(std::string const &)
 	this->_flag_shut_client = true;
 }
 
-void Client::cap(const std::string &) {} // obligee de prendre en compte cvette commande pour ne pas interrompre le traitement des cmd
+void Client::cap(const std::string &) {} // obligee de prendre en compte cette commande pour ne pas interrompre le traitement des cmd
 
 bool Client::checkParams(std::string const &password)
 {
@@ -478,8 +470,6 @@ bool Client::checkParams(std::string const &password)
 		}
 		i++;
 	}
-	DEBUG("sort de check params\n");
-	DEBUG(_cmd_registration);
 	return false;
 }
 
@@ -492,7 +482,7 @@ void Client::Clean_arg()
 
 bool Client::getCmdLine(/*std::string const &password*/)
 {
-	const std::string eol_marker = "\r\n"; // à mettre ds un define?
+	const std::string eol_marker = "\r\n";
 
 	size_t pos;
 	std::string cmd_line;
@@ -504,10 +494,7 @@ bool Client::getCmdLine(/*std::string const &password*/)
 	cmd_line = _message_recv.substr(0, pos);
 	set_arg();
 	tokenization_cmd(cmd_line);
-	// if (checkParams(password) == false)
-	// 	return;
 	_message_recv.erase(_message_recv.begin(), (_message_recv.begin() + pos + eol_marker.length()));
-	// pos = this->_message_recv.find(eol_marker);
 	return true;
 }
 
