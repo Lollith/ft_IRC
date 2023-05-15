@@ -347,10 +347,6 @@ void Client::checkUser(std::string const &)
 {
 	std::cout << GREEN_TXT << "here is USER check func" << RESET_TXT << std::endl;
 
-	if (this->_nick_ok == false) // si nick n'est pas provided avant user : nickname non given
-	{
-		setMessage(reply(ERR_NONICKNAMEGIVEN, this));
-	}
 	if (this->_already_auth == true && this->_flag_password_provided == true)
 	{
 		setMessage(reply(ERR_ALREADYREGISTERED, this));

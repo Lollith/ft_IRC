@@ -75,6 +75,6 @@ std::string Server::append_user_message(Client *client)
 //______________________________TEST CTRLC
 void Server::stop()
 {
-	std::cout << GREEN_TXT << "coucou c'est stop de sighandler" << RESET_TXT << std::endl;
+	// std::cout << GREEN_TXT << "coucou c'est stop de sighandler" << RESET_TXT << std::endl;
 	this->_flag_keep_loop = false;
 }
