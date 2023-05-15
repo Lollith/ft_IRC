@@ -5,20 +5,21 @@
 Client::Client(void) : _flag_erroneus(false), _step_registration(0), _flag_password_ok(false), _flag_password_provided(false),
 					   _flag_shut_client(false), _pass_ok(false), _nick_ok(false), _user_ok(false),
 					   _flag_not_registered(false), _already_auth(false),
-					   _user(""), _nickname(""), _hostname(""), _mode("+i")
+					   _user(""), _nickname(""), _hostname("")
 {
+	_mode[I] = "+";
+	_mode[O] = "-";
 }
 
 Client::Client(int sock_client) : _flag_erroneus(false), _socket_client(sock_client), _step_registration(0), _flag_password_ok(false),
 								  _flag_password_provided(false), _flag_shut_client(false),
 								  _pass_ok(false), _nick_ok(false), _user_ok(false),
 								  _flag_not_registered(false), _already_auth(false),
-								  _user(""), _nickname(""), _hostname(""), _mode("+i")
+								  _user(""), _nickname(""), _hostname("")
 
 {
-	// 	std::cout << "create client" << std::endl;
-	// _chan_ope = false;
-	//
+	_mode[I] = "+";
+	_mode[O] = "-";
 }
 
 Client::Client(Client const &cpy)
@@ -48,7 +49,7 @@ Client &Client::operator=(Client const &rhs)
 		_nickname = rhs._nickname;
 		_hostname = rhs._hostname;
 		_realname = rhs._realname;
-		_mode = rhs._mode;
+		_mode[2] = rhs._mode[2];
 		_arg_registration = rhs._arg_registration;
 		_client = rhs._client;
 		_channels = rhs._channels;
@@ -121,14 +122,17 @@ void Client::setFlagPsswdProvided(bool boolean)
 	this->_flag_password_provided = boolean;
 }
 
-std::string Client::get_mode(void)
+std::string *Client::get_mode(void)
 {
 	return _mode;
 }
 
-void Client::set_mode(std::string mode)
+void Client::set_mode(std::string const &mode)
 {
-	_mode = mode;
+	if (mode == "+i" || mode == "-i")
+		_mode[I] = mode[0]; // recup le + ou -
+	if (mode == "+o" || mode == "-o")
+		_mode[O] = mode[0]; // recup le + ou -
 }
 
 std::vector<std::string> Client::get_arg(void) const

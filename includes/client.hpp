@@ -35,8 +35,8 @@ public:
 	void		 				setFlagPsswdProvided(bool boolean);
 	void				 		setFlagPsswd(bool boolean);
 
-	std::string					get_mode( void );
-	void						set_mode(std::string mode);
+	std::string					*get_mode( void );
+	void						set_mode(std::string const &mode);
 
 	void						setFlagMustShutClient(bool boolean);
 	bool				 		getFlagMustShutClient();
@@ -90,7 +90,7 @@ public:
 	bool 						is_operator(Channel *chan);
 	Channel						*search_chan(std::string chan);
 	
-	bool 					hasalready(Client *client, std::vector<Client *> saveclient);
+	bool 						hasalready(Client *client, std::vector<Client *> saveclient);
 
 private:
 	// useless constructor
@@ -120,7 +120,7 @@ private:
 	std::string					_nickname;
 	std::string					_hostname;
 	std::string					_realname;
-	std::string					_mode; // "+i ou -i"
+	std::string					_mode[2]; // 0 =i, 1= o
 	
 	std::vector<std::string>	_arg_registration;
 	std::vector<Client*>		*_client;
