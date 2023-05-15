@@ -73,7 +73,7 @@ std::string	*Channel::get_mode( void )
 	return _mode;
 }
 
-void Channel::set_mode(std::string mode)
+void Channel::set_mode(std::string &mode)
 {
 	if (mode == "+i" || mode == "-i")
 		_mode[I] = mode[0]; // recup le + ou -
