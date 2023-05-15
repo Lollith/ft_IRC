@@ -391,6 +391,7 @@ void Client::quit(std::string const &)
 	// récupere le parametre apres les ´:´ (reason param)
 	size_t pos = 0;
 
+
 	for (size_t i = 0; i != _arg_registration.size(); i++)
 	{
 		if (_arg_registration[i].find_first_of(':', 0) != std::string::npos)
@@ -399,11 +400,15 @@ void Client::quit(std::string const &)
 	res = _arg_registration[pos];
 	if (_arg_registration.size() > 1)
 	{
-		pos++;
+		pos++; 
 		for (; pos != _arg_registration.size(); pos++)
 		{
 			res += " " + _arg_registration[pos];
 		}
+	}
+	else if (_arg_registration.empty())
+	{
+		res = " :Leaving";
 	}
 	quit_reason = res;
 
