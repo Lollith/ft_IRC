@@ -134,7 +134,6 @@ std::string reply (int reply, Client *client)
 	{
 		case RPL_UMODEIS:
 			mymode = client->get_mode()[I] + "i" + client->get_mode()[O] + "o";
-			std::cout << "here : "<<client->get_mode()[O] << std::endl;
 			msg = "221 " + client->get_nickname() + " " + mymode + "\r\n";
 			break;
 		case ERR_ERRONEUSNICKNAME:
