@@ -261,14 +261,15 @@ bool Client::NicknameIsValid()
 	if (_nickname.length() >= 30)
 		return false;
 
-	if (_nickname.find(' ') != std::string::npos || _nickname.find(',') != std::string::npos || _nickname.find('.') != std::string::npos || _nickname.find('*') != std::string::npos || _nickname.find('?') != std::string::npos || _nickname.find('!') != std::string::npos || _nickname.find('@') != std::string::npos || _nickname.empty())
+	if (_nickname.find(' ') != std::string::npos || _nickname.find(',') != std::string::npos 
+		|| _nickname.find('.') != std::string::npos || _nickname.find('*') != std::string::npos 
+		|| _nickname.find('?') != std::string::npos || _nickname.find('!') != std::string::npos 
+		|| _nickname.find('@') != std::string::npos || _nickname.empty())
 	{
 		return false;
 	}
 	if (_nickname[0] == '$' || _nickname[0] == ':' || _nickname[0] == '#' || _nickname[0] == '&')
-	{
 		return false;
-	}
 	else
 		return true;
 }
@@ -375,7 +376,8 @@ void Client::checkUser(std::string const &)
 
 void Client::clean_ping_mode(std::string const &)
 {
-	std::string msg = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " PONG " + this->_arg_registration.back() + "\r\n";
+	std::string msg = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() 
+		+ " PONG " + this->_arg_registration.back() + "\r\n";
 	setMessage(msg);
 }
 
@@ -390,7 +392,6 @@ void Client::quit(std::string const &)
 
 	// récupere le parametre apres les ´:´ (reason param)
 	size_t pos = 0;
-
 
 	for (size_t i = 0; i != _arg_registration.size(); i++)
 	{
@@ -413,9 +414,11 @@ void Client::quit(std::string const &)
 	quit_reason = res;
 
 	self_rpl += "ERROR: Server closing a client connection\r\n";
-	self_rpl += ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "Quit " + quit_reason + "\r\n";
+	self_rpl += ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() 
+		+ " QUIT :" + "Quit " + quit_reason + "\r\n";
 	setMessage(self_rpl);
-	broadcast_rpl += ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " QUIT :" + "Quit " + quit_reason + "\r\n";
+	broadcast_rpl += ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() 
+		+ " QUIT :" + "Quit " + quit_reason + "\r\n";
 	std::vector<Channel *>::iterator it_chan;
 	for (it_chan = this->_channels->begin(); it_chan != _channels->end(); it_chan++)
 	{
@@ -551,7 +554,9 @@ void Client::authenticationValid()
 {
 	if (isAuthenticate() && _already_auth == false)
 	{
-		std::string buffer = ":" + get_nickname() + "!" + get_user() + "@" + get_hostname() + " 001 " + get_nickname() + " :Welcome to the " + _hostname + " Network " + _nickname + "!" + _user + "@" + _hostname + "\r\n";
+		std::string buffer = ":" + get_nickname() + "!" + get_user() + "@" + 
+			get_hostname() + " 001 " + get_nickname() + " :Welcome to the " + 
+			_hostname + " Network " + _nickname + "!" + _user + "@" + _hostname + "\r\n";
 		_message.setBuffer(buffer);
 		_already_auth = true;
 	}

@@ -167,7 +167,4 @@ void Channel::check_vctor(Client *client)
 	std::vector<Client *>::iterator it_client;
 	for (it_client = _clients.begin(); it_client != _clients.end(); it_client++) // ici si remplace _clients par getClients())
 	std::cout <<std::endl;
-// 	std::vector<Channel*>::iterator it2_chan;
-// 	for (it2_chan = client->get_chan_ope().begin(); it2_chan != client->get_chan_ope().end(); it2_chan++)// ici si remplace _clients par getClients())
-// 		DEBUG (client->get_nickname()<<" is operator of chan "<< (*it2_chan)->getName()<< std::endl);
 }
