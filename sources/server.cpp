@@ -107,11 +107,6 @@ bool Server::AcceptSocketClient()
 	return true;
 }
 
-// int Server::getSocketClient()
-// {
-// 	return Client::_socket_client;
-// }
-
 // data from params_________________________________________________________
 
 int Server::getPort()
@@ -237,14 +232,8 @@ bool Server::mySelect(fd_set &rd, fd_set &wr)
 			}
 			update();
 		}
-		// here: déclencher le QUIT ? STOP le serveur ou autre
 	}
 	return (true);
-	// else if (select_ready == 0) //utile?
-	// {
-	// 	std::cout <<"timeout"<< std::endl;
-	// 	continue;
-	// }
 }
 
 void Server::myrecv(Client *client)
@@ -252,12 +241,20 @@ void Server::myrecv(Client *client)
 	char buf[1024] = {0};
 
 	int res_rd = recv(client->getSocketClient(), buf, sizeof(buf), 0);
-	if (res_rd <= 0)
+	if (res_rd < 0)
 	{
 		perror("receive client failed");
 		close(client->getSocketClient());
 		return;
 	}
+	else if (res_rd == 0)// ctrl C - nc
+	{
+		client->setFlagMustShutClient(true);
+		client->set_arg_0();
+		client->quit("");
+		return;
+	}
+	
 	if (buf[0])
 	{
 		INFO("=>Recois un message depuis le client "
@@ -280,7 +277,6 @@ void Server::mysend(Client *client)
 		{
 			perror("send client failed");
 			close(client->getSocketClient());
-			// return false;
 		}
 		client->clearMessage(); // reinitialise le message , sinon boucle
 	}
@@ -325,7 +321,7 @@ bool Server::loop_recept_send()
 		{
 			INFO("=>Accept le nouvel entrant: ");
 			if (AcceptSocketClient() == false)
-				return false; // exit here ? server should not stop?
+				return false;
 		}
 		for (it = _client.begin(); it != _client.end(); it++)
 		{
@@ -335,15 +331,17 @@ bool Server::loop_recept_send()
 			{
 				myrecv(client);
 				check_vectors();
-				if (!client->getMsgRecv().empty() && (*(client->getMsgRecv().end() - 1) == '\n'))
+
+				while (client->getCmdLine())
 				{
 					client->setVectorClient(&_client);
 					client->setVectorChan(&_channels);
-					client->getCmdLine(_password);
-					parse_msg_recv(client, client->getMsgRecvSave());
+					if (client->checkParams(_password) == false)
+					{
+						if (client->isAuthenticate() == true)
+							parse_msg_recv(client);
+					}
 				}
-				else
-					break; // à voir s'il faut modifier
 			}
 			if (FD_ISSET(client->getSocketClient(), &wr)) // check si notre socket est pret a ecrire
 				mysend(client);

@@ -62,6 +62,7 @@ Utiliser n'importe quel port au dessus de 1024 jusqu'à 65535.
  ## COMMANDES
 
 ### mode
+- info mode: ```/mode target```
 - mode user initialised : ```+i``` 
 - user mode : ```i```
 - chan mode : ```i```/```s```/```t```

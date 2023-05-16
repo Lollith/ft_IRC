@@ -7,7 +7,10 @@ void Client::deleteOperator(Channel *chan)
 	while( it != _chan_ope.end())
 	{
 		if ((*it)->getName() == chan->getName())
+		{
 			_chan_ope.erase(it);
+			this->set_mode("-o");
+		}
 		else
 			it++;
 	}
@@ -28,6 +31,7 @@ std::vector<Channel*> Client::get_chan_ope(void) const
 void Client::add_chan_ope( Channel *chan )
 {
 	_chan_ope.push_back(chan);
+	this->set_mode("+o");
 }
 
 Channel* Client::search_chan(std::string chan)

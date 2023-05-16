@@ -32,7 +32,7 @@ std::string reply (int reply, Client *client, Channel *channel)
 		case RPL_NAMREPLY:
 			for (size_t  i = 0; i < channel->getClients().size(); i++)
 			{
-					if (channel->getClients()[i]->get_mode() == "+i" && !channel->has_clients(client))
+					if (channel->getClients()[i]->get_mode()[I] == "+i" && !channel->has_clients(client))
 						name += "";
 					else
 						name += channel->getClients()[i]->get_nickname()+ " ";
@@ -128,11 +128,13 @@ std::string reply (int reply, Client *client, std::string target, std::string ne
 std::string reply (int reply, Client *client)
 {
 	std::string msg;
+	std::string mymode;
 
 	switch(reply)
 	{
 		case RPL_UMODEIS:
-			msg = "221 " + client->get_nickname() + " " + client->get_mode() + "\r\n";
+			mymode = client->get_mode()[I] + "i" + client->get_mode()[O] + "o";
+			msg = "221 " + client->get_nickname() + " " + mymode + "\r\n";
 			break;
 		case ERR_ERRONEUSNICKNAME:
 			msg = "432 " + client->get_nickname() + " " + client->get_nickname() + " :Erroneus nickname\r\n";

@@ -83,9 +83,10 @@ enum reply_code
 
 enum modes
 {
-	I,
-	S,
-	T
+	I = 0,
+	S = 1,
+	O = 1,
+	T = 2
 };
 
 std::string reply (int reply, Client *client);

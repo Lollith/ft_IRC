@@ -2,23 +2,24 @@
 
 //__________________________________________________canonic form
 
-Client::Client(void) : _step_registration(0), _flag_password_ok(false), _flag_password_provided(false),
+Client::Client(void) : _flag_erroneus(false), _step_registration(0), _flag_password_ok(false), _flag_password_provided(false),
 					   _flag_shut_client(false), _pass_ok(false), _nick_ok(false), _user_ok(false),
 					   _flag_not_registered(false), _already_auth(false),
-					   _user(""), _nickname(""), _hostname(""), _mode("+i")
+					   _user(""), _nickname(""), _hostname("")
 {
+	_mode[I] = "+";
+	_mode[O] = "-";
 }
 
-Client::Client(int sock_client) :_socket_client(sock_client), _step_registration(0), _flag_password_ok(false),
+Client::Client(int sock_client) : _flag_erroneus(false), _socket_client(sock_client), _step_registration(0), _flag_password_ok(false),
 								  _flag_password_provided(false), _flag_shut_client(false),
 								  _pass_ok(false), _nick_ok(false), _user_ok(false),
 								  _flag_not_registered(false), _already_auth(false),
-								  _user(""), _nickname(""), _hostname(""), _mode("+i")
+								  _user(""), _nickname(""), _hostname("")
 
 {
-	// 	std::cout << "create client" << std::endl;
-	// _chan_ope = false;
-	//
+	_mode[I] = "+";
+	_mode[O] = "-";
 }
 
 Client::Client(Client const &cpy)
@@ -44,11 +45,11 @@ Client &Client::operator=(Client const &rhs)
 		_message_recv = rhs._message_recv;
 		_message_recv_save = rhs._message_recv_save;
 		_cmd_registration = rhs._cmd_registration;
-		_user =rhs._user;
+		_user = rhs._user;
 		_nickname = rhs._nickname;
 		_hostname = rhs._hostname;
 		_realname = rhs._realname;
-		_mode = rhs._mode;
+		_mode[2] = rhs._mode[2];
 		_arg_registration = rhs._arg_registration;
 		_client = rhs._client;
 		_channels = rhs._channels;
@@ -121,14 +122,17 @@ void Client::setFlagPsswdProvided(bool boolean)
 	this->_flag_password_provided = boolean;
 }
 
-std::string Client::get_mode(void)
+std::string *Client::get_mode(void)
 {
 	return _mode;
 }
 
-void Client::set_mode(std::string mode)
+void Client::set_mode(std::string const &mode)
 {
-	_mode = mode;
+	if (mode == "+i" || mode == "-i")
+		_mode[I] = mode[0]; // recup le + ou -
+	if (mode == "+o" || mode == "-o")
+		_mode[O] = mode[0]; // recup le + ou -
 }
 
 std::vector<std::string> Client::get_arg(void) const
@@ -141,6 +145,11 @@ void Client::set_arg(void)
 	std::vector<std::string>::iterator it = _arg_registration.begin();
 	while (it != _arg_registration.end())
 		_arg_registration.erase(it);
+}
+
+void Client::set_arg_0(void)
+{
+	_arg_registration[0] = "connexion lost";
 }
 
 std::string Client::get_cmd(void) const
@@ -222,7 +231,6 @@ void Client::checkPassword(std::string const &psswd)
 			this->_pass_ok = true;
 			this->_step_registration += 1;
 			this->_flag_password_ok = true;
-			std::cout << GREEN_TXT << "PASSWORD OK : " << _flag_password_ok << RESET_TXT << std::endl;
 		}
 		else
 		{
@@ -272,7 +280,6 @@ bool Client::checkSameNick()
 	{
 		if ((*_client)[i] != this && (*_client)[i]->get_nickname() == this->_nickname)
 		{
-			std::cout << BLUE_TXT << "differents clients have same nickname" << RESET_TXT << std::endl;
 			setMessage(reply(ERR_NICKNAMEINUSE, this));
 			return true;
 		}
@@ -298,10 +305,9 @@ void Client::changeNick(std::string const &old_nick)
 void Client::Nick(std::string const &)
 {
 	std::cout << GREEN_TXT << "here is NICK func" << RESET_TXT << std::endl;
-	if (_arg_registration.empty())
+	if (this->_pass_ok == true && _arg_registration.empty())
 	{
 		setMessage(reply(ERR_NONICKNAMEGIVEN, this));
-		_flag_shut_client = true;
 		return;
 	}
 	std::string old_nick = _nickname;
@@ -310,15 +316,14 @@ void Client::Nick(std::string const &)
 	std::cout << "new nickname= " << _nickname << std::endl;
 	if (!NicknameIsValid())
 	{
-		std::cout << BLUE_TXT << "condition nickname not valid should respond" << RESET_TXT << std::endl;
-		std::cout << _nickname << std::endl;
 		setMessage(reply(ERR_ERRONEUSNICKNAME, this));
-		_flag_shut_client = true;
+		this->_flag_erroneus = true;
+		if (isAuthenticate())
+			_nickname = old_nick;
 		return;
 	}
 	if (checkSameNick() == true)
 	{
-		std::cout << CYAN_TXT << "here, same nicks == true" << RESET_TXT << std::endl;
 		if (isAuthenticate())
 			_nickname = old_nick; // revenir en  arrière en cas de nick already use
 		return;
@@ -366,7 +371,6 @@ void Client::checkUser(std::string const &)
 		res += " " + _arg_registration[pos];
 	}
 	this->_realname = res;
-	std::cout << BLUE_TXT << "realname is ->" << _realname << RESET_TXT << std::endl;
 }
 
 void Client::clean_ping_mode(std::string const &)
@@ -384,9 +388,10 @@ void Client::quit(std::string const &)
 	std::string self_rpl;
 	std::vector<Client *> saveclient;
 
-
 	// récupere le parametre apres les ´:´ (reason param)
 	size_t pos = 0;
+
+
 	for (size_t i = 0; i != _arg_registration.size(); i++)
 	{
 		if (_arg_registration[i].find_first_of(':', 0) != std::string::npos)
@@ -395,11 +400,15 @@ void Client::quit(std::string const &)
 	res = _arg_registration[pos];
 	if (_arg_registration.size() > 1)
 	{
-		pos++;
+		pos++; 
 		for (; pos != _arg_registration.size(); pos++)
 		{
 			res += " " + _arg_registration[pos];
 		}
+	}
+	else if (_arg_registration.empty())
+	{
+		res = " :Leaving";
 	}
 	quit_reason = res;
 
@@ -416,12 +425,11 @@ void Client::quit(std::string const &)
 			std::vector<Client *>::iterator it_client;
 			for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
 			{
-				if (*it_client != this && !hasalready(*it_client, saveclient))// do not send the message channels times to this
+				if (*it_client != this && !hasalready(*it_client, saveclient)) // do not send the message channels times to this
 				{
 					saveclient.push_back(*it_client);
 					(*it_client)->setMessage(broadcast_rpl);
 				}
-				
 			}
 			((*it_chan)->deleteClientFromChan(this));
 			(this)->deleteOperator(*it_chan);
@@ -434,28 +442,28 @@ void Client::quit(std::string const &)
 	this->_flag_shut_client = true;
 }
 
-void Client::checkParams(std::string const &password)
+void Client::cap(const std::string &) {} // obligee de prendre en compte cette commande pour ne pas interrompre le traitement des cmd
+
+bool Client::checkParams(std::string const &password)
 {
-	int i = 0;
-	int nb_func = 5;
+	unsigned int i = 0;
 	std::string rpl;
 
 	void (Client::*func_list[])(std::string const &arg) =
-		{&Client::checkPassword, &Client::Nick, &Client::checkUser,
+		{&Client::cap, &Client::checkPassword, &Client::Nick, &Client::checkUser,
 		 &Client::clean_ping_mode, &Client::quit};
-	std::string cmd_to_check[] = {"PASS", "NICK", "USER", "PING", "QUIT"};
-	while (i < nb_func)
+	std::string cmd_to_check[] = {"CAP", "PASS", "NICK", "USER", "PING", "QUIT"};
+	while (i < (sizeof(func_list) / sizeof(*func_list))) // calcul le nombre d'element d'un tableau present SUR LA STACK (only)
 	{
 		if (_cmd_registration == cmd_to_check[i])
 		{
-			if (i > 0 && _flag_password_provided == false && _flag_not_registered == false)
+			if (i > 1 && _flag_password_provided == false && _flag_not_registered == false)
 			{
 				rpl = reply(ERR_NOTREGISTERED, this);
 				rpl += "ERROR: Server closing a client connection because need registration.\r\n";
 				setMessage(rpl);
 				_flag_shut_client = true;
 				_flag_not_registered = true;
-				break;
 			}
 			else
 			{
@@ -463,11 +471,12 @@ void Client::checkParams(std::string const &password)
 				(this->*(func_list[i]))(password);
 				if (before_step != this->_step_registration)
 					this->authenticationValid();
-				break;
 			}
+			return true;
 		}
 		i++;
 	}
+	return false;
 }
 
 void Client::Clean_arg()
@@ -477,23 +486,22 @@ void Client::Clean_arg()
 		_arg_registration.erase(it);
 }
 
-void Client::getCmdLine(std::string const &password)
+bool Client::getCmdLine(/*std::string const &password*/)
 {
-	const std::string eol_marker = "\r\n"; // à mettre ds un define?
+	const std::string eol_marker = "\r\n";
 
 	size_t pos;
 	std::string cmd_line;
 
 	pos = this->_message_recv.find(eol_marker);
-	while (pos != std::string::npos)
-	{
-		cmd_line = _message_recv.substr(0, pos);
-		set_arg();
-		tokenization_cmd(cmd_line);
-		checkParams(password);
-		_message_recv.erase(_message_recv.begin(), (_message_recv.begin() + pos + eol_marker.length()));
-		pos = this->_message_recv.find(eol_marker);
-	}
+	if (pos == std::string::npos)
+		return false;
+
+	cmd_line = _message_recv.substr(0, pos);
+	set_arg();
+	tokenization_cmd(cmd_line);
+	_message_recv.erase(_message_recv.begin(), (_message_recv.begin() + pos + eol_marker.length()));
+	return true;
 }
 
 bool Client::hasalready(Client *client, std::vector<Client *> saveclient)
@@ -520,7 +528,7 @@ void Client::broadcaster(std::string const &reply)
 			std::vector<Client *>::iterator it_client;
 			for (it_client = vectclients.begin(); it_client != vectclients.end(); it_client++)
 			{
-				if (*it_client != this && !hasalready(*it_client, saveclient))// do not send the message channels times to this
+				if (*it_client != this && !hasalready(*it_client, saveclient)) // do not send the message channels times to this
 				{
 					(*it_client)->setMessage(reply);
 					saveclient.push_back(*it_client);

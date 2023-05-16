@@ -1,6 +1,6 @@
 #include "irc.hpp"
 
-void Server::parse_msg_recv(Client *client, std::string msg_recv)
+void Server::parse_msg_recv(Client *client)
 {
 	int nb_fct = 10;
 	std::string funct_names[] = {
@@ -29,7 +29,7 @@ void Server::parse_msg_recv(Client *client, std::string msg_recv)
 
 	for (int i = 0; i < nb_fct; i++)
 	{
-		if (msg_recv.find(funct_names[i]) != std::string::npos)
+		if (funct_names[i] == client->get_cmd())
 		{
 			(this->*fct_member[i])(client);
 			client->set_arg();
@@ -167,14 +167,15 @@ void Server::topic(Client *client)
 void Server::mode(Client *client)
 {	
 	std::string target = client->get_arg()[0];
-	std::string mode = client->get_mode();
+	std::string mode = client->get_mode()[I];
 
+	if (client->get_arg().size() == 2)
+	{ 
+		if (!(client->get_arg()[1][0] == '+' || client->get_arg()[1][0] == '-' ))
+			return;
+	}
 	if (client->get_arg().size() == 2 && 
-		(client->get_arg()[1][0] != '+' ||client->get_arg()[1][0] != '-' )) // ctrl apparition de lettres
-		return;
-	
-	if (client->get_arg().size() == 2 && 
-		(client->get_arg()[1][0] == '+' ||client->get_arg()[1][0] == '-' )) // ctrl apparition de lettres
+		(client->get_arg()[1][0] == '+' || client->get_arg()[1][0] == '-' ))
 			mode = client->get_arg()[1];
 	if (target[0] == '#')
 		chan_mode(client, target, mode);
@@ -217,7 +218,6 @@ void Server::user_mode(Client *client, std::string &target, std::string &mode)
 		return(client->setMessage(reply(ERR_USERSDONTMATCH, client)));
 	if (client->get_arg().size() < 2)
 		return(client->setMessage(reply (RPL_UMODEIS, client)));	
-	
 	if (mode == "+i" || mode == "-i")
 	{
 		client->set_mode(mode);
@@ -259,12 +259,12 @@ void Server::list(Client *client)
 {
 	std::string msg;
 
-	if (client->get_arg().size() == 0)
+	if (client->get_arg().size() == 0 || client->get_arg()[0] == "") // protege nc et irssi
 	{
 		msg += reply(RPL_LISTSTART, client, "");
 		for (size_t i = 0; i < _channels.size(); i++)
 		{
-			if (_channels[i]->get_mode()[S] == "-")
+			if (_channels[i]->get_mode()[S] == "-" || _channels[i]->has_clients(client))
 				msg += reply(RPL_LIST, client, _channels[i]);
 		}
 		msg += reply(RPL_LISTEND, client, "");
@@ -307,9 +307,9 @@ void Server::invite(Client *client)
 	std::string msg = reply( RPL_INVITING, client, chan->getName());
 	client->setMessage(msg);
 	chan->set_invite(new_target);
-	std::string invite_msg = ":"+ new_target->get_nickname() + "@" + 
-		new_target->get_hostname() + " INVITE " + new_target->get_nickname()+ 
-		" " +chan->getName() + "\r\n";
+	std::string invite_msg = ":"+ client->get_nickname() + "@" + 
+		client->get_hostname() + " INVITE " + new_target->get_nickname()+ 
+		" " + chan->getName() + "\r\n";
 	new_target->setMessage(invite_msg);
 	return;
 }

@@ -35,14 +35,15 @@ public:
 	void		 				setFlagPsswdProvided(bool boolean);
 	void				 		setFlagPsswd(bool boolean);
 
-	std::string					get_mode( void );
-	void						set_mode(std::string mode);
+	std::string					*get_mode( void );
+	void						set_mode(std::string const &mode);
 
 	void						setFlagMustShutClient(bool boolean);
 	bool				 		getFlagMustShutClient();
 
 	void 						set_arg( void );
 	std::vector<std::string>  	get_arg( void ) const;
+	void						set_arg_0(void);
 	
 	std::string					get_cmd( void ) const;
 	
@@ -58,16 +59,17 @@ public:
 	//__________________________________________________MEMBERS
 	// dans cette fonction split du buf pour récuperer une pair commande - argument
 	void 						tokenization_cmd( std::string& cmd_line );
-	void 						getCmdLine( std::string const& password );
+	bool 						getCmdLine(/* std::string const& password */);
 
 	//here fonctions qui vont check d'éventuelles d'erreurs et construire un objet
 	// Conncexioin pour envoyer la réponse adéquate
-	void 						checkParams( std::string const& password );
+	bool 						checkParams( std::string const& password );
 	void						ignoreCap( std::string const& );
 	void						checkPassword( std::string const& password );
 	bool						NicknameIsValid();
 	void						Nick(std::string const&);
 	bool						checkNick();
+	void						cap(std::string const&);
 	bool						checkSameNick();
 	void						changeNick(std::string const& old_nick);
 	void						checkUser( std::string const& );
@@ -89,7 +91,7 @@ public:
 	bool 						is_operator(Channel *chan);
 	Channel						*search_chan(std::string chan);
 	
-	bool 					hasalready(Client *client, std::vector<Client *> saveclient);
+	bool 						hasalready(Client *client, std::vector<Client *> saveclient);
 
 private:
 	// useless constructor
@@ -101,6 +103,7 @@ private:
 
 
 	// Client	_client_data;	//données à récupérer et à stocker ? container: set ?
+	bool						_flag_erroneus;
 	int 						_socket_client;
 	int							_step_registration; //compteur des étapes d'authentification
 	bool						_flag_password_ok;
@@ -118,12 +121,13 @@ private:
 	std::string					_nickname;
 	std::string					_hostname;
 	std::string					_realname;
-	std::string					_mode; // "+i ou -i"
+	std::string					_mode[2]; // 0 =i, 1= o
 	
 	std::vector<std::string>	_arg_registration;
 	std::vector<Client*>		*_client;
 	std::vector<Channel*>		*_channels;
 	std::vector <Channel *>		_chan_ope;
+
 
 };
 

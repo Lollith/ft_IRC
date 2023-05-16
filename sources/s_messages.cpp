@@ -40,7 +40,8 @@ void Server::privmsg_to_chan(Client *client, std::string &priv_notice, std::stri
 		std::cout<<(*it_chan)->getName()<<std::endl;
 		if ((*it_chan)->getName() == target)
 		{
-			std::string message = ":" + client->get_nickname() + priv_notice +
+			std::string nickname = client->get_nickname();
+			std::string message = ":" +  nickname +"!" + client->get_user()+ "@" + client->get_hostname() + priv_notice +
 				 target + " " + msg + "\r\n";
 			size_t i = 0;
 			while (i!= (*it_chan)->getClients().size()) //broadcast the messag
@@ -67,9 +68,10 @@ void Server::privmg_to_client(Client *client, std::string &priv_notice, std::str
 	std::vector<Client*>::iterator it_client;	
 	for (it_client = _client.begin(); it_client != _client.end(); it_client++)
 	{
+		std::string nickname = client->get_nickname();
 		if ((*it_client)->get_nickname() == target)
 		{
-			std::string message = ":" + client->get_nickname() + priv_notice + 
+			std::string message = ":" + nickname +"!" + client->get_user() + "@" + client->get_hostname() + priv_notice + 
 				(*it_client)->get_nickname() + " " + msg + "\r\n";
 			(*it_client)->setMessage(message);
 			_flag_notice = false;
