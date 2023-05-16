@@ -32,7 +32,7 @@ std::string reply (int reply, Client *client, Channel *channel)
 		case RPL_NAMREPLY:
 			for (size_t  i = 0; i < channel->getClients().size(); i++)
 			{
-					if (channel->getClients()[i]->get_mode()[I] == "+i" && !channel->has_clients(client))
+					if (channel->getClients()[i]->get_mode()[I] == "+" && !channel->has_clients(client))
 						name += "";
 					else
 						name += channel->getClients()[i]->get_nickname()+ " ";
